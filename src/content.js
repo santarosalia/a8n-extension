@@ -13,13 +13,14 @@ class CapturedEvent {
 
 
 const capture = (ev) => {
-    console.log(ev.type)
+    console.log(ev)
     const e = new CapturedEvent(ev.type,ev.target);
  
     if (e.type !== 'mousemove') {
-        chrome.storage.local.get(['Record']).then(result => {
-            const list = [...result.Record,e];
-            chrome.storage.local.set({Record : list});
+        chrome.storage.local.get(['WD_CRX_RECORD']).then(result => {
+            console.log(result)
+            const list = [...result['WD_CRX_RECORD'],e];
+            chrome.storage.local.set({'WD_CRX_RECORD' : list});
             console.log(list);
         });
     }
