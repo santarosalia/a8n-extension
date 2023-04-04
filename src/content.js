@@ -1,25 +1,17 @@
-class CapturedEvent {
-    constructor (type,target) {
-        this.type = type;
-        this.id = target.id;
-        this.class = target.classList ? Array.from(target.classList) : null;
-        this.name = target.name;
+import CapturedEvent from './js/CapturedEvent'
 
 
-        
-
-    }
-}
-
-
-const capture = (ev) => {
-    console.log(ev)
+const captureEvent = (ev) => {
     const e = new CapturedEvent(ev.type,ev.target);
  
     if (e.type !== 'mousemove') {
         chrome.storage.local.get(['WD_CRX_RECORD']).then(result => {
-            console.log(result)
-            const list = [...result['WD_CRX_RECORD'],e];
+            
+            const WD_CRX_RECORD = result['WD_CRX_RECORD'];
+
+            if (e.type === 'scroll' && WD_CRX_RECORD[WD_CRX_RECORD.length-1].type === 'scroll') WD_CRX_RECORD.pop();
+
+            const list = [...result['WD_CRX_RECORD'], e];
             chrome.storage.local.set({'WD_CRX_RECORD' : list});
             console.log(list);
         });
@@ -27,8 +19,8 @@ const capture = (ev) => {
     
     
 }
-window.addEventListener('click', capture);
-window.addEventListener('scroll', capture);
-window.addEventListener('input', capture);
-window.addEventListener('mousemove', capture);
-window.addEventListener('select', capture);
+window.addEventListener('click', captureEvent);
+window.addEventListener('scroll', captureEvent);
+window.addEventListener('input', captureEvent);
+window.addEventListener('mousemove', captureEvent);
+window.addEventListener('select', captureEvent);

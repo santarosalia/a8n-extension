@@ -1,14 +1,16 @@
 <template>
   <v-container>
-    {{ d }}
+    <div v-for="item in d">
+      {{ item.type }}
+    </div>
     <v-btn></v-btn>
+    dd
   </v-container>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-const d = ref('');
-chrome.storage.local.get(['WD_CRX_RECORD']).then(result => {
-  d.value = result['WD_CRX_RECORD'];
-})
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
+const store = useStore();
+const d = computed(()=> store.getters['getRecord']);
 </script>

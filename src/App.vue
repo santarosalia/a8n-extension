@@ -2,7 +2,6 @@
   <v-app>
     <v-main>
       <RouterView/>
-      <!-- <RecordingHistory></RecordingHistory> -->
     </v-main>
   </v-app>
 </template>
