@@ -222,11 +222,9 @@ export default class CapturedEvent {
                 frameStack.push(fe.getAttribute('id') ? fe.getAttribute('id') : fe.getAttribute('name'));
                 fe = fe.contentWindow.parent.frameElement;
             }
-            console.log(frameStack);
             return frameStack;
         } catch (e) {
 
         }
-
     }
 }
