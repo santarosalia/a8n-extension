@@ -2,6 +2,9 @@
   <v-container>
     <div v-for="item in d">
       {{ item.type }}
+      {{ item.xpath }}
+      {{ item.cssSelector }}
+      {{ item.value }}
     </div>
     <v-btn></v-btn>
     dd
