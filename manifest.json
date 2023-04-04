@@ -1,0 +1,35 @@
+{
+    "manifest_version": 3,
+    "name": "CRXJS Vue Vite Example",
+    "version": "1.0.0",
+    "action": { "default_popup": "index.html" },
+    "background" : {
+        "service_worker" : "src/sw.js",
+        "type" : "module"
+    },
+    "content_scripts": [
+        {
+          "matches": ["*://*/*"],
+          "js":["src/content.js"],
+          "match_origin_as_fallback": true,
+          "all_frames" : true
+        }
+    ],
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "unlimitedStorage",
+        "storage",
+        "contextMenus",
+        "webNavigation",
+        "scripting",
+        "notifications"
+    ],
+    "externally_connectable": {
+        "matches": [
+          "*://localhost/*",
+          "*://*.digitalworker.co.kr/*",
+          "*://10.0.1.112/*"
+      ]
+    }
+}
