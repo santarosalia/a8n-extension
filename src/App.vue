@@ -7,8 +7,7 @@
   </v-app>
 </template>
 
-<script setup>
-import RecordingHistory from './components/RecordingHistory.vue';
+<script lang="ts" setup>
 import TopBar from './components/TopBar.vue';
 import { useStore } from 'vuex'
 

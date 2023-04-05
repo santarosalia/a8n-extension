@@ -6,22 +6,18 @@
     </v-card>
 </template>
   
-<script setup>
-import { ref, computed } from 'vue'
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router';
-import CrxConstants from '@/js/constants/CrxConstants.js';
+<script lang="ts" setup>
+    import { ref } from 'vue'
+    import { useRouter } from 'vue-router';
+    import CrxConstants from '@/js/constants/CrxConstants.js';
+    import { TopbarMenu } from '@/ts/interface/CrxInterface';
 
-const store = useStore();
-const router = useRouter();
-const topbarMenu = CrxConstants.topbarMenu;
-const tab = ref(null);
+    const router = useRouter();
+    const topbarMenu = CrxConstants.topbarMenu;
+    const tab = ref(null);
 
-const pushRouter = (menu) => {
-    console.log(menu.path)
-    router.push(menu.path);
-}
-
-
+    const pushRouter = (menu : TopbarMenu) => {
+        router.push(menu.path);
+    }
 </script>
   

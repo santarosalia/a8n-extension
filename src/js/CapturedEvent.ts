@@ -1,11 +1,36 @@
+import { CapturedEventDetails } from "@/ts/interface/CrxInterface";
+import { AreaHTMLAttributes } from "vue";
+
 export default class CapturedEvent {
-    constructor (details) {
+    index : number;
+    type : string;
+    id : string;
+    class : string[];
+    name : string;
+    value : string;
+    xpath : string;
+    fullXpath : string;
+    linkTextXpath : string;
+    cssSelector : string;
+    frameStack : string[];
+    x : number;
+    y : number;
+    pageX : number;
+    pageY : number;
+    clientX : number;
+    clientY : number;
+    ctrlKey : boolean;
+    shiftKey : boolean;
+    scrollX : number;
+    scrollY : number;
+
+    constructor (details : CapturedEventDetails) {
         this.index = details.index;
         this.type = details.type;
         this.id = details.target.id;
         this.class = details.target.classList ? Array.from(details.target.classList) : null;
-        this.name = details.target.name;
-        this.value = details.target.value;
+        this.name = details.target.getAttribute('name');
+        this.value = details.target.getAttribute('value');
         this.xpath = this.getXPath(details.target);
         this.fullXpath = this.getFullXpath(details.target);
         this.linkTextXpath = this.getLinkText(details.target);
@@ -23,7 +48,7 @@ export default class CapturedEvent {
         this.scrollY = window.scrollY;
     }
 
-    getXPath(el) {
+    getXPath(el : Element) {
         try {
             let nodeElem = el;
             let isFlexibleXpath = /^-?\d+$/.test(nodeElem.id.slice(-1)); // 마지막 두자리가 숫자일경우 가변될 xpath라고 판단하기 위한 변수
@@ -69,7 +94,11 @@ export default class CapturedEvent {
                 } else {
                     parts.push(prefix + nodeElem.localName + nth);
                 }
-    
+                if (typeof nodeElem.parentNode == "string") {
+                    nodeElem = nodeElem.parentNode;
+                } else {
+                    nodeElem = null;
+                }
                 nodeElem = nodeElem.parentNode;
             }
             return parts.length ? '/' + parts.reverse().join('/') : '';
@@ -78,12 +107,13 @@ export default class CapturedEvent {
         }
     }
 
-    getFullXpath(element){
+    getFullXpath(element : HTMLElement) {
         try {
             if (element.tagName === 'BODY') {
                 return '/html/body'
-                } else {
-                    if (element.parentNode === null) return;
+            } else {
+                if (element.parentNode === null) return;
+
                 const sameTagSiblings = Array.from(element.parentNode.childNodes).filter(e => e.nodeName === element.nodeName);
                 const idx = sameTagSiblings.indexOf(element);
             
@@ -97,7 +127,7 @@ export default class CapturedEvent {
         }
     }
 
-    getLinkText(el) {
+    getLinkText(el : HTMLElement) {
         try {
             if (!el.hasChildNodes()) return '';
             let textContent;
@@ -132,16 +162,16 @@ export default class CapturedEvent {
         }
     }
 
-    getCssSelector(elSrc) {
+    getCssSelector(elSrc : HTMLElement) {
         try {
             
             if (!(elSrc instanceof Element)) return '';
-            var sSel,
-                aAttr = ["name", "value", "title", "placeholder", "data-*"], // Common attributes
+            let sSel :string = '',
+                aAttr :string[] = ["name", "value", "title", "placeholder", "data-*"], // Common attributes
                 aSel = [];
 
             // Derive selector from element
-            var getSelector = function (el) {
+            var getSelector = function (el :HTMLElement) {
                 // 1. Check ID first
                 // NOTE: ID must be unique amongst all IDs in an HTML5 document.
                 // https://www.w3.org/TR/html5/dom.html#the-id-attribute
@@ -159,7 +189,7 @@ export default class CapturedEvent {
                 for (var i = 0; i < aAttr.length; ++i) {
                     if (aAttr[i] === "data-*") {
                         // Build array of data attributes
-                        var aDataAttr = [].filter.call(el.attributes, function (attr) {
+                        var aDataAttr = [].filter.call(el.attributes, (attr : any) => {
                             return attr.name.indexOf("data-") === 0;
                         });
                         for (var j = 0; j < aDataAttr.length; ++j) {
@@ -173,8 +203,7 @@ export default class CapturedEvent {
                     }
                 }
                 // 4. Try to select by nth-of-type() as a fallback for generic elements
-                var elChild = el,
-                    sChild,
+                let elChild :HTMLElement = el,
                     n = 1;
                 while ((elChild = elChild.previousElementSibling)) {
                     if (elChild.nodeName === el.nodeName) ++n;
@@ -194,7 +223,7 @@ export default class CapturedEvent {
             };
 
             // Test query to see if it returns one element
-            var uniqueQuery = function () {
+            const uniqueQuery = () => {
                 try {
                     return (document.querySelectorAll(aSel.join(">") || null).length === 1);
                 } catch {
@@ -215,7 +244,7 @@ export default class CapturedEvent {
         }
     }
 
-    getFrameStack(el) {
+    getFrameStack() {
         try {
             const frameStack = [];
             let fe = window.frameElement;

@@ -30,9 +30,12 @@ const openWindow = (tab : chrome.tabs.Tab) => {
         height : 900
     }).then(result=> {
         setting.VIEW_WINDOW_ID = result.id;
-        console.log(setting.VIEW_WINDOW_ID)
+        console.log(setting.VIEW_WINDOW_ID);
     });
 }
 
+const onMessage = (request : chrome.webRequest.WebRequestDetails, sender, response) => {
+    console.log(request)
+}
 chrome.runtime.onInstalled.addListener(init);
-  
+chrome.runtime.onMessage.addListener(onMessage);
