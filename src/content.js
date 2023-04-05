@@ -2,7 +2,9 @@ import CapturedEvent from '@/js/CapturedEvent'
 let eventIndex = 0;
 
 const captureEvent = (ev) => {
-    
+    new MessageToServiceWorker()
+    chrome.runtime.sendMessage('asdf');
+
     const details = {
         type : ev.type,
         target : ev.target,
@@ -16,6 +18,7 @@ const captureEvent = (ev) => {
         shiftKey : ev.shiftKey,
         index : eventIndex++
     }
+
     const e = new CapturedEvent(details);
  
     if (e.type !== 'mousemove') {
