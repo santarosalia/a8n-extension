@@ -2,7 +2,7 @@
   <v-container>
     
     <v-list>
-      <v-list-item v-for="record in records" :title="record.type" :subtitle="record.xpath">
+      <v-list-item v-for="record in records" :title="record.type" :subtitle="record.xpath" :value="record.index">
         
       </v-list-item>
     </v-list>

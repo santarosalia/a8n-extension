@@ -1,8 +1,7 @@
 <template>
     <v-card>
         <v-tabs v-model="tab">
-            <v-tab value="1">레코딩 내역</v-tab>
-            <v-tab value="2">데이터 스크래핑</v-tab>
+            <v-tab v-for="menu in topbarMenu" :value="menu.index" @click="pushRouter(menu)">{{ menu.title }}</v-tab>
         </v-tabs>
     </v-card>
 </template>
@@ -10,8 +9,19 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router';
+import CrxConstants from '@/js/constants/CrxConstants.js';
+
 const store = useStore();
+const router = useRouter();
+const topbarMenu = CrxConstants.topbarMenu;
 const tab = ref(null);
-const records = computed(()=> store.getters['getRecord']);
+
+const pushRouter = (menu) => {
+    console.log(menu.path)
+    router.push(menu.path);
+}
+
+
 </script>
   

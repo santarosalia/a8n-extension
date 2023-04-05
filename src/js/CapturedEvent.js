@@ -20,6 +20,7 @@ export default class CapturedEvent {
         this.shiftKey = details.shiftKey;
         this.scrollX = window.scrollX;
         this.scrollY = window.scrollY;
+        this.index = details.index;
     }
 
     getXPath(el) {

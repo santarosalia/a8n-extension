@@ -1,5 +1,5 @@
-import CapturedEvent from './js/CapturedEvent'
-
+import CapturedEvent from '@/js/CapturedEvent'
+let eventIndex = 0;
 
 const captureEvent = (ev) => {
     
@@ -14,6 +14,7 @@ const captureEvent = (ev) => {
         pageX : ev.pageX,
         pageY : ev.pageY,
         shiftKey : ev.shiftKey,
+        index : eventIndex++
     }
     const e = new CapturedEvent(details);
  

@@ -2,13 +2,18 @@ import {createWebHistory, createRouter} from 'vue-router';
 
 const routes = [
     {
-        path : '/home',
-        name : 'Home',
-        component : () => import('./components/RecordingHistory.vue')
+        path : '/rh',
+        name : 'RecordingHistory',
+        component : () => import('@/components/RecordingHistory.vue')
+    },
+    {
+        path : '/ds',
+        name : 'DataScrapping',
+        component : () => import('@/components/DataScrapping.vue')
     },
     {
         path : '/:pathMatch(.*)',
-        redirect : 'home'
+        redirect : 'rh'
     }
 ];
 
