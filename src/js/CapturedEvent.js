@@ -1,5 +1,6 @@
 export default class CapturedEvent {
     constructor (details) {
+        this.index = details.index;
         this.type = details.type;
         this.id = details.target.id;
         this.class = details.target.classList ? Array.from(details.target.classList) : null;
@@ -20,7 +21,6 @@ export default class CapturedEvent {
         this.shiftKey = details.shiftKey;
         this.scrollX = window.scrollX;
         this.scrollY = window.scrollY;
-        this.index = details.index;
     }
 
     getXPath(el) {

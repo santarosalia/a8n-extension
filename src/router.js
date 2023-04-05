@@ -1,6 +1,10 @@
-import {createWebHistory, createRouter} from 'vue-router';
+import {createWebHashHistory, createRouter} from 'vue-router';
 
 const routes = [
+    {
+        path : '/',
+        component : () => import('@/components/RecordingHistory.vue')
+    },
     {
         path : '/rh',
         name : 'RecordingHistory',
@@ -13,13 +17,24 @@ const routes = [
     },
     {
         path : '/:pathMatch(.*)',
-        redirect : 'rh'
+        redirect : '/'
     }
 ];
 
 const router = createRouter({
-    history : createWebHistory(),
+    history : createWebHashHistory(),
     routes
 });
+
+router.beforeEach((to, from, next) => {
+    console.log('------------from------------');
+    console.log(from);
+    console.log('------------from------------');
+    console.log('------------to------------');
+    console.log(to)
+    console.log('------------to------------');
+    
+    next();
+})
 
 export default router;

@@ -1,0 +1,47 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "esnext",
+        "strict": true,
+        "jsx": "preserve",
+        "importHelpers": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
+        "baseUrl": ".",
+        "types": [
+            "chrome"
+        ],
+        "paths": {
+            "@/*": [
+            "src/*"
+            ]
+        },
+        "lib": [
+            "esnext",
+            "dom",
+            "dom.iterable",
+            "scripthost"
+        ],
+        "resolveJsonModule": true,
+        "removeComments": true, //컴파일시 주석제거
+        "noUnusedLocals": true, //쓰지않는 지역변수 있으면 에러내기
+        "noUnusedParameters": true, //쓰지않는 파라미터 있으면 에러내기
+        "noImplicitAny": false,
+        "strictNullChecks": false
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.vue",
+        "tests/**/*.ts",
+        "tests/**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+    
+}
