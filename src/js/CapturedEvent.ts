@@ -1,5 +1,4 @@
 import { CapturedEventDetails } from "@/ts/interface/CrxInterface";
-import { AreaHTMLAttributes } from "vue";
 
 export default class CapturedEvent {
     index : number;
@@ -35,7 +34,7 @@ export default class CapturedEvent {
         this.fullXpath = this.getFullXpath(details.target);
         this.linkTextXpath = this.getLinkText(details.target);
         this.cssSelector = this.getCssSelector(details.target);
-        this.frameStack = this.getFrameStack(details.target);
+        this.frameStack = this.getFrameStack();
         this.x = details.x;
         this.y = details.y;
         this.pageX = details.pageX;
@@ -99,7 +98,7 @@ export default class CapturedEvent {
                 } else {
                     nodeElem = null;
                 }
-                nodeElem = nodeElem.parentNode;
+                nodeElem = nodeElem.parentElement;
             }
             return parts.length ? '/' + parts.reverse().join('/') : '';
         } catch (e) {
@@ -117,7 +116,7 @@ export default class CapturedEvent {
                 const sameTagSiblings = Array.from(element.parentNode.childNodes).filter(e => e.nodeName === element.nodeName);
                 const idx = sameTagSiblings.indexOf(element);
             
-                return this.getFullXpath(element.parentNode) +
+                return this.getFullXpath(element.parentElement) +
                   '/' +
                   element.tagName.toLowerCase() +
                   (sameTagSiblings.length > 1 ? `[${idx + 1}]` : '');
@@ -164,19 +163,19 @@ export default class CapturedEvent {
 
     getCssSelector(elSrc : HTMLElement) {
         try {
-            
             if (!(elSrc instanceof Element)) return '';
-            let sSel :string = '',
-                aAttr :string[] = ["name", "value", "title", "placeholder", "data-*"], // Common attributes
+
+            let sSel = '',
+                aAttr = ["name", "value", "title", "placeholder", "data-*"], // Common attributes
                 aSel = [];
 
             // Derive selector from element
-            var getSelector = function (el :HTMLElement) {
+            const getSelector = function (el :Element) {
                 // 1. Check ID first
                 // NOTE: ID must be unique amongst all IDs in an HTML5 document.
                 // https://www.w3.org/TR/html5/dom.html#the-id-attribute
                 if (el.id) {
-                    aSel.unshift("#" + el.id);
+                    aSel.unshift(`#${el.id}`);
                     return true;
                 }
                 aSel.unshift((sSel = el.nodeName.toLowerCase()));
@@ -203,7 +202,7 @@ export default class CapturedEvent {
                     }
                 }
                 // 4. Try to select by nth-of-type() as a fallback for generic elements
-                let elChild :HTMLElement = el,
+                let elChild = el,
                     n = 1;
                 while ((elChild = elChild.previousElementSibling)) {
                     if (elChild.nodeName === el.nodeName) ++n;
