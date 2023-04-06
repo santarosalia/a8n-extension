@@ -1,6 +1,4 @@
-import { CapturedEventDetails } from "@/ts/interface/CrxInterface";
-
-export default class CapturedEvent {
+export class CapturedEvent {
     index : number;
     type : string;
     id : string;
@@ -11,7 +9,7 @@ export default class CapturedEvent {
     fullXpath : string;
     linkTextXpath : string;
     cssSelector : string;
-    frameStack : string[];
+    frameStack : object[];
     x : number;
     y : number;
     pageX : number;
@@ -22,8 +20,9 @@ export default class CapturedEvent {
     shiftKey : boolean;
     scrollX : number;
     scrollY : number;
+    timestamp : number;
 
-    constructor (details : CapturedEventDetails) {
+    constructor (details : any) {
         this.index = details.index;
         this.type = details.type;
         this.id = details.target.id;
@@ -45,9 +44,10 @@ export default class CapturedEvent {
         this.shiftKey = details.shiftKey;
         this.scrollX = window.scrollX;
         this.scrollY = window.scrollY;
+        this.timestamp = details.timestamp;
     }
 
-    getXPath(el : Element) {
+    getXPath(el : HTMLElement) {
         try {
             let nodeElem = el;
             let isFlexibleXpath = /^-?\d+$/.test(nodeElem.id.slice(-1)); // 마지막 두자리가 숫자일경우 가변될 xpath라고 판단하기 위한 변수
@@ -93,16 +93,12 @@ export default class CapturedEvent {
                 } else {
                     parts.push(prefix + nodeElem.localName + nth);
                 }
-                if (typeof nodeElem.parentNode == "string") {
-                    nodeElem = nodeElem.parentNode;
-                } else {
-                    nodeElem = null;
-                }
+                
                 nodeElem = nodeElem.parentElement;
             }
             return parts.length ? '/' + parts.reverse().join('/') : '';
         } catch (e) {
-            
+
         }
     }
 
@@ -246,14 +242,29 @@ export default class CapturedEvent {
     getFrameStack() {
         try {
             const frameStack = [];
-            let fe = window.frameElement;
+            let fe = window.frameElement as HTMLFrameElement;
+            let frameInedx = 0;
             while (fe) {
-                frameStack.push(fe.getAttribute('id') ? fe.getAttribute('id') : fe.getAttribute('name'));
-                fe = fe.contentWindow.parent.frameElement;
+                frameStack.push({
+                    frameIndex : frameInedx++,
+                    id : fe.getAttribute('id'),
+                    name : fe.getAttribute('name')
+                });
+                fe = fe.contentWindow.parent.frameElement as HTMLFrameElement;
             }
             return frameStack;
         } catch (e) {
 
         }
+    }
+}
+
+
+export class Setting {
+    CRX_EVENT_INDEX : number;
+    VIEW_WINDOW_ID : number;
+    constructor () {
+        this.CRX_EVENT_INDEX = 1;
+        
     }
 }

@@ -12,7 +12,7 @@ import TopBar from './components/TopBar.vue';
 import { useStore } from 'vuex'
 
 const store = useStore();
-store.dispatch('dispatchRecord');
+store.dispatch('dispatchRecords');
 
 </script>
 <style>

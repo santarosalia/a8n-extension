@@ -1,9 +1,13 @@
 <template>
   <v-container>
-    
+
     <v-list>
-      <v-list-item v-for="record in records" :title="record.type" :subtitle="record.xpath" :value="record.index">
-        
+      <v-list-item v-for="item in records" :title="EVENT_TYPE_TO_KOREAN[item.type]" :subtitle="item.xpath" :value="item.index">
+        <template v-slot:prepend>
+          {{ item.index }}
+        </template>
+        {{ item.timestamp }}
+        {{ item.fullXpath}}
       </v-list-item>
     </v-list>
     
@@ -13,7 +17,9 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { CapturedEventDetails } from '@CrxInterface';
+import { EVENT_TYPE_TO_KOREAN } from '@CrxConstants';
 
 const store = useStore();
-const records = computed(()=> store.getters['getRecord']);
+const records = computed(():CapturedEventDetails[]=> store.getters['getRecords']);
 </script>

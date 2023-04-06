@@ -1,41 +1,26 @@
-
-
-class Setting {
-    EVENT_INDEX : number
-    VIEW_WINDOW_ID : number
-    constructor () {
-        this.EVENT_INDEX = 0;
-    }
-}
+import { Setting } from "@CrxClass";
+import { setItemFromLocalStorage, createViewTab, openWindow } from "@CrxApi";
+import { CRX_RECORDS, CRX_EVENT_INDEX } from "@CrxConstants";
 
 const setting = new Setting();
 
 const init = () => {
-    chrome.storage.local.set({
-    'WD_CRX_RECORD' : [],
-    'EVENT_INDEX' : setting.EVENT_INDEX
-    });
-    
-    chrome.tabs.create({
-        url: chrome.runtime.getURL('index.html'),
-        active : true
-    }, openWindow);
-}
-  
-const openWindow = (tab : chrome.tabs.Tab) => {
-    chrome.windows.create({
-        tabId : tab.id,
-        type : "popup",
-        width : 800,
-        height : 900
-    }).then(result=> {
-        setting.VIEW_WINDOW_ID = result.id;
-        console.log(setting.VIEW_WINDOW_ID);
-    });
+    setItemFromLocalStorage(CRX_RECORDS, []);
+    setItemFromLocalStorage(CRX_EVENT_INDEX, setting.CRX_EVENT_INDEX);
+
+    createViewTab().then(result => {
+        openWindow(result).then(result => {
+            setting.VIEW_WINDOW_ID = result.id;
+        });
+    })
 }
 
 const onMessage = (request : chrome.webRequest.WebRequestDetails, sender, response) => {
     console.log(request)
 }
+const storageChange = (d) => {
+    // console.log(d)
+}
 chrome.runtime.onInstalled.addListener(init);
 chrome.runtime.onMessage.addListener(onMessage);
+chrome.storage.onChanged.addListener(storageChange);

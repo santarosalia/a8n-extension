@@ -26,14 +26,7 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach((to, from, next) => {
-    console.log('------------from------------');
-    console.log(from);
-    console.log('------------from------------');
-    console.log('------------to------------');
-    console.log(to)
-    console.log('------------to------------');
-    
+router.beforeEach((to, from, next) => {    
     next();
 })
 

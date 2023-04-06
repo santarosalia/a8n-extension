@@ -13,12 +13,16 @@
         "sourceMap": true,
         "baseUrl": ".",
         "types": [
-            "chrome"
+            "chrome",
+            "vuetify"
         ],
         "paths": {
-            "@/*": [
-            "src/*"
-            ]
+            "@/*": ["src/*"],
+            "tslib" : ["path/to/node_modules/tslib/tslib.d.ts"],
+            "@CrxClass" : ["src/ts/class/CrxClass.ts"],
+            "@CrxApi" : ["src/ts/api/CrxApi.ts"],
+            "@CrxConstants" : ["src/ts/constants/CrxConstants.ts"],
+            "@CrxInterface" : ["src/ts/interface/CrxInterface.ts"],            
         },
         "lib": [
             "esnext",
@@ -39,7 +43,7 @@
         "src/**/*.vue",
         "tests/**/*.ts",
         "tests/**/*.tsx"
-    ],
+, "src/main.js", "src/main.js"    ],
     "exclude": [
         "node_modules"
     ]

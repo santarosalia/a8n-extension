@@ -17,7 +17,23 @@ export default defineConfig({
       {
         find : '@',
         replacement : resolve(__dirname, 'src')
-      }
+      },
+      {
+        find : '@CrxApi',
+        replacement : resolve(__dirname, 'src/ts/api/CrxApi.ts')
+      },
+      {
+        find : '@CrxClass',
+        replacement : resolve(__dirname, 'src/ts/class/CrxClass.ts')
+      },
+      {
+        find : '@CrxConstants',
+        replacement : resolve(__dirname, 'src/ts/constants/CrxConstants.ts')
+      },
+      {
+        find : '@CrxInterface',
+        replacement : resolve(__dirname, 'src/ts/interface/CrxInterface.ts')
+      },
     ]
   },
   build : {
@@ -25,6 +41,7 @@ export default defineConfig({
       input : {
         main : resolve(__dirname, 'index.html')
       }
-    }
+    },
+    minify : true
   }
 })
