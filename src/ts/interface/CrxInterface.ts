@@ -24,6 +24,7 @@ export interface CapturedEventDetails {
     ctrlKey : boolean
     shiftKey : boolean
     timestamp : number
+    url : string
 }
 
 export interface SettingDetails {

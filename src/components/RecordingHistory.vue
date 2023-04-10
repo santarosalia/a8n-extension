@@ -9,9 +9,15 @@
           </v-btn>
         </template>
         <template v-slot:subtitle>
-          {{ item.localName }}
-          {{ item.value }}
-          {{ item.textContent }}
+          <span v-if="item.localName">
+            Tag : {{ item.localName }}
+          </span>
+          <span v-else-if="item.value">
+            Value : {{ item.value }}
+          </span>
+          <span v-else-if="item.url">
+            URL : {{ item.url }}
+          </span>
         </template>
       </v-list-item>
     </v-list>

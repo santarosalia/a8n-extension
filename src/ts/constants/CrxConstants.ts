@@ -16,7 +16,8 @@ export const EVENT_TYPE_TO_KOREAN = {
     click : '클릭',
     input : '입력',
     movetab : '탭이동',
-    removetab : '탭제거'
+    removetab : '탭제거',
+    openbrowser : '브라우저 오픈'
     
 }
 
@@ -29,7 +30,8 @@ export const EVENT = {
     MOUSEOVER : 'mouseover',
     MOUSEOUT : 'mouseout',
     MOVETAB : 'movetab',
-    REMOVETAB : 'removetab'
+    REMOVETAB : 'removetab',
+    OPENBROWSER : 'openbrowser'
 }
 
 export const CRX_COMMAND = {

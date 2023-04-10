@@ -29,7 +29,7 @@ export const openViewWindow = (tab : chrome.tabs.Tab) => {
 
 export const createRecordingTargetTab = () => {
     return chrome.tabs.create({
-        url: 'https:www.naver.com',
+        url: 'https://www.naver.com',
         active : true
     });
 }
@@ -55,31 +55,19 @@ export const currentWindowTabs = (windowId : number) => {
     return chrome.tabs.query({windowId : windowId});
 }
 
-export const onCreatedTab = (windowId : number) => {
+export const onHighlightedTab = (windowId : number) => {
     setTimeout(() => {
         currentWindowTabs(windowId).then(tabs => {
+            const activeTabIndex = tabs.find(tab => tab.active).index;
             getItemFromLocalStorage([CRX_RECORDS]).then(result => {
+                // 브라우저 오픈 시 탭 이동 인식해버려서 길이 1일 때 리턴함
+                if (result.CRX_RECORDS.length === 1) return;
                 result.CRX_RECORDS.push({
                     type : EVENT.MOVETAB,
-                    value : tabs.length-1
+                    value : activeTabIndex
                 });
                 setItemFromLocalStorage(CRX_RECORDS, result.CRX_RECORDS);
             });
         });
     }, 100);
 }
-
-export const onRemovedTab = (tabIndex : number) => {
-    getItemFromLocalStorage([CRX_RECORDS]).then(result => {
-        result.CRX_RECORDS.push({
-            type : EVENT.MOVETAB,
-            value : tabIndex
-        });
-        setItemFromLocalStorage(CRX_RECORDS, result.CRX_RECORDS);
-    });
-}
-
-export const onActivatedTab = (tabIndex : number) => {
-
-}
-

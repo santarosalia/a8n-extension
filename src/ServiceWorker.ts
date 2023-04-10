@@ -5,17 +5,19 @@ import { setItemFromLocalStorage,
     createRecordingTargetTab,
     openRecordingTargetWindow,
     sendRecordingStartCommand,
-    getItemFromLocalStorage,
-    currentWindowTabs,
-    onCreatedTab,
-    onRemovedTab } from "@CrxApi";
+    onHighlightedTab
+} from "@CrxApi";
 import { CRX_RECORDS } from "@CrxConstants";
+import { getItemFromLocalStorage } from "@CrxApi";
 import { EVENT } from "@CrxConstants";
 
 const crxInfo = new CrxInfo();
 
 const init = () => {
-    setItemFromLocalStorage(CRX_RECORDS, []);
+    setItemFromLocalStorage(CRX_RECORDS, [{
+        type : EVENT.OPENBROWSER,
+        url : 'https://www.naver.com'
+    }]);
     
     createRecordingTargetTab().then(result => {
         openRecordingTargetWindow(result).then(result => {
@@ -38,39 +40,21 @@ const storageChange = (d) => {
     // console.log(d)
 }
 
-const onMovedTabHandler = (tabId : number, moveInfo : chrome.tabs.TabMoveInfo) => {
-    // 추후 개발
-}
-
-const onCreatedTabHandler = (tab : chrome.tabs.Tab) => {
-    if (tab.windowId !== crxInfo.TARGET_WINDOW_ID) return;
-    onCreatedTab(crxInfo.TARGET_WINDOW_ID);
-}
-const onRemovedTabHandler = (tabId : number, removeInfo : chrome.tabs.TabRemoveInfo) => {
-    if (removeInfo.windowId !== crxInfo.TARGET_WINDOW_ID) return;
-    // const removeTabIndex = crxInfo.TARGET_TABS.find(tab => tab.id === tabId).index;
-    currentWindowTabs(crxInfo.TARGET_WINDOW_ID).then(tabs => {
-        const activeTabIndex = tabs.find(tab => tab.active).index;
-        onRemovedTab(activeTabIndex)
-    });
-    
-}
-const onActivatedTabHandler = (activeInfo : chrome.tabs.TabActiveInfo) => {
-    if (activeInfo.windowId !== crxInfo.TARGET_WINDOW_ID) return;
-
+const onHighlightedTabHandler = (highlightInfo : chrome.tabs.TabHighlightInfo) => {
+    if (highlightInfo.windowId !== crxInfo.TARGET_WINDOW_ID) return;
+    onHighlightedTab(highlightInfo.windowId);
 }
 chrome.runtime.onInstalled.addListener(init);
 chrome.runtime.onMessage.addListener(onMessage);
 chrome.storage.onChanged.addListener(storageChange);
 
-chrome.webNavigation.onCompleted.addListener(details => {
-    sendRecordingStartCommand(crxInfo.TARGET_WINDOW_ID);
-    currentWindowTabs(crxInfo.TARGET_WINDOW_ID).then((tabs)=> {
-        crxInfo.TARGET_TABS = tabs;
-    });
-});
+// chrome.webNavigation.onCompleted.addListener(details => {
+//     sendRecordingStartCommand(crxInfo.TARGET_WINDOW_ID);
+// });
 
-chrome.tabs.onMoved.addListener(onMovedTabHandler);
-chrome.tabs.onCreated.addListener(onCreatedTabHandler);
-chrome.tabs.onRemoved.addListener(onRemovedTabHandler);
-chrome.tabs.onActivated.addListener(onActivatedTabHandler)
+chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
+chrome.runtime.onInstalled.addListener(()=> {
+    setInterval(()=>{
+        sendRecordingStartCommand(crxInfo.TARGET_WINDOW_ID);
+    },1000);
+});
