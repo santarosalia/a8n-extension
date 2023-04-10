@@ -12,7 +12,8 @@
           "matches": ["*://*/*"],
           "js":["src/content.ts"],
           "match_origin_as_fallback": true,
-          "all_frames" : true
+          "all_frames" : true,
+          "runAt" : "document_start"
         }
     ],
     "permissions": [

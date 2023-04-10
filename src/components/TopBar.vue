@@ -1,9 +1,12 @@
 <template>
-    <v-card>
-        <v-tabs v-model="tab">
-            <v-tab v-for="menu in topbarMenus" :value="menu.index" @click="pushRouter(menu)">{{ menu.title }}</v-tab>
-        </v-tabs>
-    </v-card>
+    <v-app-bar density="compact">
+        <template v-slot:default>
+            <v-tabs v-model="tab">
+                <v-tab v-for="menu in topbarMenus" :value="menu.index" @click="pushRouter(menu)">{{ menu.title }}</v-tab>
+            </v-tabs>
+        </template>
+    </v-app-bar>
+
 </template>
   
 <script lang="ts" setup>

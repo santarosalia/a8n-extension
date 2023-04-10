@@ -5,9 +5,9 @@ export interface TopbarMenuDetails {
 }
 
 export interface CapturedEventDetails {
-    index : number
     type : string
-    target : HTMLElement
+    localName : string
+    textContent : string
     id : string
     value : string
     xpath : string

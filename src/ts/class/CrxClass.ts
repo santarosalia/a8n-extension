@@ -21,14 +21,17 @@ export class CapturedEvent {
     scrollX : number;
     scrollY : number;
     timestamp : number;
+    localName : string;
+    textContent : string;
 
     constructor (details : any) {
-        this.index = details.index;
         this.type = details.type;
         this.id = details.target.id;
         this.class = details.target.classList ? Array.from(details.target.classList) : null;
         this.name = details.target.getAttribute('name');
-        this.value = details.target.getAttribute('value');
+        this.value = details.target.value;
+        this.localName = details.target.localName;
+        this.textContent = details.target.textContent;
         this.xpath = this.getXPath(details.target);
         this.fullXpath = this.getFullXpath(details.target);
         this.linkTextXpath = this.getLinkText(details.target);
@@ -260,9 +263,12 @@ export class CapturedEvent {
 }
 
 
-export class Setting {
+export class CrxInfo {
     CRX_EVENT_INDEX : number;
     VIEW_WINDOW_ID : number;
+    TARGET_TAB : chrome.tabs.Tab;
+    TARGET_WINDOW_ID : number;
+    TARGET_TABS : chrome.tabs.Tab[]
     constructor () {
         this.CRX_EVENT_INDEX = 1;
         

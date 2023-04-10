@@ -11,11 +11,12 @@ export const topbarMenu = [
     }
 ];
 
-export const CRX_EVENT_INDEX = 'CRX_EVENT_INDEX';
 export const CRX_RECORDS = 'CRX_RECORDS';
 export const EVENT_TYPE_TO_KOREAN = {
-    CLICK : '클릭',
-    INPUT : '입력',
+    click : '클릭',
+    input : '입력',
+    movetab : '탭이동',
+    removetab : '탭제거'
     
 }
 
@@ -24,7 +25,15 @@ export const EVENT = {
     SCROLL : 'scroll',
     INPUT : 'input',
     WHEEL : 'wheel',
-    SELECT : 'select'
+    SELECT : 'select',
+    MOUSEOVER : 'mouseover',
+    MOUSEOUT : 'mouseout',
+    MOVETAB : 'movetab',
+    REMOVETAB : 'removetab'
+}
 
+export const CRX_COMMAND = {
+    RECORDING_START : 'RECORDING_START',
+    RECORDING_END : 'RECORDING_END'
 }
 

@@ -1,0 +1,5 @@
+.crx-highlight {
+    outline: 3px ridge red !important;
+    outline-offset:  -3px;
+    transition: none;
+}
