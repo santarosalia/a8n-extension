@@ -1,4 +1,4 @@
-import { CRX_COMMAND } from "@CrxConstants";
+import { CRX_CMD } from "@CrxConstants";
 import { CRX_RECORDS, EVENT } from "@CrxConstants";
 
 export const getItemFromLocalStorage = (key : string[]) => {
@@ -45,7 +45,7 @@ export const sendRecordingStartCommand = async (windowId : number) => {
     return chrome.tabs.query({windowId : windowId}).then(tabs => {
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
-                command : CRX_COMMAND.RECORDING_START
+                command : CRX_CMD.CMD_RECORDING_START
             });
         });
     });

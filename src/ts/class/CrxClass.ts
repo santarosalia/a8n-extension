@@ -1,6 +1,79 @@
-export class CapturedEvent {
-    index : number;
-    type : string;
+export class CapturedEventDetails {
+    AT_TARGET : number
+    BUBBLING_PHASE : number
+    CAPTURING_PHASE : number
+    NONE : number
+    bubbles : boolean
+    cancelBubble : boolean
+    cancelable : boolean
+    composed : boolean
+    currentTarget : Window
+    data : string
+    defaultPrevented: boolean
+    detail: number
+    eventPhase: number
+    inputType: string
+    isComposing: boolean
+    isTrusted: boolean
+    returnValue: boolean
+    srcElement: Element
+    target: Element
+    timeStamp: number
+    type: string
+    which: number
+    altKey: boolean
+    altitudeAngle: number
+    azimuthAngle: number
+    button: number
+    buttons: number
+    clientX: number
+    clientY: number
+    ctrlKey: boolean
+    height: number
+    isPrimary: boolean
+    layerX: number
+    layerY: number
+    metaKey: boolean
+    movementX: number
+    movementY: number
+    offsetX: number
+    offsetY: number
+    pageX: number
+    pageY: number
+    pointerId: number
+    pointerType: string
+    pressure: number
+    screenX: number
+    screenY: number
+    shiftKey: boolean
+    tangentialPressure: number
+    tiltX: number
+    tiltY: number
+    twist: number
+    width: number
+    x: number
+    y: number
+    charCode: number
+    code: string
+    key: string
+    keyCode: number
+    location: number
+    repeat : boolean
+
+    constructor (ev : Event) {
+        this.getDetails(ev);
+    }
+
+    getDetails(ev : Event) {
+        const obj = {};
+        for (let k in ev) {
+          obj[k] = ev[k];
+          this[k] = ev[k];
+        }
+    }
+}
+
+export class CapturedEvent extends CapturedEventDetails {
     id : string;
     class : string[];
     name : string;
@@ -10,47 +83,27 @@ export class CapturedEvent {
     linkTextXpath : string;
     cssSelector : string;
     frameStack : object[];
-    x : number;
-    y : number;
-    pageX : number;
-    pageY : number;
-    clientX : number;
-    clientY : number;
-    ctrlKey : boolean;
-    shiftKey : boolean;
-    scrollX : number;
-    scrollY : number;
-    timestamp : number;
     localName : string;
     textContent : string;
-
-    constructor (details : any) {
-        this.type = details.type;
-        this.id = details.target.id;
-        this.class = details.target.classList ? Array.from(details.target.classList) : null;
-        this.name = details.target.getAttribute('name');
-        this.value = details.target.value;
-        this.localName = details.target.localName;
-        this.textContent = details.target.textContent;
-        this.xpath = this.getXPath(details.target);
-        this.fullXpath = this.getFullXpath(details.target);
-        this.linkTextXpath = this.getLinkText(details.target);
-        this.cssSelector = this.getCssSelector(details.target);
+    target : Element;
+    
+    constructor (ev : Event) {
+        super(ev);
+        this.target = ev.target as Element;
+        this.id = this.target.id;
+        this.class = this.target.classList ? Array.from(this.target.classList) : null;
+        this.name = this.target.getAttribute('name');
+        this.value = (ev.target as HTMLInputElement).value;
+        this.localName = this.target.localName;
+        this.textContent = this.target.textContent;
+        this.xpath = this.getXPath(this.target);
+        this.fullXpath = this.getFullXpath(this.target);
+        this.linkTextXpath = this.getLinkText(this.target);
+        this.cssSelector = this.getCssSelector(this.target);
         this.frameStack = this.getFrameStack();
-        this.x = details.x;
-        this.y = details.y;
-        this.pageX = details.pageX;
-        this.pageY = details.pageY;
-        this.clientX = details.clientX;
-        this.clientY = details.clientY;
-        this.ctrlKey = details.ctrlKey;
-        this.shiftKey = details.shiftKey;
-        this.scrollX = window.scrollX;
-        this.scrollY = window.scrollY;
-        this.timestamp = details.timestamp;
     }
 
-    getXPath(el : HTMLElement) {
+    getXPath(el : Element) {
         try {
             let nodeElem = el;
             let isFlexibleXpath = /^-?\d+$/.test(nodeElem.id.slice(-1)); // 마지막 두자리가 숫자일경우 가변될 xpath라고 판단하기 위한 변수
@@ -105,7 +158,7 @@ export class CapturedEvent {
         }
     }
 
-    getFullXpath(element : HTMLElement) {
+    getFullXpath(element : Element) {
         try {
             if (element.tagName === 'BODY') {
                 return '/html/body'
@@ -125,7 +178,7 @@ export class CapturedEvent {
         }
     }
 
-    getLinkText(el : HTMLElement) {
+    getLinkText(el : Element) {
         try {
             if (!el.hasChildNodes()) return '';
             let textContent;
@@ -160,7 +213,7 @@ export class CapturedEvent {
         }
     }
 
-    getCssSelector(elSrc : HTMLElement) {
+    getCssSelector(elSrc : Element) {
         try {
             if (!(elSrc instanceof Element)) return '';
 

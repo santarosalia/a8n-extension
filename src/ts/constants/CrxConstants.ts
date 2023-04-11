@@ -17,12 +17,14 @@ export const EVENT_TYPE_TO_KOREAN = {
     input : '입력',
     movetab : '탭이동',
     removetab : '탭제거',
-    openbrowser : '브라우저 오픈'
+    openbrowser : '브라우저 오픈',
+    keydown : '키보드 입력'
     
 }
 
 export const EVENT = {
     CLICK : 'click',
+    KEYDOWN : 'keydown',
     SCROLL : 'scroll',
     INPUT : 'input',
     WHEEL : 'wheel',
@@ -34,8 +36,8 @@ export const EVENT = {
     OPENBROWSER : 'openbrowser'
 }
 
-export const CRX_COMMAND = {
-    RECORDING_START : 'RECORDING_START',
-    RECORDING_END : 'RECORDING_END'
+export const CRX_CMD = {
+    CMD_RECORDING_START : 'CMD_RECORDING_START',
+    CMD_RECORDING_END : 'CMD_RECORDING_END'
 }
 
