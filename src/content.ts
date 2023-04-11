@@ -1,18 +1,23 @@
-import { CapturedEvent, CapturedEventDetails } from '@CrxClass';
-import { CRX_RECORDS, EVENT, CRX_CMD } from "@CrxConstants";
-import { getItemFromLocalStorage, setItemFromLocalStorage } from '@CrxApi';
+import { CapturedEvent } from '@CrxClass';
+import { CRX_RECORDS, EVENT, CRX_CMD, CRX_MSG_RECEIVER } from "@CrxConstants";
+import { getItemFromLocalStorage, setItemFromLocalStorage, switchFrame } from '@CrxApi';
 import HilightCSS from '@/css/Highlight.css?raw'
 
 let started : boolean;
 
 const mouseEventHandler = async (ev : MouseEvent) => {
-    // chrome.runtime.sendMessage('asdf');
+    
     const e = new CapturedEvent(ev);
 
+    
     getItemFromLocalStorage([CRX_RECORDS]).then(result => {
         const records = result[CRX_RECORDS];
-        const list = [...records, e];
-        setItemFromLocalStorage(CRX_RECORDS, list);
+        
+        const isSameFrame : boolean = JSON.stringify(e.frameStack) === JSON.stringify(records[records.length-1].frameStack);
+        if (!isSameFrame) records.push(switchFrame(e));
+        
+        records.push(e);
+        setItemFromLocalStorage(CRX_RECORDS, records);
     });
 }
 
@@ -20,9 +25,13 @@ const inputEventHandler = (ev : Event) => {
     const e = new CapturedEvent(ev);
     getItemFromLocalStorage([CRX_RECORDS]).then(result => {
         const records = result[CRX_RECORDS];
+        
+        const isSameFrame : boolean = JSON.stringify(e.frameStack) === JSON.stringify(records[records.length-1].frameStack);
+        if (!isSameFrame) records.push(switchFrame(e));
+
         if (e.type === records[records.length-1].type) records.pop();
-        const list = [...records, e];
-        setItemFromLocalStorage(CRX_RECORDS, list);
+        records.push(e);
+        setItemFromLocalStorage(CRX_RECORDS, records);
     });
 }
 
@@ -40,18 +49,18 @@ const keydownEventHandler = (ev : Event)=> {
     if (e.key !== 'Enter') return;
     getItemFromLocalStorage([CRX_RECORDS]).then(result => {
         const records = result[CRX_RECORDS];
-        const list = [...records, e];
-        setItemFromLocalStorage(CRX_RECORDS, list);
+        records.push(e);
+        setItemFromLocalStorage(CRX_RECORDS, records);
     });
 }
 const eventHandler = (ev : Event) => {
     switch (ev.type) {
-        case EVENT.CLICK : {
-            mouseEventHandler(ev as MouseEvent);
+        case EVENT.INPUT || EVENT.SELECT : {
+            inputEventHandler(ev);
             break;
         }
-        case EVENT.INPUT : {
-            inputEventHandler(ev);
+        case EVENT.CLICK : {
+            mouseEventHandler(ev as MouseEvent);
             break;
         }
         case EVENT.MOUSEOVER : {
@@ -72,14 +81,15 @@ chrome.runtime.onMessage.addListener(request => {
     switch (request.command) {
         case CRX_CMD.CMD_RECORDING_START : {
             if (started) return;
-            window.addEventListener(EVENT.CLICK, eventHandler);
-            window.addEventListener(EVENT.SCROLL, eventHandler);
-            window.addEventListener(EVENT.INPUT, eventHandler);
-            window.addEventListener(EVENT.SELECT, eventHandler);
-            window.addEventListener(EVENT.WHEEL, eventHandler);
-            window.addEventListener(EVENT.MOUSEOVER, eventHandler);
-            window.addEventListener(EVENT.MOUSEOUT, eventHandler);
-            window.addEventListener(EVENT.KEYDOWN, eventHandler);
+
+            window.addEventListener(EVENT.CLICK, eventHandler, true);
+            window.addEventListener(EVENT.SCROLL, eventHandler, true);
+            window.addEventListener(EVENT.INPUT, eventHandler, true);
+            window.addEventListener(EVENT.WHEEL, eventHandler, true);
+            window.addEventListener(EVENT.MOUSEOVER, eventHandler, true);
+            window.addEventListener(EVENT.MOUSEOUT, eventHandler, true);
+            window.addEventListener(EVENT.KEYDOWN, eventHandler, true);
+
             const style = window.document.createElement('style');
             style.innerHTML = HilightCSS;
             window.document.head.appendChild(style);
