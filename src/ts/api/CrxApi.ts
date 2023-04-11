@@ -1,5 +1,6 @@
-import { CRX_CMD } from "@CrxConstants";
+import { CRX_CMD , CRX_MSG_RECEIVER } from "@CrxConstants";
 import { CRX_RECORDS, EVENT } from "@CrxConstants";
+import { CapturedEvent } from "@CrxClass";
 
 export const getItemFromLocalStorage = (key : string[]) => {
     return chrome.storage.local.get(key);
@@ -22,8 +23,8 @@ export const openViewWindow = (tab : chrome.tabs.Tab) => {
     return chrome.windows.create({
         tabId : tab.id,
         type : "popup",
-        width : 500,
-        height : 700
+        width : 400,
+        height : 600
     });
 }
 
@@ -45,6 +46,7 @@ export const sendRecordingStartCommand = async (windowId : number) => {
     return chrome.tabs.query({windowId : windowId}).then(tabs => {
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
+                receiver : CRX_MSG_RECEIVER.WEB_RECORDER,
                 command : CRX_CMD.CMD_RECORDING_START
             });
         });
@@ -70,4 +72,11 @@ export const onHighlightedTab = (windowId : number) => {
             });
         });
     }, 100);
+}
+
+export const switchFrame = (e : CapturedEvent) => {
+    return {
+        type : EVENT.SWITCHFRAME,
+        frameStack : e.frameStack
+    }
 }

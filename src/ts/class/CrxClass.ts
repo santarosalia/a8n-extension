@@ -1,3 +1,5 @@
+import { FrameStack } from '@CrxInterface';
+import { EVENT } from '@CrxConstants';
 export class CapturedEventDetails {
     AT_TARGET : number
     BUBBLING_PHASE : number
@@ -59,9 +61,11 @@ export class CapturedEventDetails {
     keyCode: number
     location: number
     repeat : boolean
+    selectedIndex : number
 
     constructor (ev : Event) {
         this.getDetails(ev);
+        this.typeCheck(ev);
     }
 
     getDetails(ev : Event) {
@@ -69,6 +73,15 @@ export class CapturedEventDetails {
         for (let k in ev) {
           obj[k] = ev[k];
           this[k] = ev[k];
+        }
+    }
+
+    typeCheck(ev : Event) {
+        const target = ev.target as Element;
+
+        if (target.localName === EVENT.SELECT) {
+            this.type = EVENT.SELECT;
+            this.selectedIndex = (target as HTMLSelectElement).selectedIndex;
         }
     }
 }
@@ -82,7 +95,7 @@ export class CapturedEvent extends CapturedEventDetails {
     fullXpath : string;
     linkTextXpath : string;
     cssSelector : string;
-    frameStack : object[];
+    frameStack : FrameStack[];
     localName : string;
     textContent : string;
     target : Element;
@@ -317,13 +330,11 @@ export class CapturedEvent extends CapturedEventDetails {
 
 
 export class CrxInfo {
-    CRX_EVENT_INDEX : number;
     VIEW_WINDOW_ID : number;
     TARGET_TAB : chrome.tabs.Tab;
     TARGET_WINDOW_ID : number;
     TARGET_TABS : chrome.tabs.Tab[]
     constructor () {
-        this.CRX_EVENT_INDEX = 1;
         
     }
 }

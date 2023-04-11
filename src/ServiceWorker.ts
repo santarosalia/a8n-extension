@@ -16,7 +16,8 @@ const crxInfo = new CrxInfo();
 const init = () => {
     setItemFromLocalStorage(CRX_RECORDS, [{
         type : EVENT.OPENBROWSER,
-        url : 'https://www.naver.com'
+        url : 'https://www.naver.com',
+        frameStack : []
     }]);
     
     createRecordingTargetTab().then(result => {

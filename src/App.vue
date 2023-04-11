@@ -3,19 +3,28 @@
     <v-main>
       <TopBar/>
       <RouterView/>
+      <Footer/>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts" setup>
-import TopBar from './components/TopBar.vue';
+import TopBar from '@/components/TopBar.vue';
 import { useStore } from 'vuex'
-
+import Footer from '@/components/Footer.vue';
 const store = useStore();
 store.dispatch('dispatchRecords');
 
 </script>
 <style>
+@font-face {
+  font-family: "nanum";
+  src: url("@/assets/NanumSquareR.otf");
+}
+* {
+  font-family: "nanum";
+  font-size: small;
+}
 body::-webkit-scrollbar {
   display: none;
 }

@@ -13,7 +13,7 @@ export interface CapturedEventDetails extends EventDetails {
     fullXpath : string
     linkTextXpath : string
     cssSelector : string
-    frameStack : object[]
+    frameStack : FrameStack[]
     url : string
 }
 
@@ -78,9 +78,11 @@ export interface EventDetails {
     keyCode: number
     location: number
     repeat : boolean
+    selectedIndex : number
 }
 
-export interface SettingDetails {
-    CRX_EVENT_INDEX : number
-    CRX_VIEW_WINDOW_ID : number
+export interface FrameStack {
+    frameIndex : number
+    id : string
+    name : string
 }
