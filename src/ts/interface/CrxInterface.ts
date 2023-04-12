@@ -14,7 +14,6 @@ export interface CapturedEventDetails extends EventDetails {
     linkTextXpath : string
     cssSelector : string
     frameStack : FrameStack[]
-    url : string
 }
 
 export interface EventDetails {
@@ -86,3 +85,4 @@ export interface FrameStack {
     id : string
     name : string
 }
+export type CapturedEventType = CapturedEventDetails;

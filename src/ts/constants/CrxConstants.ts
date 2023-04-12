@@ -24,7 +24,7 @@ export const EVENT_TYPE_TO_KOREAN = {
     input : '입력',
     movetab : '탭이동',
     removetab : '탭제거',
-    openbrowser : '브라우저 오픈',
+    openbrowser : '브라우저 열기',
     keydown : '키보드 입력',
     switchframe : '프레임 이동',
     select : '셀렉트 박스'

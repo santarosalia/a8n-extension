@@ -1,21 +1,22 @@
 import { createStore } from "vuex";
 import { CRX_RECORDS } from '@CrxConstants'
-import { getItemFromLocalStorage } from "@CrxApi";
+import { getItemFromLocalStorage, setItemFromLocalStorage } from "@CrxApi";
+import { toRaw } from "vue";
 
 export default createStore({
     modules : {
     },
     state : {
-        records : []
+        CRX_RECORDS : []
     },
     getters : {
         getRecords(state) {
-            return state.records;
+            return state.CRX_RECORDS;
         }
     },
     mutations : {
-        setRecords(state, record) {
-            state.records = record;
+        setRecords(state, CRX_RECORDS) {
+            state.CRX_RECORDS = CRX_RECORDS;
         }
     },
     actions : {
@@ -23,6 +24,11 @@ export default createStore({
             getItemFromLocalStorage([CRX_RECORDS]).then(result => {
                 commit('setRecords', result[CRX_RECORDS]);
             })
+        },
+        removeRecord({ getters }, index : number) {
+            const records = toRaw(getters['getRecords']);
+            records.splice(index, 1);
+            setItemFromLocalStorage(CRX_RECORDS, records);
         }
     }
 });

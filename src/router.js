@@ -3,12 +3,12 @@ import {createWebHashHistory, createRouter} from 'vue-router';
 const routes = [
     {
         path : '/',
-        component : () => import('@/components/RecordingHistory.vue')
+        component : () => import('@/components/recordinghistory/RecordingHistory.vue')
     },
     {
         path : '/rh',
         name : 'RecordingHistory',
-        component : () => import('@/components/RecordingHistory.vue')
+        component : () => import('@/components/recordinghistory/RecordingHistory.vue')
     },
     {
         path : '/ds',

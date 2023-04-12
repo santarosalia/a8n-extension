@@ -4,10 +4,10 @@ import { setItemFromLocalStorage,
     openViewWindow,
     createRecordingTargetTab,
     openRecordingTargetWindow,
-    sendRecordingStartCommand,
+    sendMessageByWindowId,
     onHighlightedTab
 } from "@CrxApi";
-import { CRX_RECORDS } from "@CrxConstants";
+import { CRX_CMD, CRX_RECORDS } from "@CrxConstants";
 import { getItemFromLocalStorage } from "@CrxApi";
 import { EVENT } from "@CrxConstants";
 
@@ -16,7 +16,7 @@ const crxInfo = new CrxInfo();
 const init = () => {
     setItemFromLocalStorage(CRX_RECORDS, [{
         type : EVENT.OPENBROWSER,
-        url : 'https://www.naver.com',
+        value : 'https://www.naver.com',
         frameStack : []
     }]);
     
@@ -56,6 +56,6 @@ chrome.storage.onChanged.addListener(storageChange);
 chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
 chrome.runtime.onInstalled.addListener(()=> {
     setInterval(()=>{
-        sendRecordingStartCommand(crxInfo.TARGET_WINDOW_ID);
+        sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_CMD.CMD_RECORDING_START);
     },1000);
 });

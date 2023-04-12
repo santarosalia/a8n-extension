@@ -42,12 +42,12 @@ export const openRecordingTargetWindow = (tab : chrome.tabs.Tab) => {
     });
 }
 
-export const sendRecordingStartCommand = async (windowId : number) => {
+export const sendMessageByWindowId = async (windowId : number, command :string) => {
     return chrome.tabs.query({windowId : windowId}).then(tabs => {
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
                 receiver : CRX_MSG_RECEIVER.WEB_RECORDER,
-                command : CRX_CMD.CMD_RECORDING_START
+                command : command
             });
         });
     });
@@ -66,7 +66,8 @@ export const onHighlightedTab = (windowId : number) => {
                 if (result.CRX_RECORDS.length === 1) return;
                 result.CRX_RECORDS.push({
                     type : EVENT.MOVETAB,
-                    value : activeTabIndex
+                    value : activeTabIndex,
+                    frameStack : []
                 });
                 setItemFromLocalStorage(CRX_RECORDS, result.CRX_RECORDS);
             });

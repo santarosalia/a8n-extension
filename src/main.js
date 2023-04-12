@@ -7,7 +7,7 @@ import { loadFonts } from './plugins/webfontloader'
 
 const storageChanged = () => {
   store.dispatch('dispatchRecords');
-  console.log(store.getters.getRecords)
+  console.log(store.getters.getRecords[store.getters.getRecords.length-1])
 }
 
 chrome.storage.local.onChanged.addListener(storageChanged);
