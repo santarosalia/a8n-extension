@@ -44,7 +44,47 @@ export const EVENT = {
     OPENBROWSER : 'openbrowser',
     SWITCHFRAME : 'switchframe'
 }
-
+export const INFO_BY_EVENT_TYPE = {
+    click : [
+        {
+            type : 'readonly',
+            title : '텍스트',
+            value : 'textContent'
+        },
+        {
+            type : 'select',
+            title : '로케이터',
+            value : [
+                'xpath',
+                'fullXpath',
+                'linkText',
+                'cssSelector'
+            ]
+        },
+        {
+            type : 'input',
+            title : 'text',
+            value : 'value'
+        }
+    ],
+    input : [
+        {
+            type : 'input',
+            title : '값',
+            value : 'value'
+        },
+        {
+            type : 'select',
+            title : '로케이터',
+            value : [
+                'xpath',
+                'fullXpath',
+                'linkText',
+                'cssSelector'
+            ]
+        },
+    ]
+}
 export const CRX_CMD = {
     CMD_RECORDING_START : 'CMD_RECORDING_START',
     CMD_RECORDING_END : 'CMD_RECORDING_END',

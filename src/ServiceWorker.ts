@@ -8,7 +8,6 @@ import { setItemFromLocalStorage,
     onHighlightedTab
 } from "@CrxApi";
 import { CRX_CMD, CRX_RECORDS } from "@CrxConstants";
-import { getItemFromLocalStorage } from "@CrxApi";
 import { EVENT } from "@CrxConstants";
 
 const crxInfo = new CrxInfo();
@@ -34,7 +33,7 @@ const init = () => {
     });
 }
 
-const onMessage = (request : chrome.webRequest.WebRequestDetails, sender, response) => {
+const onMessage = (request : chrome.webRequest.WebRequestDetails) => {
     console.log(request)
 }
 const storageChange = (d) => {

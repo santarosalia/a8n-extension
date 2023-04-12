@@ -1,5 +1,5 @@
 import { CapturedEvent } from '@CrxClass';
-import { CRX_RECORDS, EVENT, CRX_CMD, CRX_MSG_RECEIVER } from "@CrxConstants";
+import { CRX_RECORDS, EVENT, CRX_CMD } from "@CrxConstants";
 import { getItemFromLocalStorage, setItemFromLocalStorage, switchFrame } from '@CrxApi';
 import HilightCSS from '@/css/Highlight.css?raw'
 

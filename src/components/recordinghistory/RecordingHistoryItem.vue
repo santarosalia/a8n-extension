@@ -30,11 +30,11 @@
         </template>
         <template v-slot:append>
           <v-btn v-if="record.type !== EVENT.OPENBROWSER" variant="text" icon @click.stop="removeRecord(index)">
-            <v-icon icon="mdi-minus"></v-icon>
+            <v-icon>mdi-minus</v-icon>
           </v-btn>
         </template>
       </v-list-item>
-      
+
       <v-dialog v-model="showDialog" fullscreen transition="dialog-bottom-transition">
         <v-card>
             <v-toolbar density="compact">
@@ -46,8 +46,22 @@
                 </v-btn>
             </v-toolbar>
 <!-- Dialog Contents-->
-            <v-container>
-                
+            <v-container align="center" class="pa-1">
+                <v-card max-width="400" variant="text">
+                    <v-row align="center" v-for="info in record.info">
+                        <v-col cols="2" class="pa-0 text-center">
+                            <span>{{ info.title }}</span>
+                        </v-col>
+
+                        <v-col v-if="info.type === 'readonly'">
+                            <v-text-field v-if="info.type === 'readonly'" v-model="record[info.value]" density="compact" variant="outlined" hide-details readonly></v-text-field>
+                        </v-col>
+                        <v-col v-else-if="info.type === 'input'">
+                            <v-text-field v-model="record[info.value]" density="compact" variant="outlined" hide-details></v-text-field>
+                        </v-col>
+                        
+                    </v-row>
+                </v-card>
             </v-container>
         </v-card>
       </v-dialog>
@@ -55,21 +69,32 @@
 
 <script setup lang="ts">
 
-import { CapturedEventDetails } from '@/ts/interface/CrxInterface';
+import { CapturedEventDetails } from '@CrxInterface';
 import { EVENT, EVENT_TYPE_TO_KOREAN } from '@CrxConstants';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
 const showDialog = ref(false);
 
-defineProps<{
+const props = defineProps<{
     record : CapturedEventDetails,
     index : number
 }>();
 
-
 const removeRecord = (index : number) => {
     store.dispatch('removeRecord', index);
 }
+
+const editRecord = (index : number, record : CapturedEventDetails) => {
+    store.dispatch('editRecord', {
+        index : index,
+        record : record
+    });
+}
+
+watch(showDialog, (newVal) =>{
+    if (newVal === true) return;
+    editRecord(props.index, props.record);
+});
 </script>

@@ -1,10 +1,9 @@
 <template>
 <v-container class="pa-0" fluid>
-    <v-list :height="listHeight">
-      <v-list-item v-if="records.length == 0" title="레코딩 내역이 없습니다"></v-list-item>
-      <RecordingHistoryItem v-for="record, i in records" :record="record" :index="i"/>
-    </v-list>
-  </v-container>
+  <v-list :height="listHeight">
+    <RecordingHistoryItem v-for="record, i in records" :record="record" :index="i"/>
+  </v-list>
+</v-container>
 </template>
 
 <script lang="ts" setup>

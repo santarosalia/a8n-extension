@@ -1,4 +1,4 @@
-import { CRX_CMD , CRX_MSG_RECEIVER } from "@CrxConstants";
+import { CRX_MSG_RECEIVER } from "@CrxConstants";
 import { CRX_RECORDS, EVENT } from "@CrxConstants";
 import { CapturedEvent } from "@CrxClass";
 

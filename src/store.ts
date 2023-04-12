@@ -29,6 +29,11 @@ export default createStore({
             const records = toRaw(getters['getRecords']);
             records.splice(index, 1);
             setItemFromLocalStorage(CRX_RECORDS, records);
+        },
+        editRecord({ getters }, payload) {
+            const records = toRaw(getters['getRecords']);
+            records[payload.index] = payload.record;
+            setItemFromLocalStorage(CRX_RECORDS, records);
         }
     }
 });

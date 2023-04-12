@@ -1,5 +1,5 @@
 import { FrameStack } from '@CrxInterface';
-import { EVENT } from '@CrxConstants';
+import { EVENT, INFO_BY_EVENT_TYPE } from '@CrxConstants';
 export class CapturedEventDetails {
     AT_TARGET : number
     BUBBLING_PHASE : number
@@ -69,9 +69,7 @@ export class CapturedEventDetails {
     }
 
     getDetails(ev : Event) {
-        const obj = {};
         for (let k in ev) {
-          obj[k] = ev[k];
           this[k] = ev[k];
         }
     }
@@ -99,7 +97,8 @@ export class CapturedEvent extends CapturedEventDetails {
     localName : string;
     textContent : string;
     target : Element;
-    
+    info : any[];
+
     constructor (ev : Event) {
         super(ev);
         this.target = ev.target as Element;
@@ -114,6 +113,7 @@ export class CapturedEvent extends CapturedEventDetails {
         this.linkTextXpath = this.getLinkText(this.target);
         this.cssSelector = this.getCssSelector(this.target);
         this.frameStack = this.getFrameStack();
+        this.info = this.getInfo(this.type);
     }
 
     getXPath(el : Element) {
@@ -325,6 +325,10 @@ export class CapturedEvent extends CapturedEventDetails {
         } catch (e) {
 
         }
+    }
+
+    getInfo (type : string) {
+        return INFO_BY_EVENT_TYPE[type];
     }
 }
 
