@@ -32,7 +32,7 @@ export default createStore({
         },
         editRecord({ getters }, payload) {
             const records = toRaw(getters['getRecords']);
-            records[payload.index] = payload.record;
+            records[payload.index] = toRaw(payload.record);
             setItemFromLocalStorage(CRX_RECORDS, records);
         }
     }

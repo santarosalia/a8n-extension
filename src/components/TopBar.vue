@@ -1,6 +1,6 @@
 <template>
     <v-app-bar density="compact">
-        <template v-slot:default>
+        <template #default>
             <v-tabs v-model="tab">
                 <v-tab v-for="menu in topbarMenus" :value="menu.index" @click="pushRouter(menu)">{{ menu.title }}</v-tab>
             </v-tabs>

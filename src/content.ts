@@ -1,4 +1,4 @@
-import { CapturedEvent } from '@CrxClass';
+import { CapturedEvent, CrxClickEvent, CrxInputEvent } from '@CrxClass';
 import { CRX_RECORDS, EVENT, CRX_CMD } from "@CrxConstants";
 import { getItemFromLocalStorage, setItemFromLocalStorage, switchFrame } from '@CrxApi';
 import HilightCSS from '@/css/Highlight.css?raw'
@@ -7,7 +7,7 @@ let started : boolean;
 
 const mouseEventHandler = async (ev : MouseEvent) => {
     
-    const e = new CapturedEvent(ev);
+    const e = new CrxClickEvent(ev);
 
     
     getItemFromLocalStorage([CRX_RECORDS]).then(result => {
@@ -22,7 +22,7 @@ const mouseEventHandler = async (ev : MouseEvent) => {
 }
 
 const inputEventHandler = (ev : Event) => {
-    const e = new CapturedEvent(ev);
+    const e = new CrxInputEvent(ev);
     getItemFromLocalStorage([CRX_RECORDS]).then(result => {
         const records = result[CRX_RECORDS];
         

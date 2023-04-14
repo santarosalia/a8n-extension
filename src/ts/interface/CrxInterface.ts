@@ -14,7 +14,10 @@ export interface CapturedEventDetails extends EventDetails {
     linkTextXpath : string
     cssSelector : string
     frameStack : FrameStack[]
-    info : any[]
+    info : EventInfo[]
+    locator : string
+    class : string[]
+    name : string
 }
 
 export interface EventDetails {
@@ -86,4 +89,14 @@ export interface FrameStack {
     id : string
     name : string
 }
-export type CapturedEventType = CapturedEventDetails;
+export interface EventInfo {
+    type : string
+    displayName : string
+    value? : string | number
+    values? : LocatorInfo[]
+}
+
+export interface LocatorInfo {
+    displayName : string
+    value : string
+}

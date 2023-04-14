@@ -1,3 +1,5 @@
+import { CapturedEvent } from "../class/CrxClass";
+
 export const topbarMenu = [
     {
         title : '레코딩 내역',
@@ -30,6 +32,28 @@ export const EVENT_TYPE_TO_KOREAN = {
     select : '셀렉트 박스'
 }
 
+export const getLocatorInfo = (self : CapturedEvent) => {
+    return {
+        xpath : {
+            displayName : 'XPath',
+            value : self.xpath
+        },
+        fullxpath : {
+            displayName : '전체 XPath',
+            value : self.fullXpath
+        },
+        linktextxpath : {
+            displayName : '링크 텍스트 XPath',
+            value : self.linkTextXpath
+        },
+        cssselector : {
+            displayName : 'CSS 선택자',
+            value : self.cssSelector
+        },
+    }
+    
+}
+
 export const EVENT = {
     CLICK : 'click',
     KEYDOWN : 'keydown',
@@ -44,47 +68,7 @@ export const EVENT = {
     OPENBROWSER : 'openbrowser',
     SWITCHFRAME : 'switchframe'
 }
-export const INFO_BY_EVENT_TYPE = {
-    click : [
-        {
-            type : 'readonly',
-            title : '텍스트',
-            value : 'textContent'
-        },
-        {
-            type : 'select',
-            title : '로케이터',
-            value : [
-                'xpath',
-                'fullXpath',
-                'linkText',
-                'cssSelector'
-            ]
-        },
-        {
-            type : 'input',
-            title : 'text',
-            value : 'value'
-        }
-    ],
-    input : [
-        {
-            type : 'input',
-            title : '값',
-            value : 'value'
-        },
-        {
-            type : 'select',
-            title : '로케이터',
-            value : [
-                'xpath',
-                'fullXpath',
-                'linkText',
-                'cssSelector'
-            ]
-        },
-    ]
-}
+
 export const CRX_CMD = {
     CMD_RECORDING_START : 'CMD_RECORDING_START',
     CMD_RECORDING_END : 'CMD_RECORDING_END',

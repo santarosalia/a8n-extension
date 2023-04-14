@@ -1,4 +1,4 @@
-import { CrxInfo } from "@CrxClass";
+import { CrxInfo, CrxBrowserOpenEvent } from "@CrxClass";
 import { setItemFromLocalStorage,
     createViewTab,
     openViewWindow,
@@ -13,11 +13,9 @@ import { EVENT } from "@CrxConstants";
 const crxInfo = new CrxInfo();
 
 const init = () => {
-    setItemFromLocalStorage(CRX_RECORDS, [{
-        type : EVENT.OPENBROWSER,
-        value : 'https://www.naver.com',
-        frameStack : []
-    }]);
+    const e = new CrxBrowserOpenEvent('https://www.naver.com');
+
+    setItemFromLocalStorage(CRX_RECORDS, [e]);
     
     createRecordingTargetTab().then(result => {
         openRecordingTargetWindow(result).then(result => {

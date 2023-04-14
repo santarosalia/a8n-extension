@@ -1,5 +1,5 @@
-import { FrameStack } from '@CrxInterface';
-import { EVENT, INFO_BY_EVENT_TYPE } from '@CrxConstants';
+import { EventInfo, FrameStack } from '@CrxInterface';
+import { EVENT, getLocatorInfo } from '@CrxConstants';
 export class CapturedEventDetails {
     AT_TARGET : number
     BUBBLING_PHASE : number
@@ -65,21 +65,11 @@ export class CapturedEventDetails {
 
     constructor (ev : Event) {
         this.getDetails(ev);
-        this.typeCheck(ev);
     }
 
     getDetails(ev : Event) {
         for (let k in ev) {
           this[k] = ev[k];
-        }
-    }
-
-    typeCheck(ev : Event) {
-        const target = ev.target as Element;
-
-        if (target.localName === EVENT.SELECT) {
-            this.type = EVENT.SELECT;
-            this.selectedIndex = (target as HTMLSelectElement).selectedIndex;
         }
     }
 }
@@ -89,6 +79,7 @@ export class CapturedEvent extends CapturedEventDetails {
     class : string[];
     name : string;
     value : string;
+    locator : string;
     xpath : string;
     fullXpath : string;
     linkTextXpath : string;
@@ -97,23 +88,24 @@ export class CapturedEvent extends CapturedEventDetails {
     localName : string;
     textContent : string;
     target : Element;
-    info : any[];
-
+    info : EventInfo[]
     constructor (ev : Event) {
         super(ev);
-        this.target = ev.target as Element;
-        this.id = this.target.id;
-        this.class = this.target.classList ? Array.from(this.target.classList) : null;
-        this.name = this.target.getAttribute('name');
-        this.value = (ev.target as HTMLInputElement).value;
-        this.localName = this.target.localName;
-        this.textContent = this.target.textContent;
-        this.xpath = this.getXPath(this.target);
-        this.fullXpath = this.getFullXpath(this.target);
-        this.linkTextXpath = this.getLinkText(this.target);
-        this.cssSelector = this.getCssSelector(this.target);
-        this.frameStack = this.getFrameStack();
-        this.info = this.getInfo(this.type);
+        if (ev !== null) {
+            this.target = ev.target as Element;
+            this.id = this.target.id;
+            this.class = this.target.classList ? Array.from(this.target.classList).filter(item => item !== 'crx-highlight') : null;
+            this.name = this.target.getAttribute('name');
+            this.value = (ev.target as HTMLInputElement).value;
+            this.localName = this.target.localName;
+            this.textContent = this.target.textContent;
+            this.locator = this.getXPath(this.target);
+            this.xpath = this.getXPath(this.target);
+            this.fullXpath = this.getFullXpath(this.target);
+            this.linkTextXpath = this.getLinkText(this.target);
+            this.cssSelector = this.getCssSelector(this.target);
+            this.frameStack = this.getFrameStack();
+        }
     }
 
     getXPath(el : Element) {
@@ -326,10 +318,6 @@ export class CapturedEvent extends CapturedEventDetails {
 
         }
     }
-
-    getInfo (type : string) {
-        return INFO_BY_EVENT_TYPE[type];
-    }
 }
 
 
@@ -340,5 +328,103 @@ export class CrxInfo {
     TARGET_TABS : chrome.tabs.Tab[]
     constructor () {
         
+    }
+}
+
+export class CrxBrowserOpenEvent extends CapturedEvent {
+    constructor (url : string) {
+        super(null);
+        this.info = this.getInfo();
+        this.type = EVENT.OPENBROWSER;
+        this.value = url;
+        this.frameStack = [];
+    }
+    getInfo() {
+        return [
+            {
+                type : 'input',
+                displayName : 'URL',
+                value : 'value'
+            }
+        ]
+    }
+}
+
+
+export class CrxClickEvent extends CapturedEvent {
+    info : EventInfo[]
+
+    constructor (ev : Event) {
+        super(ev);
+        this.info = this.getInfo();
+    }
+    
+    getInfo() {
+        return [
+            {
+                type : 'readonly',
+                displayName : '텍스트',
+                value : 'textContent'
+            },
+            {
+                type : 'selectLocator',
+                displayName : '로케이터',
+                values : [
+                    getLocatorInfo(this).xpath,
+                    getLocatorInfo(this).fullxpath,
+                    getLocatorInfo(this).linktextxpath
+                ]
+            }
+        ]
+    }
+}
+
+export class CrxInputEvent extends CapturedEvent {
+    constructor (ev : Event) {
+        super(ev);
+        this.info = this.getInfo();
+    }
+    getInfo() {
+        return [
+            {
+                type : 'input',
+                displayName : '값',
+                value : 'value'
+            },
+            {
+                type : 'selectLocator',
+                displayName : '로케이터',
+                values : [
+                    getLocatorInfo(this).xpath,
+                    getLocatorInfo(this).fullxpath,
+                    getLocatorInfo(this).linktextxpath
+                ]
+            },
+        ]
+    }
+}
+
+export class CrxSelectEvent extends CapturedEvent {
+    constructor (ev : Event) {
+        super(ev);
+        this.info = this.getInfo();
+    }
+    getInfo() {
+        return [
+            {
+                type : 'input',
+                displayName : '값',
+                value : 'value'
+            },
+            {
+                type : 'selectLocator',
+                displayName : '로케이터',
+                values : [
+                    getLocatorInfo(this).xpath,
+                    getLocatorInfo(this).fullxpath,
+                    getLocatorInfo(this).linktextxpath
+                ]
+            },
+        ]
     }
 }
