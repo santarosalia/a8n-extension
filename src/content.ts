@@ -1,23 +1,21 @@
 import { CapturedEvent, CrxClickEvent, CrxInputEvent } from '@CrxClass';
 import { CRX_RECORDS, EVENT, CRX_CMD } from "@CrxConstants";
-import { getItemFromLocalStorage, setItemFromLocalStorage, switchFrame } from '@CrxApi';
+import { getItemFromLocalStorage, sendMessageToServiceWorker, setItemFromLocalStorage, switchFrame } from '@CrxApi';
 import HilightCSS from '@/css/Highlight.css?raw'
-
 let started : boolean;
 
-const mouseEventHandler = async (ev : MouseEvent) => {
-    
-    const e = new CrxClickEvent(ev);
+const clickEventHandler = async (ev : MouseEvent) => {
 
-    
+    const e = new CrxClickEvent(ev);
     getItemFromLocalStorage([CRX_RECORDS]).then(result => {
         const records = result[CRX_RECORDS];
         
         const isSameFrame : boolean = JSON.stringify(e.frameStack) === JSON.stringify(records[records.length-1].frameStack);
         if (!isSameFrame) records.push(switchFrame(e));
-        
         records.push(e);
+        sendMessageToServiceWorker(CRX_CMD.CMD_CAPTURE_IMAGE)
         setItemFromLocalStorage(CRX_RECORDS, records);
+        
     });
 }
 
@@ -46,6 +44,9 @@ const mouseoutEventHandler = (ev : Event) => {
 }
 const keydownEventHandler = (ev : Event)=> {
     const e = new CapturedEvent(ev);
+    if (e.key === 'Control') {
+        
+    }
     if (e.key !== 'Enter') return;
     getItemFromLocalStorage([CRX_RECORDS]).then(result => {
         const records = result[CRX_RECORDS];
@@ -60,7 +61,7 @@ const eventHandler = (ev : Event) => {
             break;
         }
         case EVENT.CLICK : {
-            mouseEventHandler(ev as MouseEvent);
+            clickEventHandler(ev as MouseEvent);
             break;
         }
         case EVENT.MOUSEOVER : {
@@ -73,6 +74,11 @@ const eventHandler = (ev : Event) => {
         }
         case EVENT.KEYDOWN : {
             keydownEventHandler(ev);
+            break;
+        }
+        case 'contextmenu' : {
+
+            break;
         }
     }
 }
@@ -83,13 +89,14 @@ chrome.runtime.onMessage.addListener(request => {
             if (started) return;
 
             window.addEventListener(EVENT.CLICK, eventHandler, true);
+            window.addEventListener('contextmenu', eventHandler, true);
             window.addEventListener(EVENT.SCROLL, eventHandler, true);
             window.addEventListener(EVENT.INPUT, eventHandler, true);
             window.addEventListener(EVENT.WHEEL, eventHandler, true);
             window.addEventListener(EVENT.MOUSEOVER, eventHandler, true);
             window.addEventListener(EVENT.MOUSEOUT, eventHandler, true);
             window.addEventListener(EVENT.KEYDOWN, eventHandler, true);
-
+            
             const style = window.document.createElement('style');
             style.innerHTML = HilightCSS;
             window.document.head.appendChild(style);

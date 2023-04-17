@@ -95,7 +95,6 @@
                       <v-col cols="3" class="pa-0 text-center">
                           <span>{{ info.displayName }}</span>
                       </v-col>
-
                       <v-col cols="8" v-if="info.type === 'readonly'">
                           <v-text-field v-if="info.type === 'readonly'" v-model="record.value" density="compact" variant="outlined" hide-details readonly></v-text-field>
                       </v-col>
@@ -105,6 +104,11 @@
                       <v-col cols="8" v-else-if="info.type === 'selectLocator'">
                           <v-select v-model="locator" variant="solo" density="compact" :items="info.values" item-title="displayName" hide-details @update:model-value="changeLocator"></v-select>
                           <v-text-field v-model="locatorValue" variant="outlined" density="compact" hide-details readonly></v-text-field>
+                      </v-col>
+                      <v-col cols="8" v-else-if="info.type === 'image'">
+                          <v-img :src="record.image">
+                          </v-img>
+                          
                       </v-col>
                       
                   </v-row>

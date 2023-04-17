@@ -1,5 +1,7 @@
 import { EventInfo, FrameStack } from '@CrxInterface';
 import { EVENT, getLocatorInfo } from '@CrxConstants';
+import html2canvas from 'html2canvas';
+
 export class CapturedEventDetails {
     AT_TARGET : number
     BUBBLING_PHASE : number
@@ -89,6 +91,7 @@ export class CapturedEvent extends CapturedEventDetails {
     textContent : string;
     target : Element;
     info : EventInfo[]
+    image : string
     constructor (ev : Event) {
         super(ev);
         if (ev !== null) {
@@ -374,6 +377,11 @@ export class CrxClickEvent extends CapturedEvent {
                     getLocatorInfo(this).fullxpath,
                     getLocatorInfo(this).linktextxpath
                 ]
+            },
+            {
+                type : 'image',
+                displayName : '이미지',
+                value : this.image
             }
         ]
     }

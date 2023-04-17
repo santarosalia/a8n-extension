@@ -5,7 +5,10 @@ import { setItemFromLocalStorage,
     createRecordingTargetTab,
     openRecordingTargetWindow,
     sendMessageByWindowId,
-    onHighlightedTab
+    onHighlightedTab,
+    windowFocus,
+    captureImage,
+    getItemFromLocalStorage
 } from "@CrxApi";
 import { CRX_CMD, CRX_RECORDS } from "@CrxConstants";
 import { EVENT } from "@CrxConstants";
@@ -31,8 +34,24 @@ const init = () => {
     });
 }
 
-const onMessage = (request : chrome.webRequest.WebRequestDetails) => {
-    console.log(request)
+const onMessage = (message : any,sender , sendResponse :any) => {
+    switch (message.command) {
+        case CRX_CMD.CMD_RECORDING_WINDOW_FOCUS : {
+            windowFocus(crxInfo.TARGET_WINDOW_ID);
+            break;
+        }
+        case CRX_CMD.CMD_CAPTURE_IMAGE : {
+            captureImage(crxInfo.TARGET_WINDOW_ID).then(image => {
+                // getItemFromLocalStorage([CRX_RECORDS]).then(result => {
+                //     const records = result.CRX_RECORDS;
+                //     records[message.payload].image = image;
+                //     setItemFromLocalStorage(CRX_RECORDS, records);
+                // });
+                sendResponse(image)
+            })
+        }
+
+    }
 }
 const storageChange = (d) => {
     // console.log(d)
@@ -52,7 +71,10 @@ chrome.storage.onChanged.addListener(storageChange);
 
 chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
 chrome.runtime.onInstalled.addListener(()=> {
-    setInterval(()=>{
-        sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_CMD.CMD_RECORDING_START);
+    const injectInterval = setInterval(()=>{
+        sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_CMD.CMD_RECORDING_START).catch((e) => {
+            //레코딩 창 닫힌 경우!
+            clearInterval(injectInterval);
+        });
     },1000);
 });

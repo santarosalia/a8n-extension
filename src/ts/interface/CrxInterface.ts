@@ -18,6 +18,7 @@ export interface CapturedEventDetails extends EventDetails {
     locator : string
     class : string[]
     name : string
+    image : string
 }
 
 export interface EventDetails {

@@ -1,6 +1,7 @@
 import { CRX_MSG_RECEIVER } from "@CrxConstants";
 import { CRX_RECORDS, EVENT } from "@CrxConstants";
 import { CapturedEvent } from "@CrxClass";
+import html2canvas from 'html2canvas';
 
 export const getItemFromLocalStorage = (key : string[]) => {
     return chrome.storage.local.get(key);
@@ -44,6 +45,8 @@ export const openRecordingTargetWindow = (tab : chrome.tabs.Tab) => {
 
 export const sendMessageByWindowId = async (windowId : number, command :string) => {
     return chrome.tabs.query({windowId : windowId}).then(tabs => {
+        if (tabs.length === 0) throw new Error("Window is Closed");
+        
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
                 receiver : CRX_MSG_RECEIVER.WEB_RECORDER,
@@ -81,3 +84,22 @@ export const switchFrame = (e : CapturedEvent) => {
         frameStack : e.frameStack
     }
 }
+
+export const windowFocus = (windowId : number) => {
+    return chrome.windows.update(windowId, {focused : true});
+}
+
+export const sendMessageToServiceWorker = (cmd : string, payload? : any) => {
+    return chrome.runtime.sendMessage({
+        receiver : CRX_MSG_RECEIVER.SERVICE_WORKER,
+        command : cmd,
+        payload : payload
+    },result => {
+        console.log(result)
+    });
+}
+
+export const captureImage = (windowId : number) => {
+    return chrome.tabs.captureVisibleTab(windowId, {format : 'png'})
+}
+

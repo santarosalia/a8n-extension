@@ -1,7 +1,8 @@
 import { createStore } from "vuex";
 import { CRX_RECORDS } from '@CrxConstants'
-import { getItemFromLocalStorage, setItemFromLocalStorage } from "@CrxApi";
+import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker } from "@CrxApi";
 import { toRaw } from "vue";
+import { CRX_CMD } from "@CrxConstants";
 
 export default createStore({
     modules : {
@@ -34,6 +35,9 @@ export default createStore({
             const records = toRaw(getters['getRecords']);
             records[payload.index] = toRaw(payload.record);
             setItemFromLocalStorage(CRX_RECORDS, records);
+        },
+        recordingWindowFocus() {
+            sendMessageToServiceWorker(CRX_CMD.CMD_RECORDING_WINDOW_FOCUS);
         }
     }
 });
