@@ -14,7 +14,7 @@ export const topbarMenu = [
 ];
 
 export const CRX_RECORDS = 'CRX_RECORDS';
-
+export const CRX_NEW_RECORD = 'CRX_NEW_RECORD';
 export const CRX_MSG_RECEIVER = {
     SERVICE_WORKER : 'SERVICE_WORKER',
     WEB_RECORDER : 'WEB_RECORDER',
@@ -36,19 +36,23 @@ export const getLocatorInfo = (self : CapturedEvent) => {
     return {
         xpath : {
             displayName : 'XPath',
-            value : self.xpath
+            type : 'xpath',
+            val : self.xpath
         },
         fullxpath : {
             displayName : '전체 XPath',
-            value : self.fullXpath
+            type : 'fullXpath',
+            val : self.fullXpath
         },
         linktextxpath : {
             displayName : '링크 텍스트 XPath',
-            value : self.linkTextXpath
+            type : 'linkTextXpath',
+            val : self.linkTextXpath
         },
         cssselector : {
             displayName : 'CSS 선택자',
-            value : self.cssSelector
+            type : 'cssSelector',
+            val : self.cssSelector
         },
     }
     
@@ -74,6 +78,7 @@ export const CRX_CMD = {
     CMD_RECORDING_END : 'CMD_RECORDING_END',
     CMD_STORE_CAPTURED_EVENT : 'CMD_STORE_CAPTURED_EVENT',
     CMD_RECORDING_WINDOW_FOCUS : 'CMD_RECORDING_WINDOW_FOCUS',
-    CMD_CAPTURE_IMAGE : 'CMD_CAPTURE_IMAGE'
+    CMD_CAPTURE_IMAGE : 'CMD_CAPTURE_IMAGE',
+    CMD_SEND_EVENT : 'CMD_SEND_EVENT'
 }
 

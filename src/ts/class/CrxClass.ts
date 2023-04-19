@@ -1,6 +1,5 @@
 import { EventInfo, FrameStack } from '@CrxInterface';
 import { EVENT, getLocatorInfo } from '@CrxConstants';
-import html2canvas from 'html2canvas';
 
 export class CapturedEventDetails {
     AT_TARGET : number
@@ -80,7 +79,7 @@ export class CapturedEvent extends CapturedEventDetails {
     id : string;
     class : string[];
     name : string;
-    value : string;
+    value : string | number;
     locator : string;
     xpath : string;
     fullXpath : string;
@@ -92,6 +91,8 @@ export class CapturedEvent extends CapturedEventDetails {
     target : Element;
     info : EventInfo[]
     image : string
+    rect : any
+
     constructor (ev : Event) {
         super(ev);
         if (ev !== null) {
@@ -102,6 +103,7 @@ export class CapturedEvent extends CapturedEventDetails {
             this.value = (ev.target as HTMLInputElement).value;
             this.localName = this.target.localName;
             this.textContent = this.target.textContent;
+            this.rect = this.getBoundingClientRect();
             this.locator = this.getXPath(this.target);
             this.xpath = this.getXPath(this.target);
             this.fullXpath = this.getFullXpath(this.target);
@@ -290,13 +292,7 @@ export class CapturedEvent extends CapturedEventDetails {
                 }
 
             };
-
-            // // Walk up the DOM tree to compile a unique selector
-            // while (elSrc.parentNode) {
-            //   if (getSelector(elSrc)) return aSel.join(" > ");
-            //   elSrc = elSrc.parentNode;
-            // }
-
+            
             return getSelector(elSrc) ? aSel.join(" > ") : '';
         } catch (e) {
 
@@ -312,7 +308,8 @@ export class CapturedEvent extends CapturedEventDetails {
                 frameStack.push({
                     frameIndex : frameInedx++,
                     id : fe.getAttribute('id'),
-                    name : fe.getAttribute('name')
+                    name : fe.getAttribute('name'),
+                    element : fe
                 });
                 fe = fe.contentWindow.parent.frameElement as HTMLFrameElement;
             }
@@ -321,6 +318,17 @@ export class CapturedEvent extends CapturedEventDetails {
 
         }
     }
+    getBoundingClientRect() {
+        const rect = this.target.getBoundingClientRect();
+        this.getFrameStack().forEach(frame => {
+            const frameRect = frame.element.getBoundingClientRect();
+            rect.x += frameRect.x
+            rect.y += frameRect.y
+        });
+
+        return JSON.parse(JSON.stringify(rect));
+    }
+
 }
 
 
@@ -408,6 +416,11 @@ export class CrxInputEvent extends CapturedEvent {
                     getLocatorInfo(this).linktextxpath
                 ]
             },
+            {
+                type : 'image',
+                displayName : '이미지',
+                value : this.image
+            }
         ]
     }
 }
@@ -433,6 +446,46 @@ export class CrxSelectEvent extends CapturedEvent {
                     getLocatorInfo(this).linktextxpath
                 ]
             },
+            {
+                type : 'image',
+                displayName : '이미지',
+                value : this.image
+            }
+        ]
+    }
+}
+
+export class CrxKeyEvent extends CapturedEvent {
+    constructor (ev : Event) {
+        super(ev);
+        this.info = this.getInfo();
+    }
+    getInfo() {
+        return [
+            {
+                type : 'readonly',
+                displayName : '키',
+                value : 'key'
+            }
+        ]
+    }
+}
+
+export class CrxMoveTabEvent extends CapturedEvent {
+    constructor (tabIndex : number) {
+        super(null);
+        this.type = EVENT.MOVETAB;
+        this.value = tabIndex;
+        this.frameStack = [];
+        this.info = this.getInfo();
+    }
+    getInfo() {
+        return [
+            {
+                type : 'readonly',
+                displayName : '탭 인덱스',
+                value : 'value'
+            }
         ]
     }
 }

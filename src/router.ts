@@ -1,6 +1,6 @@
-import {createWebHashHistory, createRouter} from 'vue-router';
+import {createWebHashHistory, createRouter, RouteRecordRaw} from 'vue-router';
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
     {
         path : '/',
         component : () => import('@/components/recordinghistory/RecordingHistory.vue')
@@ -23,7 +23,7 @@ const routes = [
 
 const router = createRouter({
     history : createWebHashHistory(),
-    routes
+    routes : routes
 });
 
 router.beforeEach((to, from, next) => {    

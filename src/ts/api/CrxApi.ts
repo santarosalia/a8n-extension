@@ -1,7 +1,6 @@
-import { CRX_MSG_RECEIVER } from "@CrxConstants";
+import { CRX_MSG_RECEIVER, CRX_NEW_RECORD } from "@CrxConstants";
 import { CRX_RECORDS, EVENT } from "@CrxConstants";
-import { CapturedEvent } from "@CrxClass";
-import html2canvas from 'html2canvas';
+import { CapturedEvent, CrxMoveTabEvent } from "@CrxClass";
 
 export const getItemFromLocalStorage = (key : string[]) => {
     return chrome.storage.local.get(key);
@@ -39,7 +38,8 @@ export const createRecordingTargetTab = () => {
 export const openRecordingTargetWindow = (tab : chrome.tabs.Tab) => {
     return chrome.windows.create({
         tabId : tab.id,
-        type : "normal"
+        type : 'normal',
+        state : 'maximized'
     });
 }
 
@@ -64,16 +64,9 @@ export const onHighlightedTab = (windowId : number) => {
     setTimeout(() => {
         currentWindowTabs(windowId).then(tabs => {
             const activeTabIndex = tabs.find(tab => tab.active).index;
-            getItemFromLocalStorage([CRX_RECORDS]).then(result => {
-                // 브라우저 오픈 시 탭 이동 인식해버려서 길이 1일 때 리턴함
-                if (result.CRX_RECORDS.length === 1) return;
-                result.CRX_RECORDS.push({
-                    type : EVENT.MOVETAB,
-                    value : activeTabIndex,
-                    frameStack : []
-                });
-                setItemFromLocalStorage(CRX_RECORDS, result.CRX_RECORDS);
-            });
+            const e = new CrxMoveTabEvent(activeTabIndex);
+            setItemFromLocalStorage(CRX_NEW_RECORD, e);
+
         });
     }, 100);
 }
@@ -89,17 +82,40 @@ export const windowFocus = (windowId : number) => {
     return chrome.windows.update(windowId, {focused : true});
 }
 
-export const sendMessageToServiceWorker = (cmd : string, payload? : any) => {
+export const sendMessageToServiceWorker = (cmd : string, payload? : any, callback? : (result : any) => any ) => {
     return chrome.runtime.sendMessage({
         receiver : CRX_MSG_RECEIVER.SERVICE_WORKER,
         command : cmd,
         payload : payload
-    },result => {
-        console.log(result)
-    });
+    }).then(callback);
 }
 
 export const captureImage = (windowId : number) => {
     return chrome.tabs.captureVisibleTab(windowId, {format : 'png'})
 }
 
+export const editImage = (image : string, rect : DOMRect) => {
+    return new Promise<string>((res, rej) => {
+        const img = new Image();
+        img.src = image;
+        
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+
+            canvas.width = rect.width+40;
+            canvas.height = rect.height+40;
+            
+            const ctx = canvas.getContext('2d'); 
+            ctx.drawImage(img,rect.x-20,rect.y-20,rect.width+40,rect.height+40,0,0,rect.width+40,rect.height+40);
+            res(canvas.toDataURL());
+
+        }
+        
+    });
+
+        
+
+
+
+
+}

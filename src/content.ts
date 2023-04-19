@@ -1,36 +1,18 @@
-import { CapturedEvent, CrxClickEvent, CrxInputEvent } from '@CrxClass';
-import { CRX_RECORDS, EVENT, CRX_CMD } from "@CrxConstants";
-import { getItemFromLocalStorage, sendMessageToServiceWorker, setItemFromLocalStorage, switchFrame } from '@CrxApi';
+import { CrxClickEvent, CrxInputEvent, CrxKeyEvent } from '@CrxClass';
+import { EVENT, CRX_CMD, CRX_NEW_RECORD } from "@CrxConstants";
+import { setItemFromLocalStorage} from '@CrxApi';
 import HilightCSS from '@/css/Highlight.css?raw'
 let started : boolean;
 
-const clickEventHandler = async (ev : MouseEvent) => {
-
+const clickEventHandler = (ev : MouseEvent) => {
     const e = new CrxClickEvent(ev);
-    getItemFromLocalStorage([CRX_RECORDS]).then(result => {
-        const records = result[CRX_RECORDS];
-        
-        const isSameFrame : boolean = JSON.stringify(e.frameStack) === JSON.stringify(records[records.length-1].frameStack);
-        if (!isSameFrame) records.push(switchFrame(e));
-        records.push(e);
-        sendMessageToServiceWorker(CRX_CMD.CMD_CAPTURE_IMAGE)
-        setItemFromLocalStorage(CRX_RECORDS, records);
-        
-    });
+    setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
 
 const inputEventHandler = (ev : Event) => {
     const e = new CrxInputEvent(ev);
-    getItemFromLocalStorage([CRX_RECORDS]).then(result => {
-        const records = result[CRX_RECORDS];
-        
-        const isSameFrame : boolean = JSON.stringify(e.frameStack) === JSON.stringify(records[records.length-1].frameStack);
-        if (!isSameFrame) records.push(switchFrame(e));
-
-        if (e.type === records[records.length-1].type) records.pop();
-        records.push(e);
-        setItemFromLocalStorage(CRX_RECORDS, records);
-    });
+    // console.log(e)
+    setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
 
 const mouseoverEventHandler = (ev : Event) => {
@@ -43,20 +25,18 @@ const mouseoutEventHandler = (ev : Event) => {
     target.classList.remove('crx-highlight');
 }
 const keydownEventHandler = (ev : Event)=> {
-    const e = new CapturedEvent(ev);
+    const e = new CrxKeyEvent(ev);
     if (e.key === 'Control') {
         
     }
     if (e.key !== 'Enter') return;
-    getItemFromLocalStorage([CRX_RECORDS]).then(result => {
-        const records = result[CRX_RECORDS];
-        records.push(e);
-        setItemFromLocalStorage(CRX_RECORDS, records);
-    });
+    console.log(e)
+    setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
 const eventHandler = (ev : Event) => {
     switch (ev.type) {
         case EVENT.INPUT || EVENT.SELECT : {
+            console.log(ev)
             inputEventHandler(ev);
             break;
         }

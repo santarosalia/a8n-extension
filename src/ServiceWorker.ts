@@ -7,11 +7,9 @@ import { setItemFromLocalStorage,
     sendMessageByWindowId,
     onHighlightedTab,
     windowFocus,
-    captureImage,
-    getItemFromLocalStorage
+    captureImage
 } from "@CrxApi";
 import { CRX_CMD, CRX_RECORDS } from "@CrxConstants";
-import { EVENT } from "@CrxConstants";
 
 const crxInfo = new CrxInfo();
 
@@ -34,7 +32,7 @@ const init = () => {
     });
 }
 
-const onMessage = (message : any,sender , sendResponse :any) => {
+const onMessage = (message : any, sender , sendResponse : any) => {
     switch (message.command) {
         case CRX_CMD.CMD_RECORDING_WINDOW_FOCUS : {
             windowFocus(crxInfo.TARGET_WINDOW_ID);
@@ -42,13 +40,12 @@ const onMessage = (message : any,sender , sendResponse :any) => {
         }
         case CRX_CMD.CMD_CAPTURE_IMAGE : {
             captureImage(crxInfo.TARGET_WINDOW_ID).then(image => {
-                // getItemFromLocalStorage([CRX_RECORDS]).then(result => {
-                //     const records = result.CRX_RECORDS;
-                //     records[message.payload].image = image;
-                //     setItemFromLocalStorage(CRX_RECORDS, records);
-                // });
-                sendResponse(image)
-            })
+                sendResponse({image : image});
+            }).catch(e => {
+                console.log(e)
+                sendResponse({error: e});
+            });
+            return true;
         }
 
     }

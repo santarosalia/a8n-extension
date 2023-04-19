@@ -15,7 +15,8 @@
         "types": [
             "chrome",
             "vuetify",
-            "vite/client"
+            "vite/client",
+            "vue-router"
         ],
         "paths": {
             "@/*": ["src/*"],
@@ -44,7 +45,7 @@
         "src/**/*.vue",
         "tests/**/*.ts",
         "tests/**/*.tsx",
-        "src/main.js"
+        "src/main.ts"
     ],
     "exclude": [
         "node_modules"

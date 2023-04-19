@@ -15,10 +15,12 @@ export interface CapturedEventDetails extends EventDetails {
     cssSelector : string
     frameStack : FrameStack[]
     info : EventInfo[]
-    locator : string
+    locator : Locator
     class : string[]
     name : string
     image : string
+    clientWidth : number
+    clientHeight : number
 }
 
 export interface EventDetails {
@@ -83,6 +85,7 @@ export interface EventDetails {
     location: number
     repeat : boolean
     selectedIndex : number
+
 }
 
 export interface FrameStack {
@@ -99,5 +102,18 @@ export interface EventInfo {
 
 export interface LocatorInfo {
     displayName : string
+    type : string
+    val : string
+}
+
+interface Locator {
+    type : LocatorType
     value : string
+}
+
+export enum LocatorType {
+    Xpath = 'xpath',
+    FullXpath = 'fullXpath',
+    LinkTextXpath = 'linkTextXpath',
+    CssSelector = 'cssSelector'
 }
