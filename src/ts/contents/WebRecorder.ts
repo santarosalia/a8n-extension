@@ -63,3 +63,22 @@ export const WebRecorderEventHandler =  (ev : Event) => {
         }
     }
 }
+
+export const webRecorderStart = () => {
+    window.addEventListener(EVENT.CLICK, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.CONTEXTMENU, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.SCROLL, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.INPUT, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.WHEEL, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.MOUSEOVER, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.MOUSEOUT, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.KEYDOWN, WebRecorderEventHandler, true);
+}
+
+export const webRecorderEnd = () => {
+    window.removeEventListener(EVENT.CLICK, WebRecorderEventHandler);
+    window.removeEventListener(EVENT.SCROLL, WebRecorderEventHandler);
+    window.removeEventListener(EVENT.INPUT, WebRecorderEventHandler);
+    window.removeEventListener(EVENT.SELECT, WebRecorderEventHandler);
+    window.removeEventListener(EVENT.WHEEL, WebRecorderEventHandler);
+}
