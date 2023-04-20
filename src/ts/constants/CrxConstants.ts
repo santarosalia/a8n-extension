@@ -70,7 +70,8 @@ export const EVENT = {
     MOVETAB : 'movetab',
     REMOVETAB : 'removetab',
     OPENBROWSER : 'openbrowser',
-    SWITCHFRAME : 'switchframe'
+    SWITCHFRAME : 'switchframe',
+    CONTEXTMENU : 'contextmenu'
 }
 
 export const CRX_CMD = {

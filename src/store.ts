@@ -3,7 +3,7 @@ import { CRX_RECORDS, EVENT } from '@CrxConstants'
 import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage } from "@CrxApi";
 import { toRaw } from "vue";
 import { CRX_CMD } from "@CrxConstants";
-import { CapturedEvent, CrxInputEvent } from "@CrxClass";
+import { CapturedEvent } from "@CrxClass";
 
 export default createStore({
     modules : {
