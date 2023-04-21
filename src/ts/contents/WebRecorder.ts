@@ -1,8 +1,15 @@
 import { CrxClickEvent, CrxInputEvent, CrxKeyEvent } from '@CrxClass';
 import { EVENT, CRX_NEW_RECORD } from "@CrxConstants";
 import { setItemFromLocalStorage} from '@CrxApi';
+import CrxContextMenu from '@/ts/class/CrxContextMenu';
+
+window.customElements.define('crx-contextmenu',CrxContextMenu);
+let crxContextMenu = new CrxContextMenu(0,0);
 
 const clickEventHandler = (ev : MouseEvent) => {
+    const target = ev.target as Element;
+    if (isContextMenu(target)) return;
+
     const e = new CrxClickEvent(ev);
     setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
@@ -14,6 +21,8 @@ const inputEventHandler = (ev : Event) => {
 
 const mouseoverEventHandler = (ev : Event) => {
     const target = ev.target as Element;
+    if (isContextMenu(target)) return;
+    
     target.classList.add('crx-highlight');
 }
 
@@ -27,14 +36,23 @@ const keydownEventHandler = (ev : Event)=> {
         
     }
     if (e.key !== 'Enter') return;
-    console.log(e)
     setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
 
 const contextmenuEventHandler = (ev : Event) => {
-    console.log(ev)
+    ev.preventDefault();
+    const e = new CrxClickEvent(ev);
+    crxContextMenu.hide();
+    crxContextMenu = new CrxContextMenu(e.pageX,e.pageY);
+    document.head.after(crxContextMenu);
+
+}
+const isContextMenu = (target : Element) => {
+    return target.closest('crx-contextmenu');
 }
 export const WebRecorderEventHandler =  (ev : Event) => {
+
+    
     switch (ev.type) {
         case EVENT.INPUT || EVENT.SELECT : {
             console.log(ev)

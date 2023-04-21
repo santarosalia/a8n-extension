@@ -117,3 +117,18 @@ export enum LocatorType {
     LinkTextXpath = 'linkTextXpath',
     CssSelector = 'cssSelector'
 }
+
+export interface CrxMessage {
+    receiver : string
+    command : CRX_COMMAND
+    payload? : any
+}
+
+export enum CRX_COMMAND {
+    CMD_RECORDING_START = 'CMD_RECORDING_START',
+    CMD_RECORDING_END = 'CMD_RECORDING_END',
+    CMD_STORE_CAPTURED_EVENT = 'CMD_STORE_CAPTURED_EVENT',
+    CMD_RECORDING_WINDOW_FOCUS = 'CMD_RECORDING_WINDOW_FOCUS',
+    CMD_CAPTURE_IMAGE = 'CMD_CAPTURE_IMAGE',
+    CMD_SEND_EVENT = 'CMD_SEND_EVENT'
+}

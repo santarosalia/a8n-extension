@@ -2,8 +2,8 @@ import { createStore } from "vuex";
 import { CRX_RECORDS, EVENT } from '@CrxConstants'
 import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage } from "@CrxApi";
 import { toRaw } from "vue";
-import { CRX_CMD } from "@CrxConstants";
 import { CapturedEvent } from "@CrxClass";
+import { CRX_COMMAND } from "@CrxInterface";
 
 export default createStore({
     modules : {
@@ -41,7 +41,7 @@ export default createStore({
                     break;
                 }
                 default : {
-                    await sendMessageToServiceWorker(CRX_CMD.CMD_CAPTURE_IMAGE).then(async result => {
+                    await sendMessageToServiceWorker(CRX_COMMAND.CMD_CAPTURE_IMAGE).then(async result => {
                         if (result.error) throw new Error(result.error);
                         await editImage(result.image, newVal.rect).then(result => {
                             
@@ -69,7 +69,7 @@ export default createStore({
             setItemFromLocalStorage(CRX_RECORDS, records);
         },
         recordingWindowFocus() {
-            sendMessageToServiceWorker(CRX_CMD.CMD_RECORDING_WINDOW_FOCUS);
+            sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_WINDOW_FOCUS);
         }
     }
 });

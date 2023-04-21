@@ -1,6 +1,7 @@
 import { CRX_MSG_RECEIVER, CRX_NEW_RECORD } from "@CrxConstants";
 import { CRX_RECORDS, EVENT } from "@CrxConstants";
 import { CapturedEvent, CrxMoveTabEvent } from "@CrxClass";
+import { CRX_COMMAND } from '@CrxInterface'
 
 export const getItemFromLocalStorage = (key : string[]) => {
     return chrome.storage.local.get(key);
@@ -82,7 +83,8 @@ export const windowFocus = (windowId : number) => {
     return chrome.windows.update(windowId, {focused : true});
 }
 
-export const sendMessageToServiceWorker = (cmd : string, payload? : any, callback? : (result : any) => any ) => {
+export const sendMessageToServiceWorker = (cmd : CRX_COMMAND, payload? : any, callback? : (result : any) => any ) => {
+    console.log(CRX_COMMAND.CMD_RECORDING_END)
     return chrome.runtime.sendMessage({
         receiver : CRX_MSG_RECEIVER.SERVICE_WORKER,
         command : cmd,

@@ -9,7 +9,8 @@ import { setItemFromLocalStorage,
     windowFocus,
     captureImage
 } from "@CrxApi";
-import { CRX_CMD, CRX_RECORDS } from "@CrxConstants";
+import { CRX_RECORDS } from "@CrxConstants";
+import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
 
 const crxInfo = new CrxInfo();
 
@@ -32,13 +33,13 @@ const init = () => {
     });
 }
 
-const onMessage = (message : any, sender , sendResponse : any) => {
+const onMessage = (message : CrxMessage, sender , sendResponse : any) => {
     switch (message.command) {
-        case CRX_CMD.CMD_RECORDING_WINDOW_FOCUS : {
+        case CRX_COMMAND.CMD_RECORDING_WINDOW_FOCUS : {
             windowFocus(crxInfo.TARGET_WINDOW_ID);
             break;
         }
-        case CRX_CMD.CMD_CAPTURE_IMAGE : {
+        case CRX_COMMAND.CMD_CAPTURE_IMAGE : {
             captureImage(crxInfo.TARGET_WINDOW_ID).then(image => {
                 sendResponse({image : image});
             }).catch(e => {
@@ -69,7 +70,7 @@ chrome.storage.onChanged.addListener(storageChange);
 chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
 chrome.runtime.onInstalled.addListener(()=> {
     const injectInterval = setInterval(()=>{
-        sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_CMD.CMD_RECORDING_START).catch((e) => {
+        sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
             //레코딩 창 닫힌 경우!
             clearInterval(injectInterval);
         });
