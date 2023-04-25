@@ -1,10 +1,14 @@
 import { CrxClickEvent, CrxInputEvent, CrxKeyEvent } from '@CrxClass';
-import { EVENT, CRX_NEW_RECORD } from "@CrxConstants";
+import { EVENT, CRX_NEW_RECORD, CRX_MSG_RECEIVER } from "@CrxConstants";
 import { setItemFromLocalStorage} from '@CrxApi';
 import CrxContextMenu from '@/ts/class/CrxContextMenu';
+import { CRX_COMMAND, CrxMessage } from '@CrxInterface';
+import CrxHilightCSS from '@/css/CrxHighlight.css?raw'
+import CrxContexMenuCSS from '@/css/CrxContextMenu.css?raw'
 
 window.customElements.define('crx-contextmenu',CrxContextMenu);
-let crxContextMenu = new CrxContextMenu(0,0);
+let crxContextMenu = new CrxContextMenu(0,0,null);
+let webRecorderStatus : boolean;
 
 const clickEventHandler = (ev : MouseEvent) => {
     const target = ev.target as Element;
@@ -41,25 +45,27 @@ const keydownEventHandler = (ev : Event)=> {
 
 const contextmenuEventHandler = (ev : Event) => {
     ev.preventDefault();
-    const e = new CrxClickEvent(ev);
     crxContextMenu.hide();
-    crxContextMenu = new CrxContextMenu(e.pageX,e.pageY);
-    document.head.after(crxContextMenu);
 
+    const e = new CrxClickEvent(ev);
+    
+    crxContextMenu = new CrxContextMenu(e.pageX,e.pageY, e);
+    document.head.after(crxContextMenu);
+    crxContextMenu.show();
 }
 const isContextMenu = (target : Element) => {
     return target.closest('crx-contextmenu');
 }
-export const WebRecorderEventHandler =  (ev : Event) => {
+const WebRecorderEventHandler =  (ev : Event) => {
 
     
     switch (ev.type) {
         case EVENT.INPUT || EVENT.SELECT : {
-            console.log(ev)
             inputEventHandler(ev);
             break;
         }
         case EVENT.CLICK : {
+            crxContextMenu.hide();
             clickEventHandler(ev as MouseEvent);
             break;
         }
@@ -82,7 +88,7 @@ export const WebRecorderEventHandler =  (ev : Event) => {
     }
 }
 
-export const webRecorderStart = () => {
+const webRecorderStart = () => {
     window.addEventListener(EVENT.CLICK, WebRecorderEventHandler, true);
     window.addEventListener(EVENT.CONTEXTMENU, WebRecorderEventHandler, true);
     window.addEventListener(EVENT.SCROLL, WebRecorderEventHandler, true);
@@ -93,10 +99,33 @@ export const webRecorderStart = () => {
     window.addEventListener(EVENT.KEYDOWN, WebRecorderEventHandler, true);
 }
 
-export const webRecorderEnd = () => {
+const webRecorderEnd = () => {
     window.removeEventListener(EVENT.CLICK, WebRecorderEventHandler);
     window.removeEventListener(EVENT.SCROLL, WebRecorderEventHandler);
     window.removeEventListener(EVENT.INPUT, WebRecorderEventHandler);
     window.removeEventListener(EVENT.SELECT, WebRecorderEventHandler);
     window.removeEventListener(EVENT.WHEEL, WebRecorderEventHandler);
+}
+
+export const webRecorder = (request : CrxMessage) => {
+    if (request.receiver !== CRX_MSG_RECEIVER.WEB_RECORDER) return;
+
+    switch (request.command) {
+        case CRX_COMMAND.CMD_RECORDING_START : {
+            if (webRecorderStatus) return;
+            webRecorderStart();
+            const crxHighlightStyle = document.createElement('style');
+            crxHighlightStyle.innerHTML = CrxHilightCSS;
+            document.head.appendChild(crxHighlightStyle);
+            const crxContextMenuStyle = document.createElement('style');
+            crxContextMenuStyle.innerHTML = CrxContexMenuCSS;
+            document.head.appendChild(crxContextMenuStyle)
+            webRecorderStatus = true;
+            break;
+        }
+        case CRX_COMMAND.CMD_RECORDING_END : {
+            webRecorderEnd();
+            break;
+        }
+    }
 }

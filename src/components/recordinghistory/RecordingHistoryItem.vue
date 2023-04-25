@@ -50,7 +50,7 @@
                 <v-card max-width="400" variant="text" class="pt-2">
                   <v-row v-if="record.type === EVENT.CLICK || record.type === EVENT.INPUT || record.type === EVENT.SELECT" align="center">
                       <v-col>
-                        <v-list-group value >
+                        <v-list-group value align="center">
                         <template #activator="{ props }">
                           <v-list-item v-bind="props" title="엘리먼트 정보" prepend-icon="mdi-info"></v-list-item>
                         </template>

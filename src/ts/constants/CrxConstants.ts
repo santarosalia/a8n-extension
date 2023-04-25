@@ -29,7 +29,10 @@ export const EVENT_TYPE_TO_KOREAN = {
     openbrowser : '브라우저 열기',
     keydown : '키보드 입력',
     switchframe : '프레임 이동',
-    select : '셀렉트 박스'
+    select : '셀렉트 박스',
+    readtext : '텍스트 읽기',
+    readattribute : '속성값 읽기',
+    hover : '마우스 Hover'
 }
 
 export const getLocatorInfo = (self : CapturedEvent) => {
@@ -71,6 +74,11 @@ export const EVENT = {
     REMOVETAB : 'removetab',
     OPENBROWSER : 'openbrowser',
     SWITCHFRAME : 'switchframe',
-    CONTEXTMENU : 'contextmenu'
+    CONTEXTMENU : 'contextmenu',
+    READTEXT : 'readtext',
+    DATASCRAPING : 'datascraping',
+    READATTRIBUTE : 'readattribute',
+    HOVER : 'hover',
+    OPENVIEW : 'openview'
 }
 

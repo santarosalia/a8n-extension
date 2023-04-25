@@ -84,7 +84,6 @@ export const windowFocus = (windowId : number) => {
 }
 
 export const sendMessageToServiceWorker = (cmd : CRX_COMMAND, payload? : any, callback? : (result : any) => any ) => {
-    console.log(CRX_COMMAND.CMD_RECORDING_END)
     return chrome.runtime.sendMessage({
         receiver : CRX_MSG_RECEIVER.SERVICE_WORKER,
         command : cmd,
@@ -100,24 +99,15 @@ export const editImage = (image : string, rect : DOMRect) => {
     return new Promise<string>((res, rej) => {
         const img = new Image();
         img.src = image;
-        
         img.onload = () => {
             const canvas = document.createElement('canvas');
 
-            canvas.width = rect.width+40;
-            canvas.height = rect.height+40;
+            canvas.width = rect.width+100;
+            canvas.height = rect.height+100;
             
             const ctx = canvas.getContext('2d'); 
-            ctx.drawImage(img,rect.x-20,rect.y-20,rect.width+40,rect.height+40,0,0,rect.width+40,rect.height+40);
+            ctx.drawImage(img, rect.x-50, rect.y-50, rect.width+100, rect.height+100, 0, 0, rect.width+100, rect.height+100);
             res(canvas.toDataURL());
-
         }
-        
     });
-
-        
-
-
-
-
 }

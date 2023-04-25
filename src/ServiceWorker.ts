@@ -26,11 +26,7 @@ const init = () => {
         });
     });
 
-    createViewTab().then(result => {
-        openViewWindow(result).then(result => {
-            crxInfo.VIEW_WINDOW_ID = result.id;
-        });
-    });
+    openView();
 }
 
 const onMessage = (message : CrxMessage, sender , sendResponse : any) => {
@@ -48,8 +44,23 @@ const onMessage = (message : CrxMessage, sender , sendResponse : any) => {
             });
             return true;
         }
-
+        case CRX_COMMAND.CMD_OPEN_VIEW : {
+            sendMessageByWindowId(crxInfo.VIEW_WINDOW_ID,'').then(() => {
+                windowFocus(crxInfo.VIEW_WINDOW_ID);
+            }).catch(() => {
+                openView();
+            });
+            
+            break;
+        }
     }
+}
+const openView = () => {
+    createViewTab().then(result => {
+        openViewWindow(result).then(result => {
+            crxInfo.VIEW_WINDOW_ID = result.id;
+        });
+    });
 }
 const storageChange = (d) => {
     // console.log(d)
