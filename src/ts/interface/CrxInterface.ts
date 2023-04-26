@@ -133,3 +133,14 @@ export enum CRX_COMMAND {
     CMD_SEND_EVENT = 'CMD_SEND_EVENT',
     CMD_OPEN_VIEW = 'CMD_OPEN_VIEW'
 }
+
+export interface ScrapingDatas {
+    exceptRow : []
+    data : ScrapingData[]
+}
+interface ScrapingData {
+    columnSize : number
+    pattern : string
+    textData : string[][]
+    exceptColumn : number[]
+}

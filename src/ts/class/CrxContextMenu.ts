@@ -6,23 +6,23 @@ import { CRX_COMMAND } from "@CrxInterface";
 const menu = [
     {
         title : '텍스트 읽기',
-        value : 'readtext'
+        value : EVENT.READTEXT
     },
     {
         title : '데이터스크래핑',
-        value : 'datascrapping'
+        value : EVENT.DATASCRAPING
     },
     {
         title : '속성값 읽기',
-        value : 'readattribute'
+        value : EVENT.READATTRIBUTE
     },
     {
         title : '마우스 Hover',
-        value : 'hover'
+        value : EVENT.HOVER
     },
     {
         title : '레코딩 내역창 열기',
-        value : 'openview'
+        value : EVENT.OPENVIEW
     }
 ]
 class CrxContextMenu extends HTMLElement {

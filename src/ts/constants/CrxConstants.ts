@@ -15,6 +15,9 @@ export const topbarMenu = [
 
 export const CRX_RECORDS = 'CRX_RECORDS';
 export const CRX_NEW_RECORD = 'CRX_NEW_RECORD';
+export const CRX_ADD_SCRAPING_DATA = 'CRX_ADD_SCRAPING_DATA';
+export const CRX_SCRAPING_DATAS = 'CRX_SCRAPING_DATAS';
+
 export const CRX_MSG_RECEIVER = {
     SERVICE_WORKER : 'SERVICE_WORKER',
     WEB_RECORDER : 'WEB_RECORDER',

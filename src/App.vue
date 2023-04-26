@@ -14,7 +14,7 @@ import { useStore } from 'vuex'
 import Footer from '@/components/Footer.vue';
 const store = useStore();
 store.dispatch('dispatchRecords');
-
+store.dispatch('dispatchScrapingDatas');
 </script>
 <style>
 @font-face {
@@ -30,6 +30,7 @@ body::-webkit-scrollbar {
 }
 *::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 *::-webkit-scrollbar-track{
   background-color: gainsboro;

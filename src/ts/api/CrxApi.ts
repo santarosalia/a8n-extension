@@ -7,7 +7,7 @@ export const getItemFromLocalStorage = (key : string[]) => {
     return chrome.storage.local.get(key);
 }
 
-export const setItemFromLocalStorage = (key :string , value : any) => {
+export const setItemFromLocalStorage = (key : string , value : any) => {
     const obj = {};
     obj[key] = value;
     return chrome.storage.local.set(obj);

@@ -9,7 +9,7 @@ import { setItemFromLocalStorage,
     windowFocus,
     captureImage
 } from "@CrxApi";
-import { CRX_RECORDS } from "@CrxConstants";
+import { CRX_ADD_SCRAPING_DATA, CRX_RECORDS, CRX_SCRAPING_DATAS } from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
 
 const crxInfo = new CrxInfo();
@@ -18,6 +18,11 @@ const init = () => {
     const e = new CrxBrowserOpenEvent('https://www.naver.com');
 
     setItemFromLocalStorage(CRX_RECORDS, [e]);
+    setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA, null);
+    setItemFromLocalStorage(CRX_SCRAPING_DATAS, {
+        exceptRow : [],
+        data : []
+    });
     
     createRecordingTargetTab().then(result => {
         openRecordingTargetWindow(result).then(result => {

@@ -1,24 +1,35 @@
 import { createStore } from "vuex";
-import { CRX_RECORDS, EVENT } from '@CrxConstants'
+import { CRX_RECORDS, CRX_SCRAPING_DATAS, EVENT } from '@CrxConstants'
 import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage } from "@CrxApi";
 import { toRaw } from "vue";
 import { CapturedEvent } from "@CrxClass";
-import { CRX_COMMAND } from "@CrxInterface";
+import { CRX_COMMAND, ScrapingDatas } from "@CrxInterface";
 
 export default createStore({
     modules : {
     },
     state : {
-        CRX_RECORDS : []
+        CRX_RECORDS : [],
+        CRX_SCRAPING_DATAS : {
+            exceptRow : [],
+            data : []
+        }
     },
     getters : {
         getRecords(state) {
             return state.CRX_RECORDS;
+        },
+        getScrapingDatas(state) {
+            return state.CRX_SCRAPING_DATAS;
         }
+
     },
     mutations : {
         setRecords(state, CRX_RECORDS) {
             state.CRX_RECORDS = CRX_RECORDS;
+        },
+        setScrapingDatas(state, CRX_SCRAPING_DATA) {
+            state.CRX_SCRAPING_DATAS = CRX_SCRAPING_DATA;
         }
     },
     actions : {
@@ -70,6 +81,36 @@ export default createStore({
         },
         recordingWindowFocus() {
             sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_WINDOW_FOCUS);
+        },
+        addScrapingData({ getters }, payload) {
+            const scrapingDatas = toRaw(getters['getScrapingDatas'] as ScrapingDatas);
+            const newVal = payload.newValue.data;
+            console.log(123123123)
+            console.log(scrapingDatas)
+            scrapingDatas.data.push(newVal);
+            setItemFromLocalStorage(CRX_SCRAPING_DATAS, scrapingDatas);
+        },
+        dispatchScrapingDatas({ commit }) {
+            getItemFromLocalStorage([CRX_SCRAPING_DATAS]).then(result => {
+                commit('setScrapingDatas', result[CRX_SCRAPING_DATAS]);
+            });
+        },
+        clearScrapingData() {
+            setItemFromLocalStorage(CRX_SCRAPING_DATAS, {
+                exceptRow : [],
+                data : []
+            });
+        },
+        removeColumn({getters}, payload) {
+            const colIdx = payload.colIdx;
+            const removeIdx = payload.removeIdx;
+
+            const scrapingDatas = toRaw(getters['getScrapingDatas'] as ScrapingDatas);
+            scrapingDatas.data[colIdx].exceptColumn.push(removeIdx);
+
+            setItemFromLocalStorage(CRX_SCRAPING_DATAS, scrapingDatas);
+
         }
+
     }
 });

@@ -17,8 +17,8 @@
 
     const router = useRouter();
     const topbarMenus = topbarMenu;
-    const tab = ref(null);
-
+    const tab = ref(0);
+    router.push('/')
     const pushRouter = (menu : TopbarMenuDetails) => {
         router.push(menu.path);
     }

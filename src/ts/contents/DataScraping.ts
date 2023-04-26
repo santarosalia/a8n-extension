@@ -1,3 +1,6 @@
+import { setItemFromLocalStorage } from "@CrxApi";
+import { CRX_ADD_SCRAPING_DATA } from "@CrxConstants";
+
 export const dataScraping = (ev : Event) => {
     const pattern = findPatternByNextSiblings(ev) ?? findPatternByPreviousSiblings(ev);
 
@@ -91,14 +94,16 @@ export const dataScraping = (ev : Event) => {
         alert('스크래핑 데이터가 없습니다.');
         return;
     }
-    let data = {
+    const data = {
         textData: result,
         pattern : pattern,
         columnSize: colSize
     };
-    
-    console.log(data)
 
+    setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA,{
+        data : data
+    });
+    console.log(1)
 }
 
 const findPatternByNextSiblings = (ev : Event) => {
