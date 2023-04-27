@@ -135,7 +135,7 @@ export enum CRX_COMMAND {
 }
 
 export interface ScrapingDatas {
-    exceptRow : []
+    exceptRow : number[]
     data : ScrapingData[]
 }
 interface ScrapingData {

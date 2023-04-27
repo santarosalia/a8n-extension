@@ -97,19 +97,23 @@ export default createStore({
         },
         clearScrapingData() {
             setItemFromLocalStorage(CRX_SCRAPING_DATAS, {
-                exceptRow : [],
+                exceptRow : [] as number[],
                 data : []
             });
         },
         removeColumn({getters}, payload) {
             const colIdx = payload.colIdx;
             const removeIdx = payload.removeIdx;
-
+            
             const scrapingDatas = toRaw(getters['getScrapingDatas'] as ScrapingDatas);
             scrapingDatas.data[colIdx].exceptColumn.push(removeIdx);
 
             setItemFromLocalStorage(CRX_SCRAPING_DATAS, scrapingDatas);
-
+        },
+        removeRow({ getters }, payload : number) {
+            const scrapingDatas = toRaw(getters['getScrapingDatas'] as ScrapingDatas);
+            scrapingDatas.exceptRow.push(payload);
+            setItemFromLocalStorage(CRX_SCRAPING_DATAS, scrapingDatas);
         }
 
     }

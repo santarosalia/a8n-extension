@@ -97,7 +97,8 @@ export const dataScraping = (ev : Event) => {
     const data = {
         textData: result,
         pattern : pattern,
-        columnSize: colSize
+        columnSize: colSize,
+        exceptColumn : []
     };
 
     setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA,{

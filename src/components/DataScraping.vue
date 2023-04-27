@@ -6,19 +6,21 @@
           <tr>
             <td></td>
             <td v-for="i in scrapingDatasForTable.columnSize.reduce((a, b) => a + b)">
+              <span v-if="!scrapingDatasForTable.exceptColumn[getColIdx(i-1)].includes(getCurrentIdx(i-1))">
               <v-btn icon variant="text" density="comfortable" @click="removeColumn(i)">
                 <v-icon>mdi-minus</v-icon>
               </v-btn>
+            </span>
             </td>
           </tr>
           <tr v-for="tr,trIdx in scrapingDatasForTable.textData">
-            <td>
+            <td v-if="!scrapingDatas.exceptRow.includes(trIdx)">
               <v-btn icon variant="text" density="comfortable" @click="removeRow(trIdx)">
                 <v-icon>mdi-minus</v-icon>
               </v-btn>
             </td>
-            <td v-for="td in tr" class="text-truncate" :title="td">
-            {{ td }}
+            <td v-for="td,tdIdx in tr" class="text-truncate" :title="td" v-if="!scrapingDatas.exceptRow.includes(trIdx)">
+            <span v-if="!scrapingDatasForTable.exceptColumn[getColIdx(tdIdx)].includes(getCurrentIdx(tdIdx))">{{ td }}</span>
             </td>
           </tr>
         </tbody>
@@ -34,7 +36,7 @@ import { ScrapingDatas } from '@CrxInterface'
 
 const store = useStore();
 
-// const scrapingDatas = computed(() : ScrapingDatas => store.getters['getScrapingDatas']);
+const scrapingDatas = computed(() : ScrapingDatas => store.getters['getScrapingDatas']);
 
 const scrapingDatasForTable = computed(() => {
   const scrapingDatas : ScrapingDatas = store.getters['getScrapingDatas'];
@@ -48,13 +50,13 @@ const scrapingDatasForTable = computed(() => {
     columnSize : scrapingDatas.data.map(item => item.columnSize).reverse(),
     textData : textData,
     pattern : scrapingDatas.data.map(item => item.pattern).reverse(),
-    exceptColumn : scrapingDatas.data.map(item => item.exceptColumn).reverse()
+    exceptColumn : scrapingDatas.data.map(item => item.exceptColumn).reverse(),
   }
   return result;
 });
 
 const removeRow = (idx : number) => {
-  console.log(idx)
+  store.dispatch('removeRow',idx)
 }
 
 const removeColumn = (idx : number) => {
@@ -70,8 +72,34 @@ const removeColumn = (idx : number) => {
   }
   store.dispatch('removeColumn', {
     colIdx : colIdx,
-    removeIdx : idx
+    removeIdx : idx-1
   });
+}
+
+const getColIdx = (idx : number) => {
+  let colIdx : number;
+  const colSize = scrapingDatasForTable.value.columnSize;
+  for (let i in colSize) {
+    if (colSize[i] < idx) {
+      idx -= colSize[i];
+    } else {
+      colIdx = Number(i);
+      break;
+    }
+  }
+  return colIdx;
+}
+
+const getCurrentIdx = (idx : number) => {
+  const colSize = scrapingDatasForTable.value.columnSize;
+  for (let i in colSize) {
+    if (colSize[i] < idx) {
+      idx -= colSize[i];
+    } else {
+      break;
+    }
+  }
+  return idx;
 }
 
 </script>
