@@ -120,7 +120,7 @@
 <script setup lang="ts">
 
 import { CapturedEventDetails, LocatorType } from '@CrxInterface';
-import { EVENT, EVENT_TYPE_TO_KOREAN } from '@CrxConstants';
+import { EVENT, EVENT_TYPE_TO_KOREAN, CRX_ACTION } from '@CrxConstants';
 import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
@@ -134,11 +134,11 @@ const locatorDisplayName = ref('XPath');
 const locatorValue = ref(props.record.xpath);
 
 const removeRecord = (index : number) => {
-  store.dispatch('removeRecord', index);
+  store.dispatch(CRX_ACTION.REMOVE_RECORD, index);
 }
 
 const editRecord = (index : number, record : CapturedEventDetails) => {
-    store.dispatch('editRecord', {
+    store.dispatch(CRX_ACTION.EDIT_RECORD, {
         index : index,
         record : record
     });

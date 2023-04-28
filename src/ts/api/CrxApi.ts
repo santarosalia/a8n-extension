@@ -1,5 +1,5 @@
 import { CRX_MSG_RECEIVER, CRX_NEW_RECORD } from "@CrxConstants";
-import { CRX_RECORDS, EVENT } from "@CrxConstants";
+import { EVENT } from "@CrxConstants";
 import { CapturedEvent, CrxMoveTabEvent } from "@CrxClass";
 import { CRX_COMMAND } from '@CrxInterface'
 
@@ -44,14 +44,15 @@ export const openRecordingTargetWindow = (tab : chrome.tabs.Tab) => {
     });
 }
 
-export const sendMessageByWindowId = async (windowId : number, command :string) => {
+export const sendMessageByWindowId = async (windowId : number, command : CRX_COMMAND, payload? : any) => {
     return chrome.tabs.query({windowId : windowId}).then(tabs => {
         if (tabs.length === 0) throw new Error("Window is Closed");
         
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
                 receiver : CRX_MSG_RECEIVER.WEB_RECORDER,
-                command : command
+                command : command,
+                payload : payload
             });
         });
     });

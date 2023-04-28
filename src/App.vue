@@ -12,9 +12,10 @@
 import TopBar from '@/components/TopBar.vue';
 import { useStore } from 'vuex'
 import Footer from '@/components/Footer.vue';
+import { CRX_ACTION } from '@CrxConstants'
 const store = useStore();
-store.dispatch('dispatchRecords');
-store.dispatch('dispatchScrapingDatas');
+store.dispatch(CRX_ACTION.DISPATCH_RECORDS);
+store.dispatch(CRX_ACTION.DISPATCH_SCRAPING_DATAS);
 </script>
 <style>
 @font-face {

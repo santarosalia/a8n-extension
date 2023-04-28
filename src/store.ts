@@ -1,45 +1,63 @@
 import { createStore } from "vuex";
-import { CRX_RECORDS, CRX_SCRAPING_DATAS, EVENT } from '@CrxConstants'
+import { EVENT, CRX_STATE } from '@CrxConstants'
 import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage } from "@CrxApi";
 import { toRaw } from "vue";
 import { CapturedEvent } from "@CrxClass";
 import { CRX_COMMAND, ScrapingDatas } from "@CrxInterface";
 
-export default createStore({
-    modules : {
-    },
-    state : {
+const getInitState = () => {
+    const state = {
         CRX_RECORDS : [],
         CRX_SCRAPING_DATAS : {
             exceptRow : [],
             data : []
-        }
+        },
+    }
+    Object.keys(CRX_STATE.CRX_DIALOG_STATE).forEach(key => {
+        state[key] = false;
+    });
+    return state;
+}
+
+export default createStore({
+    modules : {
     },
+    state : getInitState(),
     getters : {
-        getRecords(state) {
+        CRX_RECORDS(state) {
             return state.CRX_RECORDS;
         },
-        getScrapingDatas(state) {
+        CRX_SCRAPING_DATAS(state) {
             return state.CRX_SCRAPING_DATAS;
+        },
+        CRX_MULTI_PAGE_DIALOG(state) {
+            return state[CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG];
+        },
+        CRX_CONFIRM_DIALOG(state) {
+            return state[CRX_STATE.CRX_DIALOG_STATE.CRX_CONFIRM_DIALOG];
         }
-
     },
     mutations : {
-        setRecords(state, CRX_RECORDS) {
+        CRX_RECORDS(state, CRX_RECORDS) {
             state.CRX_RECORDS = CRX_RECORDS;
         },
-        setScrapingDatas(state, CRX_SCRAPING_DATA) {
+        CRX_SCRAPING_DATAS(state, CRX_SCRAPING_DATA) {
             state.CRX_SCRAPING_DATAS = CRX_SCRAPING_DATA;
+        },
+        CRX_MULTI_PAGE_DIALOG(state, payload) {
+            state[CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG] = payload;
         }
     },
     actions : {
-        dispatchRecords({commit}) {
-            getItemFromLocalStorage([CRX_RECORDS]).then(result => {
-                commit('setRecords', result[CRX_RECORDS]);
-            })
+        DISPATCH_RECORDS({commit}) {
+            getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]).then(result => {
+                commit(CRX_STATE.CRX_RECORDS, result[CRX_STATE.CRX_RECORDS]);
+            });
         },
-        async addNewRecord({ getters }, payload) {
-            const records = toRaw(getters['getRecords']);
+        async ADD_NEW_RECORD({ getters }, payload) {
+            console.log(CRX_STATE.CRX_RECORDS)
+            const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
+            console.log(records)
             const newVal = payload.newValue as CapturedEvent;
             const oldVal = payload.oldValue as CapturedEvent;
             
@@ -67,53 +85,56 @@ export default createStore({
             const isSameFrame : boolean = JSON.stringify(oldVal.frameStack) === JSON.stringify(newVal.frameStack);
             if (!isSameFrame) records.push(switchFrame(newVal));
             records.push(newVal);
-            setItemFromLocalStorage(CRX_RECORDS, records);
+            setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
         },
-        removeRecord({ getters }, index : number) {
-            const records = toRaw(getters['getRecords']);
+        REMOVE_RECORD({ getters }, index : number) {
+            const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
             records.splice(index, 1);
-            setItemFromLocalStorage(CRX_RECORDS, records);
+            setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
         },
-        editRecord({ getters }, payload) {
-            const records = toRaw(getters['getRecords']);
+        EDIT_RECORD({ getters }, payload) {
+            const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
             records[payload.index] = toRaw(payload.record);
-            setItemFromLocalStorage(CRX_RECORDS, records);
+            setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
         },
-        recordingWindowFocus() {
+        RECORDING_WINDOW_FOCUS() {
             sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_WINDOW_FOCUS);
         },
-        addScrapingData({ getters }, payload) {
-            const scrapingDatas = toRaw(getters['getScrapingDatas'] as ScrapingDatas);
+        ADD_SCRAPING_DATA({ getters }, payload) {
+            const scrapingDatas = toRaw(getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas);
             const newVal = payload.newValue.data;
             console.log(123123123)
             console.log(scrapingDatas)
             scrapingDatas.data.push(newVal);
-            setItemFromLocalStorage(CRX_SCRAPING_DATAS, scrapingDatas);
+            setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, scrapingDatas);
         },
-        dispatchScrapingDatas({ commit }) {
-            getItemFromLocalStorage([CRX_SCRAPING_DATAS]).then(result => {
-                commit('setScrapingDatas', result[CRX_SCRAPING_DATAS]);
+        DISPATCH_SCRAPING_DATAS({ commit }) {
+            getItemFromLocalStorage([CRX_STATE.CRX_SCRAPING_DATAS]).then(result => {
+                commit(CRX_STATE.CRX_SCRAPING_DATAS, result[CRX_STATE.CRX_SCRAPING_DATAS]);
             });
         },
-        clearScrapingData() {
-            setItemFromLocalStorage(CRX_SCRAPING_DATAS, {
+        CLEAR_SCRAPING_DATA() {
+            setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, {
                 exceptRow : [] as number[],
                 data : []
             });
         },
-        removeColumn({getters}, payload) {
+        REMOVE_COLUMN({getters}, payload) {
             const colIdx = payload.colIdx;
             const removeIdx = payload.removeIdx;
             
-            const scrapingDatas = toRaw(getters['getScrapingDatas'] as ScrapingDatas);
+            const scrapingDatas = toRaw(getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas);
             scrapingDatas.data[colIdx].exceptColumn.push(removeIdx);
 
-            setItemFromLocalStorage(CRX_SCRAPING_DATAS, scrapingDatas);
+            setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, scrapingDatas);
         },
-        removeRow({ getters }, payload : number) {
-            const scrapingDatas = toRaw(getters['getScrapingDatas'] as ScrapingDatas);
+        REMOVE_ROW({ getters }, payload : number) {
+            const scrapingDatas = toRaw(getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas);
             scrapingDatas.exceptRow.push(payload);
-            setItemFromLocalStorage(CRX_SCRAPING_DATAS, scrapingDatas);
+            setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, scrapingDatas);
+        },
+        SELECT_NEXT_PAGE_BUTTON() {
+            sendMessageToServiceWorker(CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON);
         }
 
     }

@@ -1,6 +1,6 @@
 import { CrxClickEvent, CrxInputEvent, CrxKeyEvent } from '@CrxClass';
-import { EVENT, CRX_NEW_RECORD, CRX_MSG_RECEIVER } from "@CrxConstants";
-import { setItemFromLocalStorage} from '@CrxApi';
+import { EVENT, CRX_NEW_RECORD, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
+import { getItemFromLocalStorage, sendMessageToServiceWorker, setItemFromLocalStorage} from '@CrxApi';
 import CrxContextMenu from '@/ts/class/CrxContextMenu';
 import { CRX_COMMAND, CrxMessage } from '@CrxInterface';
 import CrxHilightCSS from '@/css/CrxHighlight.css?raw'
@@ -8,14 +8,24 @@ import CrxContexMenuCSS from '@/css/CrxContextMenu.css?raw'
 
 window.customElements.define('crx-contextmenu',CrxContextMenu);
 let crxContextMenu = new CrxContextMenu(0,0,null);
-let webRecorderStatus : boolean;
+let webRecorderStatus : boolean = false;
 
 const clickEventHandler = (ev : MouseEvent) => {
     const target = ev.target as Element;
     if (isContextMenu(target)) return;
 
     const e = new CrxClickEvent(ev);
-    setItemFromLocalStorage(CRX_NEW_RECORD, e);
+
+    getItemFromLocalStorage([CRX_STATE.CRX_NEXT_PAGE_BUTTON]).then(result => {
+        if (result[CRX_STATE.CRX_NEXT_PAGE_BUTTON]) {
+            sendMessageToServiceWorker(CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON, e.xpath);
+            setItemFromLocalStorage(CRX_STATE.CRX_NEXT_PAGE_BUTTON, false);
+
+        } else {
+            setItemFromLocalStorage(CRX_NEW_RECORD, e);
+
+        }
+    });
 }
 
 const inputEventHandler = (ev : Event) => {
@@ -24,6 +34,20 @@ const inputEventHandler = (ev : Event) => {
 }
 
 const mouseoverEventHandler = (ev : Event) => {
+    getItemFromLocalStorage([CRX_STATE.CRX_NEXT_PAGE_BUTTON]).then(result => {
+       
+        const preventEvent = (ev : Event) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+        
+        if (result[CRX_STATE.CRX_NEXT_PAGE_BUTTON]) {
+            ev.target.addEventListener('click', preventEvent, true);
+        } else {
+            ev.target.removeEventListener('click', preventEvent, true);
+        }
+
+    })
     const target = ev.target as Element;
     if (isContextMenu(target)) return;
     
@@ -57,7 +81,6 @@ const isContextMenu = (target : Element) => {
     return target.closest('crx-contextmenu');
 }
 const WebRecorderEventHandler =  (ev : Event) => {
-
     
     switch (ev.type) {
         case EVENT.INPUT || EVENT.SELECT : {
@@ -109,8 +132,8 @@ const webRecorderEnd = () => {
 
 export const webRecorder = (request : CrxMessage) => {
     if (request.receiver !== CRX_MSG_RECEIVER.WEB_RECORDER) return;
-
     switch (request.command) {
+        
         case CRX_COMMAND.CMD_RECORDING_START : {
             if (webRecorderStatus) return;
             webRecorderStart();

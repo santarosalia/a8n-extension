@@ -9,7 +9,7 @@ import { setItemFromLocalStorage,
     windowFocus,
     captureImage
 } from "@CrxApi";
-import { CRX_ADD_SCRAPING_DATA, CRX_RECORDS, CRX_SCRAPING_DATAS } from "@CrxConstants";
+import { CRX_ADD_SCRAPING_DATA, CRX_STATE } from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
 
 const crxInfo = new CrxInfo();
@@ -17,9 +17,9 @@ const crxInfo = new CrxInfo();
 const init = () => {
     const e = new CrxBrowserOpenEvent('https://www.naver.com');
 
-    setItemFromLocalStorage(CRX_RECORDS, [e]);
+    setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [e]);
     setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA, null);
-    setItemFromLocalStorage(CRX_SCRAPING_DATAS, {
+    setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, {
         exceptRow : [],
         data : []
     });
@@ -34,8 +34,10 @@ const init = () => {
     openView();
 }
 
-const onMessage = (message : CrxMessage, sender , sendResponse : any) => {
-    switch (message.command) {
+const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , sendResponse : any) => {
+    const COMMAND = message.command;
+    const SENDER = sender.tab.windowId;
+    switch (COMMAND) {
         case CRX_COMMAND.CMD_RECORDING_WINDOW_FOCUS : {
             windowFocus(crxInfo.TARGET_WINDOW_ID);
             break;
@@ -45,18 +47,30 @@ const onMessage = (message : CrxMessage, sender , sendResponse : any) => {
                 sendResponse({image : image});
             }).catch(e => {
                 console.log(e)
-                sendResponse({error: e});
+                sendResponse({error : e});
             });
             return true;
         }
         case CRX_COMMAND.CMD_OPEN_VIEW : {
-            sendMessageByWindowId(crxInfo.VIEW_WINDOW_ID,'').then(() => {
+            sendMessageByWindowId(crxInfo.VIEW_WINDOW_ID, CRX_COMMAND.NONE).then(() => {
                 windowFocus(crxInfo.VIEW_WINDOW_ID);
             }).catch(() => {
                 openView();
             });
             
             break;
+        }
+        case CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON : {
+            switch(SENDER) {
+                case crxInfo.VIEW_WINDOW_ID : {
+                    // sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID,CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON);
+                    setItemFromLocalStorage(CRX_STATE.CRX_NEXT_PAGE_BUTTON, true);
+                }
+                case crxInfo.TARGET_WINDOW_ID : {
+                    sendMessageByWindowId(crxInfo.VIEW_WINDOW_ID,CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON, message.payload);
+                }
+                default : break;
+            }
         }
     }
 }
