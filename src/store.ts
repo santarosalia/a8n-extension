@@ -55,9 +55,8 @@ export default createStore({
             });
         },
         async ADD_NEW_RECORD({ getters }, payload) {
-            console.log(CRX_STATE.CRX_RECORDS)
+
             const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
-            console.log(records)
             const newVal = payload.newValue as CapturedEvent;
             const oldVal = payload.oldValue as CapturedEvent;
             
@@ -103,8 +102,6 @@ export default createStore({
         ADD_SCRAPING_DATA({ getters }, payload) {
             const scrapingDatas = toRaw(getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas);
             const newVal = payload.newValue.data;
-            console.log(123123123)
-            console.log(scrapingDatas)
             scrapingDatas.data.push(newVal);
             setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, scrapingDatas);
         },
