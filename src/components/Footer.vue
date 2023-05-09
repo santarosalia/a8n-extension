@@ -4,7 +4,7 @@
             <v-icon>mdi-map-marker</v-icon>
             레코딩 창
         </v-btn>
-        <v-btn v-if="!isDataScraping">
+        <v-btn v-if="!isDataScraping" @click="saveData">
             <v-icon>mdi-inbox-arrow-up</v-icon>
             저장
         </v-btn>
@@ -85,6 +85,10 @@ const saveScrapingData = () => {
 }
 const multiPage = () => {
    store.commit(CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG, true);
+}
+
+const saveData = () => {
+    store.dispatch(CRX_ACTION.SAVE_DATA);
 }
 </script>
   

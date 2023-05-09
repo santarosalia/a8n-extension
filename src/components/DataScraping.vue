@@ -1,7 +1,7 @@
 <template>
-    <v-container fluid>
-      <span v-if="scrapingDatasForTable.textData.length === 0">스크래핑 데이터가 없습니다</span>
-      <v-table v-else density="compact">
+    <v-container fluid class="pa-0">
+      <div v-if="scrapingDatasForTable.textData.length === 0" class="pa-5">스크래핑 데이터가 없습니다</div>
+      <v-table v-else density="compact" :height="height">
         <tbody align="center">
           <tr>
             <td></td>
@@ -97,7 +97,7 @@ import { ref, watch, computed } from 'vue';
 import { CRX_STATE, CRX_ACTION } from '@CrxConstants'
 
 const store = useStore();
-
+const height = ref(window.innerHeight - (48 + 56));
 const multiPageDialog = ref(false);
 const multiPageCount = ref(0);
 const getMultiPageDialog = computed(() => store.getters[CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG]);
@@ -195,6 +195,9 @@ const saveMultiPage = () => {
   multiPageDialog.value = false;
 }
 
+window.onresize = () => {
+  height.value = window.innerHeight - (48 + 56);
+}
 watch(getMultiPageDialog, newVal => {
   multiPageDialog.value = newVal;
 });

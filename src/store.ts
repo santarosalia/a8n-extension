@@ -165,6 +165,11 @@ export default createStore({
             const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
             records.push(payload);
             setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
+        },
+        SAVE_DATA() {
+            // const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
+            // localStorage.setItem(CRX_STATE.CRX_RECORDS, JSON.stringify(records));
+            sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_END);
         }
 
     }

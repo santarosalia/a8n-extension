@@ -1,7 +1,7 @@
 import { CRX_MSG_RECEIVER, CRX_NEW_RECORD } from "@CrxConstants";
 import { EVENT } from "@CrxConstants";
 import { CapturedEvent, CrxMoveTabEvent } from "@CrxClass";
-import { CRX_COMMAND } from '@CrxInterface'
+import { CRX_COMMAND, CrxMessage } from '@CrxInterface'
 
 export const getItemFromLocalStorage = (key : string[]) => {
     return chrome.storage.local.get(key);
@@ -125,4 +125,12 @@ export const sendMessageToView = async (windowId : number, command : CRX_COMMAND
             });
         });
     });
+}
+
+export const closeWindow = (windowId : number) => {
+    return chrome.windows.remove(windowId);
+}
+
+export const sendMessageByTabId = (tabId : number, message : CrxMessage) => {
+    return chrome.tabs.sendMessage(tabId, message);
 }
