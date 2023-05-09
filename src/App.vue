@@ -13,9 +13,11 @@ import TopBar from '@/components/TopBar.vue';
 import { useStore } from 'vuex'
 import Footer from '@/components/Footer.vue';
 import { CRX_ACTION } from '@CrxConstants'
+import { CRX_CONTEXT_MENU_TYPE } from '@CrxInterface';
 const store = useStore();
 store.dispatch(CRX_ACTION.DISPATCH_RECORDS);
 store.dispatch(CRX_ACTION.DISPATCH_SCRAPING_DATAS);
+store.dispatch(CRX_ACTION.CONTEXT_MENU_CHANGE, CRX_CONTEXT_MENU_TYPE.NORMAL);
 </script>
 <style>
 @font-face {

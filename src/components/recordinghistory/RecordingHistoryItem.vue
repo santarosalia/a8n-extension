@@ -46,7 +46,7 @@
                 </v-btn>
             </v-toolbar>
 <!-- Dialog Contents-->
-            <v-container class="pa-1">
+            <v-container class="pa-1" align="center">
                 <v-card max-width="400" variant="text" class="pt-2">
                   <v-row v-if="record.type === EVENT.CLICK || record.type === EVENT.INPUT || record.type === EVENT.SELECT" align="center">
                       <v-col>

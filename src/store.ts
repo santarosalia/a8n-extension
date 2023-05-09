@@ -1,9 +1,9 @@
 import { createStore } from "vuex";
 import { EVENT, CRX_STATE } from '@CrxConstants'
-import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage } from "@CrxApi";
+import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage, sendMessageByWindowId } from "@CrxApi";
 import { toRaw } from "vue";
-import { CapturedEvent } from "@CrxClass";
-import { CRX_COMMAND, ScrapingDatas } from "@CrxInterface";
+import { CapturedEvent, CrxDataScrapingEvent } from "@CrxClass";
+import { CRX_COMMAND, CRX_CONTEXT_MENU_TYPE, ScrapingDatas } from "@CrxInterface";
 
 const getInitState = () => {
     const state = {
@@ -12,6 +12,10 @@ const getInitState = () => {
             exceptRow : [],
             data : []
         },
+        CRX_NEXT_PAGE_BUTTON : null,
+        CRX_NEXT_PAGE_NUMBER : null,
+        CRX_PAGE_COUNT : 0,
+        CRX_IS_MULTI_PAGE : false
     }
     Object.keys(CRX_STATE.CRX_DIALOG_STATE).forEach(key => {
         state[key] = false;
@@ -35,6 +39,18 @@ export default createStore({
         },
         CRX_CONFIRM_DIALOG(state) {
             return state[CRX_STATE.CRX_DIALOG_STATE.CRX_CONFIRM_DIALOG];
+        },
+        CRX_NEXT_PAGE_BUTTON(state) {
+            return state.CRX_NEXT_PAGE_BUTTON;
+        },
+        CRX_NEXT_PAGE_NUMBER(state) {
+            return state.CRX_NEXT_PAGE_NUMBER;
+        },
+        CRX_IS_MULTI_PAGE(state) {
+            return state.CRX_IS_MULTI_PAGE;
+        },
+        CRX_PAGE_COUNT(state) {
+            return state.CRX_PAGE_COUNT;
         }
     },
     mutations : {
@@ -46,6 +62,18 @@ export default createStore({
         },
         CRX_MULTI_PAGE_DIALOG(state, payload) {
             state[CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG] = payload;
+        },
+        CRX_NEXT_PAGE_BUTTON(state, payload) {
+            state[CRX_STATE.CRX_NEXT_PAGE_BUTTON] = payload;
+        },
+        CRX_NEXT_PAGE_NUMBER(state, payload) {
+            state[CRX_STATE.CRX_NEXT_PAGE_NUMBER] = payload;
+        },
+        CRX_IS_MULTI_PAGE(state, payload) {
+            state[CRX_STATE.CRX_IS_MULTI_PAGE] = payload;
+        },
+        CRX_PAGE_COUNT(state, payload) {
+            state[CRX_STATE.CRX_PAGE_COUNT] = payload;
         }
     },
     actions : {
@@ -130,8 +158,13 @@ export default createStore({
             scrapingDatas.exceptRow.push(payload);
             setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, scrapingDatas);
         },
-        SELECT_NEXT_PAGE_BUTTON() {
-            sendMessageToServiceWorker(CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON);
+        CONTEXT_MENU_CHANGE({}, payload : CRX_CONTEXT_MENU_TYPE) {
+            sendMessageToServiceWorker(CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE, payload);
+        },
+        SAVE_DATA_SCRAPING({ getters }, payload : CrxDataScrapingEvent) {
+            const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
+            records.push(payload);
+            setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
         }
 
     }

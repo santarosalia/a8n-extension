@@ -22,5 +22,10 @@
     const pushRouter = (menu : TopbarMenuDetails) => {
         router.push(menu.path);
     }
+    router.beforeEach((to, from, next) => {
+        if (to.path == '/rh') tab.value = 0;
+        from.path;
+        next();
+    })
 </script>
   

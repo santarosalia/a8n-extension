@@ -523,3 +523,18 @@ export class CrxContextMenuEvent extends CapturedEvent {
         ]
     }
 }
+
+export class CrxDataScrapingEvent extends CapturedEvent {
+
+    constructor (ev : Event, data : any) {
+        super(ev);
+        this.info = this.getInfo();
+        this.type = 'datascraping';
+        this.data = data;
+    }
+    
+    getInfo() {
+        return [
+        ]
+    }
+}

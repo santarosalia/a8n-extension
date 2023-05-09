@@ -9,15 +9,15 @@
             저장
         </v-btn>
         <v-btn v-if="isDataScraping" @click="scrapingDataClear">
-            <v-icon>mdi-minus</v-icon>
+            <v-icon>mdi-cancel</v-icon>
             스크래핑 초기화
         </v-btn>
-        <v-btn v-if="isDataScraping">
+        <v-btn v-if="isDataScraping" @click="saveScrapingData">
             <v-icon>mdi-inbox-arrow-up</v-icon>
             스크래핑 저장
         </v-btn>
         <v-btn v-if="isDataScraping" @click="multiPage">
-            <v-icon>mdi-plus</v-icon>
+            <v-icon>mdi-text-box-multiple-outline</v-icon>
             다중 페이지
         </v-btn>
     </v-bottom-navigation>
@@ -29,6 +29,8 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { CRX_STATE, CRX_ACTION } from '@CrxConstants';
+import { ScrapingDatas } from '@/ts/interface/CrxInterface';
+import { CrxDataScrapingEvent } from '@CrxClass';
 
 const store = useStore();
 const router = useRouter();
@@ -42,6 +44,44 @@ const recordingWindowFocus = () => {
 }
 const scrapingDataClear = () => {
     store.dispatch(CRX_ACTION.CLEAR_SCRAPING_DATA)
+}
+const saveScrapingData = () => {
+    let data :any;
+    const isMultiPage = store.getters[CRX_STATE.CRX_IS_MULTI_PAGE];
+    const scrapingDatas = store.getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas;
+    if (scrapingDatas.data.length === 0) return;
+    const exceptRow = scrapingDatas.exceptRow;
+    const patterns = scrapingDatas.data.map(item => item.pattern);
+    const columnSize = scrapingDatas.data.map(item => item.columnSize);
+    const exceptColumn = scrapingDatas.data.map(item => item.exceptColumn);
+
+    if (isMultiPage) {
+        const pageCnt = store.getters[CRX_STATE.CRX_PAGE_COUNT];
+        const nextPageButton = store.getters[CRX_STATE.CRX_NEXT_PAGE_BUTTON];
+        const nextPageNumber = store.getters[CRX_STATE.CRX_NEXT_PAGE_NUMBER];
+        data = {
+            patterns : patterns,
+            columnSize : columnSize,
+            exceptColumn : exceptColumn,
+            exceptRow : exceptRow,
+            pageCnt : pageCnt,
+            pageXpath : nextPageButton,
+            paginationXpath : nextPageNumber
+        }
+    } else {
+        data = {
+            patterns : patterns,
+            columnSize : columnSize,
+            exceptColumn : exceptColumn,
+            exceptRow : exceptRow
+        }
+    }
+    const e = new CrxDataScrapingEvent(null, data);
+    store.dispatch(CRX_ACTION.SAVE_DATA_SCRAPING, e);
+    store.dispatch(CRX_ACTION.CLEAR_SCRAPING_DATA);
+    router.push('/rh');
+    store.commit(CRX_STATE.CRX_IS_MULTI_PAGE, false);
+    
 }
 const multiPage = () => {
    store.commit(CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG, true);

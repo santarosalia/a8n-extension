@@ -7,9 +7,10 @@ import { setItemFromLocalStorage,
     sendMessageByWindowId,
     onHighlightedTab,
     windowFocus,
-    captureImage
+    captureImage,
+    sendMessageToView
 } from "@CrxApi";
-import { CRX_ADD_SCRAPING_DATA, CRX_STATE } from "@CrxConstants";
+import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
 
 const crxInfo = new CrxInfo();
@@ -35,8 +36,8 @@ const init = () => {
 }
 
 const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , sendResponse : any) => {
+    if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     const COMMAND = message.command;
-    const SENDER = sender.tab.windowId;
     switch (COMMAND) {
         case CRX_COMMAND.CMD_RECORDING_WINDOW_FOCUS : {
             windowFocus(crxInfo.TARGET_WINDOW_ID);
@@ -60,17 +61,17 @@ const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , 
             
             break;
         }
-        case CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON : {
-            switch(SENDER) {
-                case crxInfo.VIEW_WINDOW_ID : {
-                    // sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID,CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON);
-                    setItemFromLocalStorage(CRX_STATE.CRX_NEXT_PAGE_BUTTON, true);
-                }
-                case crxInfo.TARGET_WINDOW_ID : {
-                    sendMessageByWindowId(crxInfo.VIEW_WINDOW_ID,CRX_COMMAND.CMD_CAPTURE_NEXT_PAGE_BUTTON, message.payload);
-                }
-                default : break;
-            }
+        case CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE : {
+            sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE, message.payload);
+            break;
+        }
+        case CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON : {
+            sendMessageToView(crxInfo.VIEW_WINDOW_ID,CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON, message.payload);
+            break;
+        }
+        case CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER : {
+            sendMessageToView(crxInfo.VIEW_WINDOW_ID,CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER, message.payload);
+            break;
         }
     }
 }

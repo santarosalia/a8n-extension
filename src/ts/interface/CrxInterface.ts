@@ -133,14 +133,21 @@ export enum CRX_COMMAND {
     CMD_CAPTURE_IMAGE,
     CMD_SEND_EVENT,
     CMD_OPEN_VIEW,
-    CMD_CAPTURE_NEXT_PAGE_BUTTON,
-    CMD_CAPTURE_NEXT_PAGE_NUMBER
+    CMD_CONTEXT_MENU_CHANGE,
+    CMD_SEND_NEXT_PAGE_BUTTON,
+    CMD_SEND_NEXT_PAGE_NUMBER
+}
+
+export enum CRX_CONTEXT_MENU_TYPE {
+    NORMAL,
+    MULTIPAGE
 }
 
 export interface ScrapingDatas {
     exceptRow : number[]
     data : ScrapingData[]
 }
+
 interface ScrapingData {
     columnSize : number
     pattern : string

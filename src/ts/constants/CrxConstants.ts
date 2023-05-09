@@ -20,7 +20,8 @@ export const CRX_MSG_RECEIVER = {
     SERVICE_WORKER : 'SERVICE_WORKER',
     WEB_RECORDER : 'WEB_RECORDER',
     WEB_SELECTOR : 'WEB_SELECTOR',
-    BROWSER_CONTROLLER : 'BROWSER_CONTROLLER'
+    BROWSER_CONTROLLER : 'BROWSER_CONTROLLER',
+    VIEW : 'VIEW'
 }
 
 const CRX_DIALOG_STATE =  {
@@ -32,7 +33,10 @@ export const CRX_STATE = {
     CRX_RECORDS : 'CRX_RECORDS',
     CRX_SCRAPING_DATAS : 'CRX_SCRAPING_DATAS',
     CRX_DIALOG_STATE : CRX_DIALOG_STATE,
-    CRX_NEXT_PAGE_BUTTON : 'CRX_NEXT_PAGE_BUTTON'
+    CRX_NEXT_PAGE_BUTTON : 'CRX_NEXT_PAGE_BUTTON',
+    CRX_NEXT_PAGE_NUMBER : 'CRX_NEXT_PAGE_NUMBER',
+    CRX_IS_MULTI_PAGE : 'CRX_IS_MULTI_PAGE',
+    CRX_PAGE_COUNT : 'CRX_PAGE_COUNT'
 }
 export const CRX_ACTION = {
     DISPATCH_RECORDS : 'DISPATCH_RECORDS',
@@ -45,9 +49,8 @@ export const CRX_ACTION = {
     CLEAR_SCRAPING_DATA : 'CLEAR_SCRAPING_DATA',
     REMOVE_COLUMN : 'REMOVE_COLUMN',
     REMOVE_ROW : 'REMOVE_ROW',
-    SELECT_NEXT_PAGE_BUTTON : 'SELECT_NEXT_PAGE_BUTTON',
-    SELECT_NEXT_PAGE_NUMBER : 'SELECT_NEXT_PAGE_NUMBER'
-
+    CONTEXT_MENU_CHANGE : 'CONTEXT_MENU_CHANGE',
+    SAVE_DATA_SCRAPING : 'SAVE_DATA_SCRAPING'
 }
 export const EVENT_TYPE_TO_KOREAN = {
     click : '클릭',
@@ -60,7 +63,8 @@ export const EVENT_TYPE_TO_KOREAN = {
     select : '셀렉트 박스',
     readtext : '텍스트 읽기',
     readattribute : '속성값 읽기',
-    hover : '마우스 Hover'
+    hover : '마우스 Hover',
+    datascraping : '데이터 스크래핑'
 }
 
 export const getLocatorInfo = (self : CapturedEvent) => {
@@ -107,6 +111,8 @@ export const EVENT = {
     DATASCRAPING : 'datascraping',
     READATTRIBUTE : 'readattribute',
     HOVER : 'hover',
-    OPENVIEW : 'openview'
+    OPENVIEW : 'openview',
+    NEXTPAGEBUTTON : 'nextpagebutton',
+    NEXTPAGENUMBER : 'nextpagenumber'
 }
 

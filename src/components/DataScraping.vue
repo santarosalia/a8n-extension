@@ -26,7 +26,7 @@
         </tbody>
       </v-table>
     </v-container>
-    <v-dialog v-model="multiPageDialog" height="80%" max-width="350" max-height="500">   
+    <v-dialog v-model="multiPageDialog" height="400" max-width="350" max-height="500">   
       <v-card height="100%">
         <template #title>
           다중 페이지 설정
@@ -54,7 +54,14 @@
 
         <v-card-item>
           <v-label class="ma-1">다음 페이지 선택 방법</v-label>
-          <v-icon>mdi-help-circle-outline</v-icon>
+          <v-tooltip text="페이지에서 우클릭하여 버튼을 선택 해 주세요." location="top">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" variant="text" icon>
+                <v-icon>mdi-help-circle-outline</v-icon>
+              </v-btn>
+            </template>
+          </v-tooltip>
+          
           <!-- <v-img :src="example"></v-img> -->
         </v-card-item>
 
@@ -63,33 +70,31 @@
           <span class="v-label ml-1">다음 페이지 버튼</span>
 
           <v-btn-group class="ml-2" density="compact">
-            <v-btn v-if="isntSelectedNextPageButton" variant="outlined" @click="selectNextPageButton">선택</v-btn>
-            <v-btn v-else variant="outlined" >취소</v-btn>
+            <v-btn v-if="nextPageButton === null" variant="outlined">없음</v-btn>
+            <v-btn v-else variant="outlined" color="red" @click="resetNextPageButton">취소</v-btn>
           </v-btn-group>
 
 
           <span class="v-label ml-1">숫자 페이지 버튼</span>
 
           <v-btn-group class="ml-2" density="compact">
-            <v-btn v-if="isntSelectedNumberPageButton" variant="outlined" >선택</v-btn>
-            <v-btn v-else variant="outlined" >취소</v-btn>
+            <v-btn v-if="nextPageNumber === null" variant="outlined">없음</v-btn>
+            <v-btn v-else variant="outlined" color="red" @click="resetNumberPageButton">취소</v-btn>
           </v-btn-group>
         </v-card-item>
 
           
-        <v-btn variant="text" color="info" location="bottom end" position="absolute">SAVE</v-btn>
+        <v-btn variant="text" color="info" location="bottom end" position="absolute" @click="saveMultiPage">완료</v-btn>
 
       </v-card>
     </v-dialog>
   </template>
   
 <script lang="ts" setup>
-import { computed } from 'vue'
 import { useStore } from 'vuex'
-import { ScrapingDatas } from '@CrxInterface'
-import { ref, watch } from 'vue';
+import { ScrapingDatas, CRX_CONTEXT_MENU_TYPE } from '@CrxInterface'
+import { ref, watch, computed } from 'vue';
 import { CRX_STATE, CRX_ACTION } from '@CrxConstants'
-// import example from '@/assets/multipageex.gif';
 
 const store = useStore();
 
@@ -97,15 +102,22 @@ const multiPageDialog = ref(false);
 const multiPageCount = ref(0);
 const getMultiPageDialog = computed(() => store.getters[CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG]);
 const pageRadio = ref(1);
-const isntSelectedNextPageButton = ref(true);
-const isntSelectedNumberPageButton = ref(true);
+const nextPageButton = computed(() => store.getters[CRX_STATE.CRX_NEXT_PAGE_BUTTON]);
+const nextPageNumber = computed(() => store.getters[CRX_STATE.CRX_NEXT_PAGE_NUMBER]);
+const resetNextPageButton = () => {
+  store.commit(CRX_STATE.CRX_NEXT_PAGE_BUTTON, null);
+}
+const resetNumberPageButton = () => {
+  store.commit(CRX_STATE.CRX_NEXT_PAGE_NUMBER, null);
+}
 const multiPageDialogClose = () => {
   store.commit(CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG, false);
 }
+
 const scrapingDatas = computed(() : ScrapingDatas => store.getters[CRX_STATE.CRX_SCRAPING_DATAS]);
 const scrapingDatasForTable = computed(() => {
   const scrapingDatas : ScrapingDatas = store.getters[CRX_STATE.CRX_SCRAPING_DATAS];
-  let textData = [];
+  let textData :string[][] = [];
 
   scrapingDatas.data.reverse().forEach(item => {
     textData = item.textData.map((arr,idx) => arr.concat(textData[idx]))
@@ -167,8 +179,20 @@ const getCurrentIdx = (idx : number) => {
   return idx;
 }
 
-const selectNextPageButton = () => {
-  store.dispatch(CRX_ACTION.SELECT_NEXT_PAGE_BUTTON);
+const saveMultiPage = () => {
+  let pageCnt :string | number;
+  if (pageRadio.value === 1) {
+    pageCnt = '*';
+  } else {
+    pageCnt = multiPageCount.value;
+  }
+  store.commit(CRX_STATE.CRX_PAGE_COUNT, pageCnt);
+  if (store.getters[CRX_STATE.CRX_NEXT_PAGE_BUTTON] || store.getters[CRX_STATE.CRX_NEXT_PAGE_NUMBER]) {
+    store.commit(CRX_STATE.CRX_IS_MULTI_PAGE, true);
+  } else {
+    store.commit(CRX_STATE.CRX_IS_MULTI_PAGE, false);
+  }
+  multiPageDialog.value = false;
 }
 
 watch(getMultiPageDialog, newVal => {
@@ -177,6 +201,12 @@ watch(getMultiPageDialog, newVal => {
 
 watch(multiPageDialog, newVal => {
   store.commit(CRX_STATE.CRX_DIALOG_STATE.CRX_MULTI_PAGE_DIALOG, newVal);
+
+  if (newVal === true) {
+    store.dispatch(CRX_ACTION.CONTEXT_MENU_CHANGE, CRX_CONTEXT_MENU_TYPE.MULTIPAGE);
+  } else {
+    store.dispatch(CRX_ACTION.CONTEXT_MENU_CHANGE, CRX_CONTEXT_MENU_TYPE.NORMAL);
+  }
 });
 
 watch(multiPageCount, (newVal, oldVal) => {
