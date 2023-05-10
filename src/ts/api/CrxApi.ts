@@ -103,11 +103,11 @@ export const editImage = (image : string, rect : DOMRect) => {
         img.onload = () => {
             const canvas = document.createElement('canvas');
 
-            canvas.width = rect.width+100;
-            canvas.height = rect.height+100;
+            canvas.width = rect.width + 200;
+            canvas.height = rect.height + 200;
             
             const ctx = canvas.getContext('2d'); 
-            ctx.drawImage(img, rect.x-50, rect.y-50, rect.width+100, rect.height+100, 0, 0, rect.width+100, rect.height+100);
+            ctx.drawImage(img, rect.x - 100, rect.y - 100, rect.width + 200, rect.height + 200, 0, 0, rect.width + 200, rect.height + 200);
             res(canvas.toDataURL());
         }
     });
