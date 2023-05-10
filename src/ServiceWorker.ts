@@ -19,8 +19,9 @@ const crxInfo = new CrxInfo();
 console.log('--------------------');
 console.log('|     '+'%cd'+'%co'+'%cp'+'%ce '+'%cc'+'%cr'+'%cx'+'%c     |','color:red','color:orange','color:yellow','color:green','color:blue','color:navy','color:purple','color:white');
 console.log('--------------------');
-const init = () => {
-    const e = new CrxBrowserOpenEvent('https://www.naver.com');
+
+const init = (url : string) => {
+    const e = new CrxBrowserOpenEvent(url);
 
     setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [e]);
     setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA, null);
@@ -29,7 +30,7 @@ const init = () => {
         data : []
     });
     
-    createRecordingTargetTab().then(result => {
+    createRecordingTargetTab(url).then(result => {
         openRecordingTargetWindow(result).then(result => {
             crxInfo.TARGET_TAB = result.tabs[0];
             crxInfo.TARGET_WINDOW_ID = result.tabs[0].windowId;
@@ -79,7 +80,7 @@ const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , 
         }
         case CRX_COMMAND.CMD_RECORDING_END : {
             sendMessageByTabId(crxInfo.LAUNCHER_TAB_ID,{
-                receiver : CRX_MSG_RECEIVER.LAUNCHER,
+                receiver : CRX_MSG_RECEIVER.CONTENT_SCRIPT,
                 command : CRX_COMMAND.CMD_CREATE_ACTIVITY
             });
             closeWindow(crxInfo.TARGET_WINDOW_ID);
@@ -96,8 +97,8 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
         case CRX_COMMAND.CMD_LAUNCH_WEB_RECORDER : {
             crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
             crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
-            console.log(crxInfo)
-            init();
+            
+            init(message.payload);
             const injectInterval = setInterval(()=>{
                 // if(crxInfo.TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
                 sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {

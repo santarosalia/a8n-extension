@@ -1,5 +1,5 @@
 import { getItemFromLocalStorage, sendMessageToServiceWorker, setItemFromLocalStorage } from "@CrxApi";
-import { CrxClickEvent, CrxContextMenuEvent } from "@CrxClass";
+import { CrxClickEvent, CrxContextMenuEvent, CrxReadAttributeEvent } from "@CrxClass";
 import { CRX_NEW_RECORD, CRX_STATE, EVENT } from "@CrxConstants";
 import { dataScraping } from "@/ts/contents/DataScraping";
 import { CRX_COMMAND, CRX_CONTEXT_MENU_TYPE } from "@CrxInterface";
@@ -112,7 +112,12 @@ class CrxContextMenu extends HTMLElement {
                 sendMessageToServiceWorker(CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER, this.e.xpath);
                 return;
             }
-
+            case EVENT.HOVER : {
+                const e = new CrxReadAttributeEvent(this.e);
+                setItemFromLocalStorage(CRX_NEW_RECORD, e);
+                return;
+            }
+            
             default : break;
         }
         const e = new CrxContextMenuEvent(this.e, contextMenuValue);

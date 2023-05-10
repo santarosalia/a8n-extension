@@ -29,9 +29,9 @@ export const openViewWindow = (tab : chrome.tabs.Tab) => {
     });
 }
 
-export const createRecordingTargetTab = () => {
+export const createRecordingTargetTab = (url : string) => {
     return chrome.tabs.create({
-        url: 'https://www.naver.com',
+        url: url,
         active : true
     });
 }

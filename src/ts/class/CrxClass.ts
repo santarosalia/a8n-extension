@@ -1,4 +1,4 @@
-import { EventInfo, FrameStack } from '@CrxInterface';
+import { EventInfo, FrameStack, Locator, LocatorType } from '@CrxInterface';
 import { EVENT, getLocatorInfo } from '@CrxConstants';
 
 export class CapturedEventDetails {
@@ -63,7 +63,7 @@ export class CapturedEventDetails {
     location: number
     repeat : boolean
     selectedIndex : number
-
+    attribute : Locator
     constructor (ev : Event) {
         this.getDetails(ev);
     }
@@ -80,7 +80,7 @@ export class CapturedEvent extends CapturedEventDetails {
     class : string[];
     name : string;
     value : string | number;
-    locator : string;
+    locator : Locator
     xpath : string;
     fullXpath : string;
     linkTextXpath : string;
@@ -104,7 +104,10 @@ export class CapturedEvent extends CapturedEventDetails {
             this.localName = this.target.localName;
             this.textContent = this.target.textContent;
             this.rect = this.getBoundingClientRect();
-            this.locator = this.getXPath(this.target);
+            this.locator = {
+                type : LocatorType.Xpath,
+                value : this.getXPath(this.target)
+            };
             this.xpath = this.getXPath(this.target);
             this.fullXpath = this.getFullXpath(this.target);
             this.linkTextXpath = this.getLinkText(this.target);
@@ -430,6 +433,38 @@ export class CrxInputEvent extends CapturedEvent {
 export class CrxSelectEvent extends CapturedEvent {
     constructor (ev : Event) {
         super(ev);
+        this.type = EVENT.SELECT;
+        this.info = this.getInfo();
+    }
+    getInfo() {
+        return [
+            {
+                type : 'input',
+                displayName : '값',
+                value : 'value'
+            },
+            {
+                type : 'selectLocator',
+                displayName : '로케이터',
+                values : [
+                    getLocatorInfo(this).xpath,
+                    getLocatorInfo(this).fullxpath,
+                    getLocatorInfo(this).linktextxpath
+                ]
+            },
+            {
+                type : 'image',
+                displayName : '이미지',
+                value : this.image
+            }
+        ]
+    }
+}
+
+export class CrxHoverEvent extends CapturedEvent {
+    constructor (ev : Event) {
+        super(ev);
+        this.type = EVENT.HOVER;
         this.info = this.getInfo();
     }
     getInfo() {
@@ -499,6 +534,19 @@ export class CrxContextMenuEvent extends CapturedEvent {
         super(ev);
         this.info = this.getInfo();
         this.type = type;
+        if (this.type === EVENT.READATTRIBUTE) {
+            this.info.push({
+                type : 'selectAttribute',
+                displayName : '속성',
+                values : Array.from(this.target.attributes).map(item => {
+                  return {
+                    displayName : item.name,
+                    type : item.name,
+                    val : item.nodeValue
+                  }
+                })
+            });
+        }
     }
     
     getInfo() {
@@ -516,6 +564,51 @@ export class CrxContextMenuEvent extends CapturedEvent {
                     getLocatorInfo(this).fullxpath,
                     getLocatorInfo(this).linktextxpath
                 ]
+            },
+            {
+                type : 'image',
+                displayName : '이미지',
+                value : this.image
+            }
+        ]
+    }
+}
+
+export class CrxReadAttributeEvent extends CapturedEvent {
+    info : EventInfo[]
+
+    constructor (ev : Event) {
+        super(ev);
+        this.info = this.getInfo();
+        this.type = EVENT.HOVER;
+    }
+    
+    getInfo() {
+        return [
+            {
+                type : 'readonly',
+                displayName : '텍스트',
+                value : 'textContent'
+            },
+            {
+                type : 'selectLocator',
+                displayName : '로케이터',
+                values : [
+                    getLocatorInfo(this).xpath,
+                    getLocatorInfo(this).fullxpath,
+                    getLocatorInfo(this).linktextxpath
+                ]
+            },
+            {
+                type : 'selectAttribute',
+                displayName : '속성',
+                values : Array.from(this.target.attributes).map(item => {
+                  return {
+                    displayName : item.name,
+                    type : item.name,
+                    val : item.nodeValue
+                  }
+                })
             },
             {
                 type : 'image',

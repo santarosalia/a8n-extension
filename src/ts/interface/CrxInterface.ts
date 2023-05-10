@@ -21,6 +21,7 @@ export interface CapturedEventDetails extends EventDetails {
     image : string
     clientWidth : number
     clientHeight : number
+    attribute : Locator
 }
 
 export interface EventDetails {
@@ -106,7 +107,7 @@ export interface LocatorInfo {
     val : string
 }
 
-interface Locator {
+export interface Locator {
     type : LocatorType
     value : string
 }
@@ -125,20 +126,20 @@ export interface CrxMessage {
 }
 
 export enum CRX_COMMAND {
-    NONE,
-    CMD_RECORDING_START,
-    CMD_RECORDING_END,
-    CMD_STORE_CAPTURED_EVENT,
-    CMD_RECORDING_WINDOW_FOCUS,
-    CMD_CAPTURE_IMAGE,
-    CMD_SEND_EVENT,
-    CMD_OPEN_VIEW,
-    CMD_CONTEXT_MENU_CHANGE,
-    CMD_SEND_NEXT_PAGE_BUTTON,
-    CMD_SEND_NEXT_PAGE_NUMBER,
-    CMD_WD_WINDOW_CHECK,
-    CMD_CREATE_ACTIVITY,
-    CMD_LAUNCH_WEB_RECORDER
+    NONE = 'NONE',
+    CMD_RECORDING_START = 'CMD_RECORDING_START',
+    CMD_RECORDING_END = 'CMD_RECORDING_END',
+    CMD_STORE_CAPTURED_EVENT = 'CMD_STORE_CAPTURED_EVENT',
+    CMD_RECORDING_WINDOW_FOCUS = 'CMD_RECORDING_WINDOW_FOCUS',
+    CMD_CAPTURE_IMAGE = 'CMD_CAPTURE_IMAGE',
+    CMD_SEND_EVENT = 'CMD_SEND_EVENT',
+    CMD_OPEN_VIEW = 'CMD_OPEN_VIEW',
+    CMD_CONTEXT_MENU_CHANGE = 'CMD_CONTEXT_MENU_CHANGE',
+    CMD_SEND_NEXT_PAGE_BUTTON = 'CMD_SEND_NEXT_PAGE_BUTTON',
+    CMD_SEND_NEXT_PAGE_NUMBER = 'CMD_SEND_NEXT_PAGE_NUMBER',
+    CMD_WD_WINDOW_CHECK = 'CMD_WD_WINDOW_CHECK',
+    CMD_CREATE_ACTIVITY = 'CMD_CREATE_ACTIVITY',
+    CMD_LAUNCH_WEB_RECORDER = 'CMD_LAUNCH_WEB_RECORDER'
 }
 
 export enum CRX_CONTEXT_MENU_TYPE {

@@ -1,4 +1,4 @@
-import { CrxClickEvent, CrxInputEvent, CrxKeyEvent } from '@CrxClass';
+import { CrxClickEvent, CrxInputEvent, CrxKeyEvent, CrxSelectEvent } from '@CrxClass';
 import { EVENT, CRX_NEW_RECORD, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
 import { getItemFromLocalStorage, sendMessageToServiceWorker, setItemFromLocalStorage} from '@CrxApi';
 import CrxContextMenu from '@/ts/class/CrxContextMenu';
@@ -22,7 +22,13 @@ const clickEventHandler = (ev : MouseEvent) => {
 }
 
 const inputEventHandler = (ev : Event) => {
-    const e = new CrxInputEvent(ev);
+    const target = ev.target as Element;
+    let e : CrxInputEvent | CrxSelectEvent;
+    if (target.localName === EVENT.SELECT) {
+        e = new CrxSelectEvent(ev);
+    } else {
+        e = new CrxInputEvent(ev);
+    }
     setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
 
@@ -39,9 +45,6 @@ const mouseoutEventHandler = (ev : Event) => {
 }
 const keydownEventHandler = (ev : Event)=> {
     const e = new CrxKeyEvent(ev);
-    if (e.key === 'Control') {
-        
-    }
     if (e.key !== 'Enter') return;
     setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
@@ -62,7 +65,7 @@ const isContextMenu = (target : Element) => {
 const WebRecorderEventHandler =  (ev : Event) => {
     
     switch (ev.type) {
-        case EVENT.INPUT || EVENT.SELECT : {
+        case EVENT.INPUT : {
             inputEventHandler(ev);
             break;
         }

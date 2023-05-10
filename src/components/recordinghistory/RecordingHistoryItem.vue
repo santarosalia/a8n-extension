@@ -105,6 +105,10 @@
                           <v-select v-model="locatorDisplayName" variant="solo" density="compact" :items="info.values" item-title="displayName" item-value="type" hide-details @update:model-value="changeLocator"></v-select>
                           <v-text-field v-model="locatorValue" variant="outlined" density="compact" hide-details readonly></v-text-field>
                       </v-col>
+                      <v-col cols="8" v-else-if="info.type === 'selectAttribute'">
+                          <v-select v-model="attributeDisplayName" variant="solo" density="compact" :items="info.values" item-title="displayName" item-value="type" hide-details @update:model-value="changeAttribute"></v-select>
+                          <v-text-field v-model="attributeValue" variant="outlined" density="compact" hide-details readonly></v-text-field>
+                      </v-col>
                       <v-col cols="8" v-else-if="info.type === 'image'">
                         <v-img v-if="record.image" :src="record.image"/>
                         <span v-else>이미지가 없습니다.</span>
@@ -133,6 +137,9 @@ const props = defineProps<{
 const locatorDisplayName = ref('XPath');
 const locatorValue = ref(props.record.xpath);
 
+const attributeDisplayName = ref('속성을 선택 해 주세요');
+const attributeValue = ref('');
+
 const removeRecord = (index : number) => {
   store.dispatch(CRX_ACTION.REMOVE_RECORD, index);
 }
@@ -150,6 +157,14 @@ const changeLocator = (locatorType : LocatorType) => {
     value : props.record[locatorType]
   };
   locatorValue.value = props.record.locator.value;
+}
+
+const changeAttribute = (attributeType : LocatorType) => {
+  props.record.attribute = {
+    type : attributeType,
+    value : props.record.info.find(item => item.type === 'selectAttribute').values.find(item => item.type === attributeType).val
+  };
+  attributeValue.value = props.record.attribute.value;
 }
 
 watch(showDialog, (newVal) => {

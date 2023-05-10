@@ -98,13 +98,13 @@ export const dataScraping = (ev : Event) => {
         textData: result,
         pattern : pattern,
         columnSize: colSize,
-        exceptColumn : []
+        exceptColumn : [],
+        exceptRow : []
     };
 
     setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA,{
         data : data
     });
-    console.log(1)
 }
 
 const findPatternByNextSiblings = (ev : Event) => {
