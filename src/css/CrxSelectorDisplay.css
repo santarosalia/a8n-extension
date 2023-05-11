@@ -1,0 +1,10 @@
+crx-selector-display {
+    z-index : 999999999;
+    position : absolute;
+    padding : 5px;
+    background-color : #1e1f21;
+    color : white;
+    font-weight : bold;
+    border-radius : 5px;
+    white-space : nowrap;
+}

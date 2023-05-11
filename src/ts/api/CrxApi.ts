@@ -2,7 +2,6 @@ import { CRX_MSG_RECEIVER, CRX_NEW_RECORD } from "@CrxConstants";
 import { EVENT } from "@CrxConstants";
 import { CapturedEvent, CrxMoveTabEvent } from "@CrxClass";
 import { CRX_COMMAND, CrxMessage } from '@CrxInterface'
-
 export const getItemFromLocalStorage = (key : string[]) => {
     return chrome.storage.local.get(key);
 }
@@ -131,6 +130,47 @@ export const closeWindow = (windowId : number) => {
     return chrome.windows.remove(windowId);
 }
 
-export const sendMessageByTabId = (tabId : number, message : CrxMessage) => {
-    return chrome.tabs.sendMessage(tabId, message);
+export const sendMessageToContentScript = (tabId : number, command : CRX_COMMAND, payload? : any) => {
+    return chrome.tabs.sendMessage(tabId, {
+        receiver : CRX_MSG_RECEIVER.CONTENT_SCRIPT,
+        command : command,
+        payload : payload
+    });
 }
+
+export const sendMessageToSelector = (command : CRX_COMMAND, payload? : any, launcherTabId? : number) => {
+    return chrome.tabs.query({}).then(tabs => {
+        tabs.filter(tab => tab.id !== launcherTabId).forEach(tab => {
+            chrome.tabs.sendMessage(tab.id, {
+                receiver : CRX_MSG_RECEIVER.WEB_SELECTOR,
+                command : command,
+                payload : payload
+            });
+        });
+    })
+}
+
+export const showNotification = (title :string, message : string) => {
+    if (!chrome.notifications) {
+        return sendMessageToServiceWorker(CRX_COMMAND.CMD_SHOW_NOTIFICATION,{
+            title : title,
+            message : message
+        });
+    }
+    // clear alert
+    chrome.notifications.getAll((notifications)=>{
+      Object.keys(notifications).forEach(notification =>chrome.notifications.clear(notification));
+    });
+  
+    // create alert
+    chrome.notifications.create('',{
+      iconUrl : 'recIcon_default64.png',
+      type : 'basic',
+      title : title,
+      message : message
+    });
+  }
+
+  export const focusTab = (tabId : number) => {
+    chrome.tabs.update(tabId,{active :true});
+  }

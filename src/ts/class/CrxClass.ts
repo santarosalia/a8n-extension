@@ -92,6 +92,7 @@ export class CapturedEvent extends CapturedEventDetails {
     info : EventInfo[]
     image : string
     rect : any
+    view : Window
 
     constructor (ev : Event) {
         super(ev);
@@ -342,6 +343,7 @@ export class CrxInfo {
     TARGET_TABS : chrome.tabs.Tab[];
     LAUNCHER_TAB_ID : number;
     LAUNCHER_WINDOW_ID : number;
+    SELECTOR_INJECT_INTERVAL : number;
     constructor () {
         
     }
@@ -397,6 +399,12 @@ export class CrxClickEvent extends CapturedEvent {
                 value : this.image
             }
         ]
+    }
+}
+
+export class CrxMousemoveEvent extends CapturedEvent {
+    constructor (ev : Event) {
+        super(ev);
     }
 }
 

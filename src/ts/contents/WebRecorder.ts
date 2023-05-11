@@ -122,9 +122,11 @@ export const webRecorder = (request : CrxMessage) => {
             const crxHighlightStyle = document.createElement('style');
             crxHighlightStyle.innerHTML = CrxHilightCSS;
             document.head.appendChild(crxHighlightStyle);
+            
             const crxContextMenuStyle = document.createElement('style');
             crxContextMenuStyle.innerHTML = CrxContexMenuCSS;
-            document.head.appendChild(crxContextMenuStyle)
+            document.head.appendChild(crxContextMenuStyle);
+
             webRecorderStatus = true;
             break;
         }

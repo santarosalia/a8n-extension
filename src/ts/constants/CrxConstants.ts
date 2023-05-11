@@ -102,6 +102,7 @@ export const EVENT = {
     INPUT : 'input',
     WHEEL : 'wheel',
     SELECT : 'select',
+    MOUSEMOVE : 'mousemove',
     MOUSEOVER : 'mouseover',
     MOUSEOUT : 'mouseout',
     MOVETAB : 'movetab',

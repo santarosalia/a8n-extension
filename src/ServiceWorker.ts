@@ -10,17 +10,23 @@ import { setItemFromLocalStorage,
     captureImage,
     sendMessageToView,
     closeWindow,
-    sendMessageByTabId
+    sendMessageToContentScript,
+    sendMessageToSelector,
+    showNotification,
+    focusTab
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
 
 const crxInfo = new CrxInfo();
-console.log('--------------------');
-console.log('|     '+'%cd'+'%co'+'%cp'+'%ce '+'%cc'+'%cr'+'%cx'+'%c     |','color:red','color:orange','color:yellow','color:green','color:blue','color:navy','color:purple','color:white');
-console.log('--------------------');
+console.log('%c ______'+'%c       ___'+'%c     _______'+'%c    ________  ','color:red','color:orange','color:yellow','color:green')
+console.log("%c|_   _ `."+"%c   .'   `."+"%c  |_   __ \\"+"%c  |_   __  | ",'color:red','color:orange','color:yellow','color:green')
+console.log('%c  | | `. \\'+'%c /  .-.  \\'+'%c   | |__) |   '+'%c| |_ \\_| ','color:red','color:orange','color:yellow','color:green')
+console.log('%c  | |  | |'+'%c | |   | |'+'%c   |  ___/'+'%c    |  _| _  ','color:red','color:orange','color:yellow','color:green')
+console.log("%c _| |_.' / "+"%c\\  `-'  /"+"%c  _| |_    "+"%c  _| |__/ | ",'color:red','color:orange','color:yellow','color:green')
+console.log("%c|______.' "+"%c  `.___.' "+"%c |_____|   "+"%c |________| ",'color:red','color:orange','color:yellow','color:green')
 
-const init = (url : string) => {
+const initWebRecorder = (url : string) => {
     const e = new CrxBrowserOpenEvent(url);
 
     setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [e]);
@@ -79,12 +85,20 @@ const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , 
             break;
         }
         case CRX_COMMAND.CMD_RECORDING_END : {
-            sendMessageByTabId(crxInfo.LAUNCHER_TAB_ID,{
-                receiver : CRX_MSG_RECEIVER.CONTENT_SCRIPT,
-                command : CRX_COMMAND.CMD_CREATE_ACTIVITY
-            });
+            sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID, CRX_COMMAND.CMD_CREATE_ACTIVITY);
             closeWindow(crxInfo.TARGET_WINDOW_ID);
             closeWindow(crxInfo.VIEW_WINDOW_ID);
+            break;
+        }
+        case CRX_COMMAND.CMD_SELECTOR_END : {
+            clearInterval(crxInfo.SELECTOR_INJECT_INTERVAL);
+            sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID,CRX_COMMAND.CMD_SEND_LOCATORS, message.payload.locators);
+            sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_END);
+            focusTab(crxInfo.LAUNCHER_TAB_ID)
+            break;
+        }
+        case CRX_COMMAND.CMD_SHOW_NOTIFICATION : {
+            showNotification(message.payload.title,message.payload.message);
             break;
         }
         
@@ -98,8 +112,8 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
             crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
             crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
             
-            init(message.payload);
-            const injectInterval = setInterval(()=>{
+            initWebRecorder(message.payload);
+            const injectInterval = setInterval(() => {
                 // if(crxInfo.TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
                 sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
                     //레코딩 창 닫힌 경우!
@@ -107,7 +121,23 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
                 });
             },1000);
             break;
+        }
+        case CRX_COMMAND.CMD_LAUNCH_WEB_SELECTOR : {
+            crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
+            crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
+            
+            const injectInterval = setInterval(() => {
+                sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_START, null, crxInfo.LAUNCHER_TAB_ID);
+            },1000);
 
+            crxInfo.SELECTOR_INJECT_INTERVAL = injectInterval;
+            sendResponse({started : true});
+            break;
+        }
+        case CRX_COMMAND.CMD_KILL_WEB_SELECTOR : {
+            clearInterval(crxInfo.SELECTOR_INJECT_INTERVAL);
+            sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_END);
+            break;
         }
     }
     sendResponse({});

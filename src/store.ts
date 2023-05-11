@@ -4,6 +4,7 @@ import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceW
 import { toRaw } from "vue";
 import { CapturedEvent, CrxDataScrapingEvent } from "@CrxClass";
 import { CRX_COMMAND, CRX_CONTEXT_MENU_TYPE, ScrapingDatas } from "@CrxInterface";
+import router from "@/router";
 
 const getInitState = () => {
     const state = {
@@ -131,6 +132,7 @@ export default createStore({
             const scrapingDatas = toRaw(getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas);
             const newVal = payload.newValue.data;
             scrapingDatas.data.push(newVal);
+            router.push('/ds');
             setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, scrapingDatas);
         },
         DISPATCH_SCRAPING_DATAS({ commit }) {

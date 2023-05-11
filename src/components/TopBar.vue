@@ -23,7 +23,8 @@
         router.push(menu.path);
     }
     router.beforeEach((to, from, next) => {
-        if (to.path == '/rh') tab.value = 0;
+        if (to.path === '/rh') tab.value = 0;
+        else if (to.path === '/ds') tab.value = 1;
         from.path;
         next();
     })
