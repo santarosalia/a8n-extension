@@ -39,7 +39,7 @@ const initWebRecorder = (url : string) => {
     createRecordingTargetTab(url).then(result => {
         openRecordingTargetWindow(result).then(result => {
             crxInfo.TARGET_TAB = result.tabs[0];
-            crxInfo.TARGET_WINDOW_ID = result.tabs[0].windowId;
+            crxInfo.RECORDING_TARGET_WINDOW_ID = result.tabs[0].windowId;
         });
     });
 
@@ -51,11 +51,11 @@ const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , 
     const COMMAND = message.command;
     switch (COMMAND) {
         case CRX_COMMAND.CMD_RECORDING_WINDOW_FOCUS : {
-            windowFocus(crxInfo.TARGET_WINDOW_ID);
+            windowFocus(crxInfo.RECORDING_TARGET_WINDOW_ID);
             break;
         }
         case CRX_COMMAND.CMD_CAPTURE_IMAGE : {
-            captureImage(crxInfo.TARGET_WINDOW_ID).then(image => {
+            captureImage(crxInfo.RECORDING_TARGET_WINDOW_ID).then(image => {
                 sendResponse({image : image});
             }).catch(e => {
                 console.log(e)
@@ -73,7 +73,7 @@ const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , 
             break;
         }
         case CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE : {
-            sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE, message.payload);
+            sendMessageByWindowId(crxInfo.RECORDING_TARGET_WINDOW_ID, CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE, message.payload);
             break;
         }
         case CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON : {
@@ -86,7 +86,7 @@ const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , 
         }
         case CRX_COMMAND.CMD_RECORDING_END : {
             sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID, CRX_COMMAND.CMD_CREATE_ACTIVITY);
-            closeWindow(crxInfo.TARGET_WINDOW_ID);
+            closeWindow(crxInfo.RECORDING_TARGET_WINDOW_ID);
             closeWindow(crxInfo.VIEW_WINDOW_ID);
             break;
         }
@@ -114,8 +114,8 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
             
             initWebRecorder(message.payload);
             const injectInterval = setInterval(() => {
-                // if(crxInfo.TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
-                sendMessageByWindowId(crxInfo.TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
+                // if(crxInfo.RECORDING_TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
+                sendMessageByWindowId(crxInfo.RECORDING_TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
                     //레코딩 창 닫힌 경우!
                     clearInterval(injectInterval);
                 });
@@ -155,7 +155,7 @@ const storageChange = (d) => {
 }
 
 const onHighlightedTabHandler = (highlightInfo : chrome.tabs.TabHighlightInfo) => {
-    if (highlightInfo.windowId !== crxInfo.TARGET_WINDOW_ID) return;
+    if (highlightInfo.windowId !== crxInfo.RECORDING_TARGET_WINDOW_ID) return;
     onHighlightedTab(highlightInfo.windowId);
 }
 // chrome.runtime.onInstalled.addListener(init);
@@ -163,7 +163,7 @@ chrome.runtime.onMessage.addListener(onMessage);
 chrome.storage.onChanged.addListener(storageChange);
 
 // chrome.webNavigation.onCompleted.addListener(details => {
-//     sendRecordingStartCommand(crxInfo.TARGET_WINDOW_ID);
+//     sendRecordingStartCommand(crxInfo.RECORDING_TARGET_WINDOW_ID);
 // });
 
 chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);

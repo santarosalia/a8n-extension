@@ -39,20 +39,22 @@ const clickEventHandler = (ev : MouseEvent) => {
     sendMessageToServiceWorker(CRX_COMMAND.CMD_SELECTOR_END, {
         locatorType : 'all',
         locators : locators
-    })
+    });
 }
 
 const mousemoveEventHandler = (ev : MouseEvent) => {
-    crxSelectorDisplay.hide();
+    crxSelectorDisplay.remove();
     const target = ev.target as Element;
     target.classList.add('crx-highlight');
     const e = new CrxMousemoveEvent(ev);
     crxSelectorDisplay = new CrxSelectorDisplay(e);
+    
     document.head.after(crxSelectorDisplay);
     crxSelectorDisplay.show();
 }
 
 const mouseoutEventHandler = (ev : Event) => {
+    crxSelectorDisplay.remove();
     const target = ev.target as Element;
     target.classList.remove('crx-highlight');
 }
@@ -80,7 +82,7 @@ const webSelectorStart = () => {
     window.addEventListener(EVENT.MOUSEOUT, WebSelectorEventHandler, true);
 }
 const webSelectorEnd = () => {
-    crxSelectorDisplay.hide();
+    crxSelectorDisplay.remove();
     window.removeEventListener(EVENT.CLICK, WebSelectorEventHandler, true);
     window.removeEventListener(EVENT.MOUSEMOVE, WebSelectorEventHandler, true);
     window.removeEventListener(EVENT.MOUSEOUT, WebSelectorEventHandler, true);

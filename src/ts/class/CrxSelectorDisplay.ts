@@ -71,9 +71,6 @@ class CrxSelectorDisplay extends HTMLElement {
         this.style.left = `${this.x}px`;
         this.style.top = `${this.y}px`;
         this.style.display = 'block';
-        // if (this.x + this.getBoundingClientRect().width > window.innerWidth) {
-        //     this.style.left = `${this.x - this.getBoundingClientRect().width}px`;
-        // }
     }
 
     hide() {
