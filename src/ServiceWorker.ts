@@ -1,4 +1,4 @@
-import { CrxInfo, CrxBrowserOpenEvent } from "@CrxClass";
+import { CrxInfo, CrxBrowserOpenEvent, CrxPopupEvent } from "@CrxClass";
 import { setItemFromLocalStorage,
     createViewTab,
     openViewWindow,
@@ -15,7 +15,7 @@ import { setItemFromLocalStorage,
     showNotification,
     focusTab
 } from "@CrxApi";
-import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
+import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
 
 const crxInfo = new CrxInfo();
@@ -28,7 +28,7 @@ console.log("%c|______.' "+"%c  `.___.' "+"%c |_____|   "+"%c |________| ",'colo
 
 const initWebRecorder = (url : string) => {
     const e = new CrxBrowserOpenEvent(url);
-
+    setItemFromLocalStorage(CRX_NEW_RECORD, null);
     setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [e]);
     setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA, null);
     setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, {
@@ -46,7 +46,7 @@ const initWebRecorder = (url : string) => {
     openView();
 }
 
-const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , sendResponse : any) => {
+const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageSender , sendResponse : any) => {
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     const COMMAND = message.command;
     switch (COMMAND) {
@@ -105,6 +105,7 @@ const onMessage = (message : CrxMessage, sender :chrome.runtime.MessageSender , 
         
     }
 }
+
 const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageSender, sendResponse : any) => {
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     switch (message.command) {
@@ -158,13 +159,19 @@ const onHighlightedTabHandler = (highlightInfo : chrome.tabs.TabHighlightInfo) =
     if (highlightInfo.windowId !== crxInfo.RECORDING_TARGET_WINDOW_ID) return;
     onHighlightedTab(highlightInfo.windowId);
 }
-// chrome.runtime.onInstalled.addListener(init);
+
+const onCreated = (window : chrome.windows.Window)=> {
+    if (window.id === crxInfo.VIEW_WINDOW_ID || window.type !== 'popup') return;
+    const e = new CrxPopupEvent();
+    setTimeout(() => {
+        setItemFromLocalStorage(CRX_NEW_RECORD, e);
+        sendMessageByWindowId(window.id, CRX_COMMAND.CMD_RECORDING_START)
+    }, 500);
+}
+
 chrome.runtime.onMessage.addListener(onMessage);
 chrome.storage.onChanged.addListener(storageChange);
 
-// chrome.webNavigation.onCompleted.addListener(details => {
-//     sendRecordingStartCommand(crxInfo.RECORDING_TARGET_WINDOW_ID);
-// });
-
 chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
+// chrome.windows.onCreated.addListener(onCreated);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);

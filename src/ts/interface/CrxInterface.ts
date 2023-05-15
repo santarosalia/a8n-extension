@@ -157,6 +157,7 @@ export enum CRX_CONTEXT_MENU_TYPE {
 export interface ScrapingDatas {
     exceptRow : number[]
     data : ScrapingData[]
+    frameStack : FrameStack[]
 }
 
 interface ScrapingData {

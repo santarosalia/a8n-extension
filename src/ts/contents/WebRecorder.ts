@@ -51,7 +51,7 @@ const keydownEventHandler = (ev : Event)=> {
 
 const contextmenuEventHandler = (ev : Event) => {
     ev.preventDefault();
-    crxContextMenu.hide();
+    crxContextMenu.remove();
 
     const e = new CrxClickEvent(ev);
     
@@ -70,7 +70,7 @@ const WebRecorderEventHandler =  (ev : Event) => {
             break;
         }
         case EVENT.CLICK : {
-            crxContextMenu.hide();
+            crxContextMenu.remove();
             clickEventHandler(ev as MouseEvent);
             break;
         }

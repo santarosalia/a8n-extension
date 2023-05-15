@@ -535,6 +535,19 @@ export class CrxMoveTabEvent extends CapturedEvent {
     }
 }
 
+export class CrxPopupEvent extends CapturedEvent {
+    constructor () {
+        super(null);
+        this.type = EVENT.POPUP;
+        this.frameStack = [];
+        this.info = this.getInfo();
+    }
+    getInfo() {
+        return [
+        ]
+    }
+}
+
 export class CrxContextMenuEvent extends CapturedEvent {
     info : EventInfo[]
 
@@ -634,6 +647,7 @@ export class CrxDataScrapingEvent extends CapturedEvent {
         this.info = this.getInfo();
         this.type = 'datascraping';
         this.data = data;
+        this.frameStack = data.frameStack;
     }
     
     getInfo() {

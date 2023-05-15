@@ -44,7 +44,7 @@ export const openRecordingTargetWindow = (tab : chrome.tabs.Tab) => {
 }
 
 export const sendMessageByWindowId = async (windowId : number, command : CRX_COMMAND, payload? : any) => {
-    return chrome.tabs.query({windowId : windowId}).then(tabs => {
+    return currentWindowTabs(windowId).then(tabs => {
         if (tabs.length === 0) throw new Error("Window is Closed");
         
         tabs.forEach(tab => {
@@ -71,11 +71,16 @@ export const onHighlightedTab = (windowId : number) => {
         });
     }, 100);
 }
+export const resetFrame = () => {
+    return {
+        type : EVENT.RESETFRAME
+    }
+}
 
 export const switchFrame = (e : CapturedEvent) => {
     return {
         type : EVENT.SWITCHFRAME,
-        frameStack : e.frameStack
+        frameStack : e.frameStack.reverse()
     }
 }
 
@@ -113,7 +118,7 @@ export const editImage = (image : string, rect : DOMRect) => {
 }
 
 export const sendMessageToView = async (windowId : number, command : CRX_COMMAND, payload? : any) => {
-    return chrome.tabs.query({windowId : windowId}).then(tabs => {
+    return currentWindowTabs(windowId).then(tabs => {
         if (tabs.length === 0) throw new Error("Window is Closed");
         
         tabs.forEach(tab => {
@@ -138,7 +143,7 @@ export const sendMessageToContentScript = (tabId : number, command : CRX_COMMAND
     });
 }
 
-export const sendMessageToSelector = (command : CRX_COMMAND, payload? : any, launcherTabId? : number) => {
+export const sendMessageToSelector = async (command : CRX_COMMAND, payload? : any, launcherTabId? : number) => {
     return chrome.tabs.query({}).then(tabs => {
         tabs.filter(tab => tab.id !== launcherTabId).forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
@@ -147,23 +152,23 @@ export const sendMessageToSelector = (command : CRX_COMMAND, payload? : any, lau
                 payload : payload
             });
         });
-    })
+    });
 }
 
 export const showNotification = (title :string, message : string) => {
     if (!chrome.notifications) {
-        return sendMessageToServiceWorker(CRX_COMMAND.CMD_SHOW_NOTIFICATION,{
+        return sendMessageToServiceWorker(CRX_COMMAND.CMD_SHOW_NOTIFICATION, {
             title : title,
             message : message
         });
     }
     // clear alert
-    chrome.notifications.getAll((notifications)=>{
-      Object.keys(notifications).forEach(notification =>chrome.notifications.clear(notification));
+    chrome.notifications.getAll(notifications => {
+      Object.keys(notifications).forEach(notification => chrome.notifications.clear(notification));
     });
   
     // create alert
-    chrome.notifications.create('',{
+    chrome.notifications.create('', {
       iconUrl : 'recIcon_default64.png',
       type : 'basic',
       title : title,
@@ -171,6 +176,6 @@ export const showNotification = (title :string, message : string) => {
     });
   }
 
-  export const focusTab = (tabId : number) => {
-    chrome.tabs.update(tabId,{active :true});
-  }
+export const focusTab = (tabId : number) => {
+    chrome.tabs.update(tabId, {active : true});
+}

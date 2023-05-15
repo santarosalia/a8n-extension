@@ -66,7 +66,9 @@ export const EVENT_TYPE_TO_KOREAN = {
     readtext : '텍스트 읽기',
     readattribute : '속성값 읽기',
     hover : '마우스 Hover',
-    datascraping : '데이터 스크래핑'
+    datascraping : '데이터 스크래핑',
+    resetframe : '프레임 초기화',
+    popup : '팝업'
 }
 
 export const getLocatorInfo = (self : CapturedEvent) => {
@@ -116,6 +118,8 @@ export const EVENT = {
     HOVER : 'hover',
     OPENVIEW : 'openview',
     NEXTPAGEBUTTON : 'nextpagebutton',
-    NEXTPAGENUMBER : 'nextpagenumber'
+    NEXTPAGENUMBER : 'nextpagenumber',
+    RESETFRAME : 'resetframe',
+    POPUP : 'popup'
 }
 

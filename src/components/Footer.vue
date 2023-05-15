@@ -46,7 +46,7 @@ const scrapingDataClear = () => {
     store.dispatch(CRX_ACTION.CLEAR_SCRAPING_DATA)
 }
 const saveScrapingData = () => {
-    let data :any;
+    let data : any;
     const isMultiPage = store.getters[CRX_STATE.CRX_IS_MULTI_PAGE];
     const scrapingDatas = store.getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas;
     if (scrapingDatas.data.length === 0) return;
@@ -54,11 +54,13 @@ const saveScrapingData = () => {
     const patterns = scrapingDatas.data.map(item => item.pattern);
     const columnSize = scrapingDatas.data.map(item => item.columnSize);
     const exceptColumn = scrapingDatas.data.map(item => item.exceptColumn);
-
+    const frameStack = scrapingDatas.frameStack.map(item => item);
+    
     if (isMultiPage) {
         const pageCnt = store.getters[CRX_STATE.CRX_PAGE_COUNT];
         const nextPageButton = store.getters[CRX_STATE.CRX_NEXT_PAGE_BUTTON];
         const nextPageNumber = store.getters[CRX_STATE.CRX_NEXT_PAGE_NUMBER];
+        
         data = {
             patterns : patterns,
             columnSize : columnSize,
@@ -66,17 +68,20 @@ const saveScrapingData = () => {
             exceptRow : exceptRow,
             pageCnt : pageCnt,
             pageXpath : nextPageButton,
-            paginationXpath : nextPageNumber
+            paginationXpath : nextPageNumber,
+            frameStack : frameStack
         }
     } else {
         data = {
             patterns : patterns,
             columnSize : columnSize,
             exceptColumn : exceptColumn,
-            exceptRow : exceptRow
+            exceptRow : exceptRow,
+            frameStack : frameStack
         }
     }
     const e = new CrxDataScrapingEvent(null, data);
+    console.log(e)
     store.dispatch(CRX_ACTION.SAVE_DATA_SCRAPING, e);
     store.dispatch(CRX_ACTION.CLEAR_SCRAPING_DATA);
     router.push('/rh');

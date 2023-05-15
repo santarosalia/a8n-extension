@@ -1,8 +1,17 @@
-import { setItemFromLocalStorage } from "@CrxApi";
+import { setItemFromLocalStorage, switchFrame } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA } from "@CrxConstants";
+import { CrxClickEvent } from "../class/CrxClass";
 
 export const dataScraping = (ev : Event) => {
-    const pattern = findPatternByNextSiblings(ev) ?? findPatternByPreviousSiblings(ev);
+    const target = ev.target as Element;
+    const e = new CrxClickEvent(ev);
+    
+    let pattern : string;
+    if (target.closest('table')) {
+        pattern = tableScrapping(ev);
+    } else {
+        pattern = findPatternByNextSiblings(ev) ?? findPatternByPreviousSiblings(ev);
+    }
 
     let tList = [];
     let result = [];
@@ -99,7 +108,8 @@ export const dataScraping = (ev : Event) => {
         pattern : pattern,
         columnSize: colSize,
         exceptColumn : [],
-        exceptRow : []
+        exceptRow : [],
+        frameStack : e.frameStack
     };
 
     setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA,{

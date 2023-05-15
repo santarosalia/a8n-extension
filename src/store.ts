@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
-import { EVENT, CRX_STATE } from '@CrxConstants'
-import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage, sendMessageByWindowId } from "@CrxApi";
+import { EVENT, CRX_STATE, CRX_NEW_RECORD } from '@CrxConstants'
+import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage} from "@CrxApi";
 import { toRaw } from "vue";
 import { CapturedEvent, CrxDataScrapingEvent } from "@CrxClass";
 import { CRX_COMMAND, CRX_CONTEXT_MENU_TYPE, ScrapingDatas } from "@CrxInterface";
@@ -11,7 +11,8 @@ const getInitState = () => {
         CRX_RECORDS : [],
         CRX_SCRAPING_DATAS : {
             exceptRow : [],
-            data : []
+            data : [],
+            frameStack : []
         },
         CRX_NEXT_PAGE_BUTTON : null,
         CRX_NEXT_PAGE_NUMBER : null,
@@ -87,14 +88,21 @@ export default createStore({
 
             const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
             const newVal = payload.newValue as CapturedEvent;
-            const oldVal = payload.oldValue as CapturedEvent;
-            
-            if (oldVal.type === EVENT.INPUT && newVal.type === EVENT.INPUT) {
+            const oldVal = payload.oldValue as CapturedEvent;   
+
+            if (oldVal && oldVal.type === EVENT.INPUT && newVal.type === EVENT.INPUT) {
                 records.pop();
             }
             
             switch (newVal.type) {
-                case EVENT.MOVETAB || EVENT.OPENBROWSER : {
+                case EVENT.MOVETAB : {
+                    if (!oldVal) return;
+                    break;
+                }
+                case EVENT.POPUP : {
+                    break;
+                }
+                case EVENT.DATASCRAPING : {
                     break;
                 }
                 default : {
@@ -110,8 +118,12 @@ export default createStore({
             }
             
             
-            const isSameFrame : boolean = JSON.stringify(oldVal.frameStack) === JSON.stringify(newVal.frameStack);
-            if (!isSameFrame) records.push(switchFrame(newVal));
+            if (oldVal) {
+                const isSameFrame : boolean = JSON.stringify(oldVal.frameStack) === JSON.stringify(newVal.frameStack);
+                if (!isSameFrame) {
+                    records.push(switchFrame(newVal));
+                }
+            }
             records.push(newVal);
             setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
         },
@@ -132,6 +144,7 @@ export default createStore({
             const scrapingDatas = toRaw(getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas);
             const newVal = payload.newValue.data;
             scrapingDatas.data.push(newVal);
+            scrapingDatas.frameStack = newVal.frameStack;
             router.push('/ds');
             setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, scrapingDatas);
         },
@@ -143,7 +156,8 @@ export default createStore({
         CLEAR_SCRAPING_DATA() {
             setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, {
                 exceptRow : [] as number[],
-                data : []
+                data : [],
+                frameStack : []
             });
         },
         REMOVE_COLUMN({getters}, payload) {
@@ -164,9 +178,10 @@ export default createStore({
             sendMessageToServiceWorker(CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE, payload);
         },
         SAVE_DATA_SCRAPING({ getters }, payload : CrxDataScrapingEvent) {
-            const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
-            records.push(payload);
-            setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
+            // const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
+            // records.push(payload);
+            // setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
+            setItemFromLocalStorage(CRX_NEW_RECORD, payload);
         },
         SAVE_DATA() {
             // const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
