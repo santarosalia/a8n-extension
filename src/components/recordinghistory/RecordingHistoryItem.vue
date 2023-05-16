@@ -27,8 +27,10 @@
               {{ frame.id ?? frame.name }}
             </span>
           </span>
+          
         </template>
         <template #append>
+          <img v-if="record.image" :src="record.image" width="50"/>
           <v-btn v-if="record.type !== EVENT.OPENBROWSER" variant="text" icon @click.stop="removeRecord(index)">
             <v-icon>mdi-minus</v-icon>
           </v-btn>

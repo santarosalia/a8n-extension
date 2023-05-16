@@ -2,9 +2,8 @@ import { setItemFromLocalStorage, switchFrame } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA } from "@CrxConstants";
 import { CrxClickEvent } from "../class/CrxClass";
 
-export const dataScraping = (ev : Event) => {
+export const dataScraping = (ev : CrxClickEvent) => {
     const target = ev.target as Element;
-    const e = new CrxClickEvent(ev);
     
     let pattern : string;
     if (target.closest('table')) {
@@ -109,7 +108,7 @@ export const dataScraping = (ev : Event) => {
         columnSize: colSize,
         exceptColumn : [],
         exceptRow : [],
-        frameStack : e.frameStack
+        frameStack : ev.frameStack
     };
 
     setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA,{
@@ -117,7 +116,7 @@ export const dataScraping = (ev : Event) => {
     });
 }
 
-const findPatternByNextSiblings = (ev : Event) => {
+const findPatternByNextSiblings = (ev : CrxClickEvent) => {
     const standards = getPath(ev).map((el : Element, i : number, arr : Element[]) => {
         if (el.nextElementSibling) {
             
@@ -139,7 +138,7 @@ const findPatternByNextSiblings = (ev : Event) => {
     }).filter(item => item !== undefined);
     return standards[standards.length-1];
 }
-const findPatternByPreviousSiblings = (ev : Event) => {
+const findPatternByPreviousSiblings = (ev : CrxClickEvent) => {
     const standards = getPath(ev).map((el : Element, i : number, arr : Element[]) => {
         if (el.previousElementSibling) {
             
@@ -163,7 +162,7 @@ const findPatternByPreviousSiblings = (ev : Event) => {
     return standards[standards.length-1];
 }
 
-const tableScrapping = (ev : Event) => {
+const tableScrapping = (ev : CrxClickEvent) => {
 
     const path = [];
     const fullPath = [];
@@ -185,7 +184,7 @@ const tableScrapping = (ev : Event) => {
     return pattern;
 }
 
-const getPath = (ev : Event) => {
+const getPath = (ev : CrxClickEvent) => {
     const arr = [];
     let el = ev.target as Element;
     while (el) {

@@ -140,6 +140,9 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
             sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_END);
             break;
         }
+        case CRX_COMMAND.CMD_WEB_CONTROL : {
+            
+        }
     }
     sendResponse({});
     return;

@@ -120,6 +120,8 @@ export const EVENT = {
     NEXTPAGEBUTTON : 'nextpagebutton',
     NEXTPAGENUMBER : 'nextpagenumber',
     RESETFRAME : 'resetframe',
-    POPUP : 'popup'
+    POPUP : 'popup',
+    MOUSEDOWN : 'mousedown',
+    MOUSEUP : 'mouseup'
 }
 

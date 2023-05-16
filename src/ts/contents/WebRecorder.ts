@@ -90,6 +90,22 @@ const WebRecorderEventHandler =  (ev : Event) => {
             contextmenuEventHandler(ev);
             break;
         }
+        case EVENT.MOUSEUP : {
+            const event = ev as MouseEvent;
+            if (event.button === 2) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+            break
+        }
+        case EVENT.MOUSEDOWN : {
+            const event = ev as MouseEvent;
+            if (event.button === 2) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+            break
+        }
     }
 }
 
@@ -102,6 +118,8 @@ const webRecorderStart = () => {
     window.addEventListener(EVENT.MOUSEOVER, WebRecorderEventHandler, true);
     window.addEventListener(EVENT.MOUSEOUT, WebRecorderEventHandler, true);
     window.addEventListener(EVENT.KEYDOWN, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.MOUSEUP, WebRecorderEventHandler, true);
+    window.addEventListener(EVENT.MOUSEDOWN, WebRecorderEventHandler, true);
 }
 
 const webRecorderEnd = () => {
@@ -110,6 +128,8 @@ const webRecorderEnd = () => {
     window.removeEventListener(EVENT.INPUT, WebRecorderEventHandler);
     window.removeEventListener(EVENT.SELECT, WebRecorderEventHandler);
     window.removeEventListener(EVENT.WHEEL, WebRecorderEventHandler);
+    window.removeEventListener(EVENT.MOUSEUP, WebRecorderEventHandler);
+    window.removeEventListener(EVENT.MOUSEDOWN, WebRecorderEventHandler);
 }
 
 export const webRecorder = (request : CrxMessage) => {

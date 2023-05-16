@@ -38,7 +38,7 @@ const multiPageMenu = [
 class CrxContextMenu extends HTMLElement {
     x : number
     y : number
-    e : any
+    e : CrxClickEvent
     contextMenuType : CRX_CONTEXT_MENU_TYPE
 
     constructor (x :number, y : number, e : CrxClickEvent, contextMenuType : CRX_CONTEXT_MENU_TYPE) {
@@ -105,11 +105,11 @@ class CrxContextMenu extends HTMLElement {
                 return;
             }
             case EVENT.NEXTPAGEBUTTON : {
-                sendMessageToServiceWorker(CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON, this.e.xpath);
+                sendMessageToServiceWorker(CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON, this.e.linkTextXpath);
                 return;
             }
             case EVENT.NEXTPAGENUMBER : {
-                sendMessageToServiceWorker(CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER, this.e.xpath);
+                sendMessageToServiceWorker(CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER, this.getXPath(this.e.target.closest('div')));
                 return;
             }
             case EVENT.HOVER : {
@@ -122,6 +122,57 @@ class CrxContextMenu extends HTMLElement {
         }
         const e = new CrxContextMenuEvent(this.e, contextMenuValue);
         setItemFromLocalStorage(CRX_NEW_RECORD,e);
+    }
+
+    getXPath(el : Element) {
+        let nodeElem = el;
+        let isFlexibleXpath = /^-?\d+$/.test(nodeElem.id.slice(-1)); // 마지막 두자리가 숫자일경우 가변될 xpath라고 판단하기 위한 변수
+
+        if (nodeElem.id && !isFlexibleXpath) {
+            return `//*[@id="${nodeElem.id}"]`; //선택된 엘리먼트의 id가 있을 경우 id 형식의 xpath를 바로 리턴
+        }
+
+        const parts = [];
+        while (nodeElem && nodeElem.nodeType === Node.ELEMENT_NODE) {
+            let nbOfPreviousSiblings = 0;
+            let hasNextSiblings = false;
+            let sibling = nodeElem.previousSibling;
+
+            while (sibling) {
+                if (sibling.nodeType !== Node.DOCUMENT_TYPE_NODE && sibling.nodeName === nodeElem.nodeName) {
+                    nbOfPreviousSiblings++;
+                }
+                sibling = sibling.previousSibling;
+            }
+            sibling = nodeElem.nextSibling;
+
+            while (sibling) {
+                if (sibling.nodeName === nodeElem.nodeName) {
+                    hasNextSiblings = true;
+                    break;
+                }
+                sibling = sibling.nextSibling;
+            }
+
+            const prefix = nodeElem.prefix ? nodeElem.prefix + ':' : '';
+            const nth = nbOfPreviousSiblings || hasNextSiblings ? `[${nbOfPreviousSiblings + 1}]` : '';
+            isFlexibleXpath = /^-?\d+$/.test(nodeElem.id.slice(-1));
+
+            if (nodeElem.id && !isFlexibleXpath) {
+                var nodeCount = document.querySelectorAll(`#${nodeElem.id}`);
+                if (nodeCount.length == 1) {
+                    parts.push(`/*[@id="${nodeElem.id}"]`); //부모노드 중 id가 있을 경우 id를 담아준 후 노드검색을 멈춤
+                    break;
+                } else {
+                    parts.push(prefix + nodeElem.localName + nth);
+                }
+            } else {
+                parts.push(prefix + nodeElem.localName + nth);
+            }
+
+            nodeElem = nodeElem.parentNode as Element;
+        }
+        return parts.length ? '/' + parts.reverse().join('/') : '';
     }
 }
 

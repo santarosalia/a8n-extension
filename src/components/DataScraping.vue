@@ -14,7 +14,7 @@
             </td>
           </tr>
           <tr v-for="tr,trIdx in scrapingDatasForTable.textData">
-            <td v-if="!scrapingDatas.exceptRow.includes(trIdx)">
+            <td v-if="!scrapingDatas.exceptRow.includes(trIdx)" class="minus">
               <v-btn icon variant="text" density="comfortable" @click="removeRow(trIdx)">
                 <v-icon>mdi-minus</v-icon>
               </v-btn>
@@ -216,4 +216,11 @@ watch(multiPageCount, (newVal, oldVal) => {
   if (isNaN(newVal) || newVal < 0) multiPageCount.value = oldVal;
 });
 </script>
-  
+<style>
+.minus {
+  width: 10px;
+}
+td.text-truncate {
+  max-width: 100px;
+}
+</style>

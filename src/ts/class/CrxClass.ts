@@ -64,11 +64,11 @@ export class CapturedEventDetails {
     repeat : boolean
     selectedIndex : number
     attribute : Locator
-    constructor (ev : Event) {
+    constructor (ev : Event | CapturedEvent) {
         this.getDetails(ev);
     }
 
-    getDetails(ev : Event) {
+    getDetails(ev : Event | CapturedEvent) {
         for (let k in ev) {
           this[k] = ev[k];
         }
@@ -94,7 +94,7 @@ export class CapturedEvent extends CapturedEventDetails {
     rect : any
     view : Window
 
-    constructor (ev : Event) {
+    constructor (ev : Event | CapturedEvent) {
         super(ev);
         if (ev !== null) {
             this.target = ev.target as Element;
@@ -551,7 +551,7 @@ export class CrxPopupEvent extends CapturedEvent {
 export class CrxContextMenuEvent extends CapturedEvent {
     info : EventInfo[]
 
-    constructor (ev : Event, type : string) {
+    constructor (ev : Event | CrxClickEvent, type : string) {
         super(ev);
         this.info = this.getInfo();
         this.type = type;
@@ -598,7 +598,7 @@ export class CrxContextMenuEvent extends CapturedEvent {
 export class CrxReadAttributeEvent extends CapturedEvent {
     info : EventInfo[]
 
-    constructor (ev : Event) {
+    constructor (ev : CrxClickEvent) {
         super(ev);
         this.info = this.getInfo();
         this.type = EVENT.HOVER;
