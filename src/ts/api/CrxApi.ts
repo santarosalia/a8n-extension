@@ -179,3 +179,34 @@ export const showNotification = (title :string, message : string) => {
 export const focusTab = (tabId : number) => {
     chrome.tabs.update(tabId, {active : true});
 }
+
+export const allTabReload = () => {
+    chrome.tabs.query({}).then(tabs => {
+        tabs.forEach(tab => {
+            chrome.tabs.reload(tab.id);
+        });
+    });
+}
+
+export const createWindow = () => {
+    return chrome.windows.create({
+        type : 'normal',
+        url : 'https://naver.com',
+        state : 'maximized'
+    })
+}
+
+
+export const sendMessageByWindowIdToFocusedTab = async (windowId : number, command : CRX_COMMAND, payload? : any) => {
+    return currentWindowTabs(windowId).then(tabs => {
+        if (tabs.length === 0) throw new Error("Window is Closed");
+        
+        const activeTab = tabs.find(tab => tab.active);
+        chrome.tabs.sendMessage(activeTab.id, {
+            receiver : CRX_MSG_RECEIVER.WEB_CONTROLLER,
+            command : command,
+            payload : payload
+        });
+
+    });
+}

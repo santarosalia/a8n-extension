@@ -13,9 +13,12 @@ import { setItemFromLocalStorage,
     sendMessageToContentScript,
     sendMessageToSelector,
     showNotification,
-    focusTab
+    focusTab,
+    allTabReload,
+    createWindow,
+    sendMessageByWindowIdToFocusedTab
 } from "@CrxApi";
-import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE} from "@CrxConstants";
+import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
 
 const crxInfo = new CrxInfo();
@@ -172,9 +175,61 @@ const onCreated = (window : chrome.windows.Window)=> {
     }, 500);
 }
 
+const onInstalled = () => {
+    allTabReload();
+}
+
 chrome.runtime.onMessage.addListener(onMessage);
 chrome.storage.onChanged.addListener(storageChange);
 
 chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
 // chrome.windows.onCreated.addListener(onCreated);
+chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
+
+var port = chrome.runtime.connectNative('crx');
+
+port.onMessage.addListener((message : CrxMessage) => {
+    const window = this as Window;
+    console.log(window.navigator.userAgent);
+    console.log(message.payload.browser)
+    if (window.navigator.userAgent.indexOf('Edg') > -1) {
+        //edge 일 때 브라우저 edge 아니면 리턴
+        if (message.payload.browser !== 'Edge') return;
+    } else {
+        // chrome 일 때 크롬 아니면 리턴
+        if (message.payload.browser !== 'Chrome') return;
+    }
+
+    switch (message.command) {
+        case CRX_COMMAND.CMD_OPEN_BROWSER : {
+            
+
+            createWindow().then(window => {
+                crxInfo.CONTROLLER_WINDOW_ID = window.id;
+            });
+
+            break;
+        }
+        case CRX_COMMAND.CMD_WEB_CONTROL : {
+            sendMessageByWindowIdToFocusedTab(crxInfo.CONTROLLER_WINDOW_ID, CRX_COMMAND.CMD_WEB_CONTROL, {
+                type : EVENT.CLICK,
+                cssSelector : message.payload.locator.locator,
+                value : message.payload.value
+            });
+            break;
+        }
+    }
+    
+});
+
+port.onDisconnect.addListener(()=>{
+    console.log('discon')
+    // port = chrome.runtime.connectNative('crx');
+})
+
+chrome.action.onClicked.addListener(()=>{
+    console.log("Sending:  start");
+
+    port.postMessage("start");
+})

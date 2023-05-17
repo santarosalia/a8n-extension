@@ -344,6 +344,7 @@ export class CrxInfo {
     LAUNCHER_TAB_ID : number;
     LAUNCHER_WINDOW_ID : number;
     SELECTOR_INJECT_INTERVAL : number;
+    CONTROLLER_WINDOW_ID : number
     constructor () {
         
     }
@@ -619,17 +620,6 @@ export class CrxReadAttributeEvent extends CapturedEvent {
                     getLocatorInfo(this).fullxpath,
                     getLocatorInfo(this).linktextxpath
                 ]
-            },
-            {
-                type : 'selectAttribute',
-                displayName : '속성',
-                values : Array.from(this.target.attributes).map(item => {
-                  return {
-                    displayName : item.name,
-                    type : item.name,
-                    val : item.nodeValue
-                  }
-                })
             },
             {
                 type : 'image',
