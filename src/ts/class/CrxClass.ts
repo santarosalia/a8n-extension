@@ -645,3 +645,48 @@ export class CrxDataScrapingEvent extends CapturedEvent {
         ]
     }
 }
+
+export class CrxWebController {
+    browser : string
+    locator : Locator
+    value : string | number
+    eventType : string
+
+    constructor (payload : any) {
+        this.browser = payload.browser;
+        this.locator = payload.locator;
+        this.value = payload.value;
+        this.eventType = payload.eventType;
+        
+    }
+
+    execute() {
+        const el = this.getElement() as HTMLInputElement;
+        el.value = '1ga'
+    }
+
+    getElement() {
+        let el : Element;
+        const timeout = 5000;
+        const now = Date.now();
+        
+        while (now + timeout > Date.now()) {
+            switch (this.locator.type) {
+                case 'cssSelector' : {
+                    el = document.querySelector(this.locator.value);
+                    break;
+                }
+                case 'xpath' : {
+                    el = document.evaluate(this.locator.value, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).singleNodeValue as Element;
+                    break;
+                }
+            }
+            console.log(`try ${this.locator.value}`)
+            if (el) break;
+        }
+
+        if (!!!el) throw new Error('not found');
+        
+        return el;
+    }
+}

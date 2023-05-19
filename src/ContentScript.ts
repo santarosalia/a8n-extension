@@ -3,7 +3,6 @@ import { webSelector } from "@/ts/contents/WebSelector";
 import { getItemFromLocalStorage, sendMessageToServiceWorker, showNotification } from "@CrxApi";
 import { CRX_COMMAND, CrxMessage } from "@CrxInterface";
 import { CRX_MSG_RECEIVER, CRX_STATE, EVENT } from "@CrxConstants";
-import { webController } from "@/ts/contents/WebController";
 
 const contentScript = async (message : CrxMessage) => {
     if (message.receiver !== CRX_MSG_RECEIVER.CONTENT_SCRIPT) return;
@@ -31,4 +30,3 @@ const contentScript = async (message : CrxMessage) => {
 chrome.runtime.onMessage.addListener(contentScript);
 chrome.runtime.onMessage.addListener(webRecorder);
 chrome.runtime.onMessage.addListener(webSelector);
-chrome.runtime.onMessage.addListener(webController);

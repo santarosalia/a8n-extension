@@ -1,8 +1,17 @@
 {
     "manifest_version": 3,
-    "name": "CRX DOPE",
-    "version": "1.0.0",
-    "action": { },
+    "name": "Worktronics Web Recorder",
+    "version": "23.05.25",
+    "icons": {
+      "16": "icons/recIcon_default16.png",
+      "64": "icons/recIcon_default64.png",
+      "48": "icons/recIcon_default48.png",
+      "128": "icons/recIcon_default128.png"
+    },
+    "action": {
+      "default_icon": "icons/recIcon_default64.png",
+      "default_title": "이든티앤에스 웹레코더"
+    },
     "background" : {
         "service_worker" : "src/ServiceWorker.ts",
         "type" : "module"
@@ -13,6 +22,13 @@
           "js":["src/ContentScript.ts","node_modules/@webcomponents/custom-elements/custom-elements.min.js"],
           "match_origin_as_fallback": true,
           "all_frames" : true,
+          "runAt" : "document_start"
+        },
+        {
+          "matches": ["*://*/*"],
+          "js":["src/ts/contents/WebController.ts"],
+          "match_origin_as_fallback": true,
+          "all_frames" : false,
           "runAt" : "document_start"
         }
     ],

@@ -1,4 +1,4 @@
-import { CrxInfo, CrxBrowserOpenEvent, CrxPopupEvent } from "@CrxClass";
+import { CrxInfo, CrxBrowserOpenEvent, CrxPopupEvent, CrxWebController } from "@CrxClass";
 import { setItemFromLocalStorage,
     createViewTab,
     openViewWindow,
@@ -188,11 +188,9 @@ chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 var port = chrome.runtime.connectNative('crx');
-
+chrome.runtime.getURL('./sdfasdf.js');
 port.onMessage.addListener((message : CrxMessage) => {
     const window = this as Window;
-    console.log(window.navigator.userAgent);
-    console.log(message.payload.browser)
     if (window.navigator.userAgent.indexOf('Edg') > -1) {
         //edge 일 때 브라우저 edge 아니면 리턴
         if (message.payload.browser !== 'Edge') return;
@@ -212,15 +210,10 @@ port.onMessage.addListener((message : CrxMessage) => {
             break;
         }
         case CRX_COMMAND.CMD_WEB_CONTROL : {
-            sendMessageByWindowIdToFocusedTab(crxInfo.CONTROLLER_WINDOW_ID, CRX_COMMAND.CMD_WEB_CONTROL, {
-                type : EVENT.CLICK,
-                cssSelector : message.payload.locator.locator,
-                value : message.payload.value
-            });
+            sendMessageByWindowIdToFocusedTab(crxInfo.CONTROLLER_WINDOW_ID, CRX_COMMAND.CMD_WEB_CONTROL, message.payload);
             break;
         }
     }
-    
 });
 
 port.onDisconnect.addListener(()=>{
