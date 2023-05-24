@@ -45,7 +45,8 @@
         "src/**/*.vue",
         "tests/**/*.ts",
         "tests/**/*.tsx",
-        "src/main.ts"
+        "src/main.ts",
+        "src/DevToolsPlugin.js"
     ],
     "exclude": [
         "node_modules"

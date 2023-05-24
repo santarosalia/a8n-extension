@@ -32,6 +32,7 @@
           "runAt" : "document_start"
         }
     ],
+    "devtools_page" : "src/DevToolsPlugin.html",
     "permissions": [
         "activeTab",
         "tabs",
@@ -42,7 +43,8 @@
         "scripting",
         "notifications",
         "nativeMessaging",
-        "background"
+        "background",
+        "debugger"
     ],
     "host_permissions": [
         "<all_urls>"

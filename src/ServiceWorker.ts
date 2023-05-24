@@ -15,11 +15,12 @@ import { setItemFromLocalStorage,
     showNotification,
     focusTab,
     allTabReload,
-    createWindow,
     sendMessageByWindowIdToFocusedTab
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
+import { PuppeteerController } from "./ts/class/CrxWebController";
+
 
 const crxInfo = new CrxInfo();
 console.log('%c ______'+'%c       ___'+'%c     _______'+'%c    ________  ','color:red','color:orange','color:yellow','color:green')
@@ -226,3 +227,21 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 //     port.postMessage("start");
 // })
+
+// chrome.tabs.create(
+//     {
+//         active: true,
+//         url: 'https://www.google.co.in',
+//     },
+//     tab => (tab.id ? run(tab.id) : null)
+// )
+
+// chrome.action.onClicked.addListener(async ()=>{
+//     console.log("Sending:  start");
+    
+//     const controller = new PuppeteerController();
+//     await controller.create();
+//     await controller.run();
+
+// })
+

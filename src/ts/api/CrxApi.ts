@@ -191,7 +191,7 @@ export const allTabReload = () => {
 export const createWindow = () => {
     return chrome.windows.create({
         type : 'normal',
-        url : 'https://naver.com',
+        url : 'https://www.google.co.in',
         state : 'maximized'
     })
 }
@@ -208,5 +208,11 @@ export const sendMessageByWindowIdToFocusedTab = async (windowId : number, comma
             payload : payload
         });
 
+    });
+}
+
+export const findTabsByTitle = async (title : string) => {
+    return await chrome.tabs.query({}).then(tabs => {
+        return tabs.filter(tab => tab.title.includes(title));
     });
 }

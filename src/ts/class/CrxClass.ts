@@ -343,7 +343,7 @@ export class CrxInfo {
     TARGET_TABS : chrome.tabs.Tab[];
     LAUNCHER_TAB_ID : number;
     LAUNCHER_WINDOW_ID : number;
-    SELECTOR_INJECT_INTERVAL : number;
+    SELECTOR_INJECT_INTERVAL : NodeJS.Timer;
     CONTROLLER_WINDOW_ID : number
     constructor () {
         
