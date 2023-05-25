@@ -6,7 +6,8 @@
     "serve": "vite preview",
     "build": "vite build",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "zip" : "npm-build-zip --source=dist/ --destination=./build"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -14,6 +15,7 @@
     "@types/puppeteer-core": "^7.0.4",
     "@types/vue-router": "^2.0.0",
     "@webcomponents/custom-elements": "^1.6.0",
+    "npm-build-zip": "^1.0.3",
     "puppeteer-core": "^13.0.0",
     "puppeteer-extension-transport": "^0.0.6",
     "roboto-fontface": "*",
