@@ -31,7 +31,7 @@ const multiPageMenu = [
         value : EVENT.NEXTPAGEBUTTON
     },
     {
-        title : '다음 페이지 숫자',
+        title : '숫자 페이지 버튼',
         value : EVENT.NEXTPAGENUMBER
     }
 ]
