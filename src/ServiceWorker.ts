@@ -236,12 +236,12 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 //     tab => (tab.id ? run(tab.id) : null)
 // )
 
-// chrome.action.onClicked.addListener(async ()=>{
-//     console.log("Sending:  start");
+chrome.action.onClicked.addListener(async ()=>{
+    console.log("Sending:  start");
     
-//     const controller = new PuppeteerController();
-//     await controller.create();
-//     await controller.run();
+    const controller = new PuppeteerController();
+    await controller.create();
+    await controller.run();
 
-// })
+})
 
