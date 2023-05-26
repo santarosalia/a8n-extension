@@ -19,7 +19,7 @@ import { setItemFromLocalStorage,
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
-import { PuppeteerController } from "./ts/class/CrxWebController";
+import { Action, BrowserController, Order, Type } from "./ts/class/CrxWebController";
 
 
 const crxInfo = new CrxInfo();
@@ -236,12 +236,19 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 //     tab => (tab.id ? run(tab.id) : null)
 // )
 
-chrome.action.onClicked.addListener(async ()=>{
+chrome.action.onClicked.addListener(async () => {
     console.log("Sending:  start");
+    let order : Order;
+    const browserControllerArray : BrowserController[] = [];
+    let browserController : BrowserController;
+    if (order.targetVariable) {
+        browserController = browserControllerArray.find(browserController => browserController.getBrowser.variable === order.targetVariable);
+    } else {
+        browserController = new BrowserController();
+    }
     
-    const controller = new PuppeteerController();
-    await controller.create();
-    await controller.run();
+    //message receive
+    browserController.run(order);
+    
 
 })
-

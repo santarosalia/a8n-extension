@@ -216,3 +216,16 @@ export const findTabsByTitle = async (title : string) => {
         return tabs.filter(tab => tab.title.includes(title));
     });
 }
+
+export const findTabsByIndex = (windowId : number, index : number) => {
+    return chrome.tabs.query({
+        windowId : windowId,
+        index : index
+    });
+}
+
+export const findTabsByUrl = (url : string) => {
+    return chrome.tabs.query({
+        url : url
+    });
+}
