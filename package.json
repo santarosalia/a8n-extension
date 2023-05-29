@@ -7,7 +7,7 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "zip" : "npm-build-zip --source=dist/ --destination=./build"
+    "zip": "npm-build-zip --source=dist/ --destination=./build"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",

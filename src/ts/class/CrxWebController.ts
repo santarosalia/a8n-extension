@@ -58,6 +58,7 @@ export class BrowserController {
         switch(type) {
             case Type.BROWSER : {
                 await this.browserHandler(order);
+
                 if (order.returnVariable) {
                     this.browser.variable = order.returnVariable;
                 }
@@ -107,7 +108,7 @@ export interface Order {
     type : Type,
     action : Action
     parameter : Parameter
-    returnVariable : string
+    returnVariable? : string
 }
 
 export enum Type {
