@@ -243,7 +243,7 @@ chrome.action.onClicked.addListener(async () => {
     let browserController : BrowserController;
     
     if (order.targetVariable) {
-        browserController = browserControllerArray.find(browserController => browserController.getBrowser.variable === order.targetVariable);
+        browserController = browserControllerArray.find(browserController => browserController.getVariable === order.targetVariable);
     } else {
         browserController ? browserControllerArray.push(browserController) : null;
         browserController = new BrowserController();

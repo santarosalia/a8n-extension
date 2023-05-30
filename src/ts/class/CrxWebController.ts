@@ -1,32 +1,33 @@
 import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl } from "@CrxApi";
-import { Browser, Page } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
+import { Browser, Page, ElementHandle } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
 
 export class BrowserController {
     private window : chrome.windows.Window
     private tab : chrome.tabs.Tab
-    private browser : {
-        instance : Browser,
-        variable : string
-    }
+    private instance : Browser
+    private browser : string
     private variable : string
     private page : Page
-
+    private elArray : {
+        instance : ElementHandle,
+        variable : string
+    }[]
     constructor () {
 
     }
-    get getBrowser() {
-        return this.browser;
+    get getVariable() {
+        return this.variable;
     }
 
     private async connect() {
         const transport = await ExtensionDebuggerTransport.create(this.tab.id);
-        this.browser.instance = await puppeteer.connect({
+        this.instance = await puppeteer.connect({
             transport : transport,
             defaultViewport : null
         });
-        [this.page] = await this.browser.instance.pages();
+        [this.page] = await this.instance.pages();
     }
 
     private async create() {
@@ -60,7 +61,7 @@ export class BrowserController {
                 await this.browserHandler(order);
 
                 if (order.returnVariable) {
-                    this.browser.variable = order.returnVariable;
+                    this.variable = order.returnVariable;
                 }
                 break;
             }
@@ -99,7 +100,37 @@ export class BrowserController {
     }
 
     private async elementHandler(order : Order) {
+        const action = order.action;
+        const locatorType = order.parameter.locatorType;
+        const locator = order.parameter.locator;
+        const variable = order.returnVariable;
+        switch(action) {
+            case Action.WAIT : {
+                switch(locatorType) {
+                    case LocatorType.XPATH : {
+                        const el = await this.page.waitForXPath(locator);
+                        this.elArray.push({
+                            instance : el,
+                            variable : variable
+                        });
+                        break;
+                    }
+                    case LocatorType.CSSSELECTOR : {
+                        const el = await this.page.waitForSelector(locator);
+                        this.elArray.push({
+                            instance : el,
+                            variable : variable
+                        });
+                        break;
+                    }
+                }
+                break;
+            }
+            case Action.CLICK : {
 
+            }
+
+        }
     }
 }
 
@@ -119,13 +150,19 @@ export enum Type {
 export enum Action {
     OPEN = 'open',
     CONNECT = 'connect',
-    WAIT = 'wait'
+    WAIT = 'wait',
+    CLICK = 'click',
+    HOVER = 'hover',
 }
 
 enum ConnectOptionType {
     URL = 'url',
     TITLE = 'title',
     INDEX = 'index'
+}
+enum LocatorType {
+    XPATH = 'xpath',
+    CSSSELECTOR = 'cssselector'
 }
 
 interface Parameter {
@@ -135,5 +172,7 @@ interface Parameter {
         type : ConnectOptionType,
         value : string | number
     }
+    locatorType? : LocatorType
+    locator : string
 }
 
