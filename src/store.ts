@@ -166,7 +166,6 @@ export default createStore({
             
             const scrapingDatas = toRaw(getters[CRX_STATE.CRX_SCRAPING_DATAS] as ScrapingDatas);
             scrapingDatas.data[colIdx].exceptColumn.push(removeIdx);
-
             setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, scrapingDatas);
         },
         REMOVE_ROW({ getters }, payload : number) {
@@ -178,14 +177,9 @@ export default createStore({
             sendMessageToServiceWorker(CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE, payload);
         },
         SAVE_DATA_SCRAPING({ getters }, payload : CrxDataScrapingEvent) {
-            // const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
-            // records.push(payload);
-            // setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, records);
             setItemFromLocalStorage(CRX_NEW_RECORD, payload);
         },
         SAVE_DATA() {
-            // const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
-            // localStorage.setItem(CRX_STATE.CRX_RECORDS, JSON.stringify(records));
             sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_END);
         }
 
