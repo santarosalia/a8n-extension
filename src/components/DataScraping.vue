@@ -6,7 +6,7 @@
           <tr>
             <td></td>
             <td v-for="i in scrapingDatasForTable.columnSize.reduce((a, b) => a + b)">
-              <span v-if="!scrapingDatasForTable.exceptColumn[getColIdx(i-1)].includes(getCurrentIdx(i-1))">
+              <span>
               <v-btn icon variant="text" density="comfortable" @click="removeColumn(i)">
                 <v-icon>mdi-minus</v-icon>
               </v-btn>
@@ -118,16 +118,17 @@ const scrapingDatas = computed(() : ScrapingDatas => store.getters[CRX_STATE.CRX
 const scrapingDatasForTable = computed(() => {
   const scrapingDatas : ScrapingDatas = store.getters[CRX_STATE.CRX_SCRAPING_DATAS];
   let textData :string[][] = [];
-
-  scrapingDatas.data.reverse().forEach(item => {
-    textData = item.textData.map((arr,idx) => arr.concat(textData[idx]))
+  scrapingDatas.data.forEach(item => {
+    textData = item.textData.map((arr,idx) => {
+      textData.push([]);
+      return textData[idx].concat(arr);
+    });
   });
-
   const result = {
-    columnSize : scrapingDatas.data.map(item => item.columnSize).reverse(),
+    columnSize : scrapingDatas.data.map(item => item.columnSize),
     textData : textData,
-    pattern : scrapingDatas.data.map(item => item.pattern).reverse(),
-    exceptColumn : scrapingDatas.data.map(item => item.exceptColumn).reverse(),
+    pattern : scrapingDatas.data.map(item => item.pattern),
+    exceptColumn : scrapingDatas.data.map(item => item.exceptColumn),
   }
   return result;
 });
@@ -157,7 +158,7 @@ const getColIdx = (idx : number) => {
   let colIdx : number;
   const colSize = scrapingDatasForTable.value.columnSize;
   for (let i in colSize) {
-    if (colSize[i] < idx) {
+    if (colSize[i] <= idx) {
       idx -= colSize[i];
     } else {
       colIdx = Number(i);
@@ -170,7 +171,7 @@ const getColIdx = (idx : number) => {
 const getCurrentIdx = (idx : number) => {
   const colSize = scrapingDatasForTable.value.columnSize;
   for (let i in colSize) {
-    if (colSize[i] < idx) {
+    if (colSize[i] <= idx) {
       idx -= colSize[i];
     } else {
       break;
