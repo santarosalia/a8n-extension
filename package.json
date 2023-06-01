@@ -7,7 +7,8 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "zip": "npm-build-zip --source=dist/ --destination=./build"
+    "zip" : "npm-build-zip --source=dist/ --destination=./build",
+    "docs" : "npx typedoc --entryPointStrategy expand ./src"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -29,6 +30,7 @@
     "@crxjs/vite-plugin": "^1.0.14",
     "@vitejs/plugin-vue": "^4.1.0",
     "tslib": "^2.5.0",
+    "typedoc": "^0.24.7",
     "vite": "^4.2.0",
     "vite-plugin-vuetify": "^1.0.0-alpha.12",
     "vue-cli-plugin-vuetify": "~2.5.8"

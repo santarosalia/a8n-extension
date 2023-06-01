@@ -155,17 +155,17 @@ export enum Action {
     HOVER = 'hover',
 }
 
-enum ConnectOptionType {
+export enum ConnectOptionType {
     URL = 'url',
     TITLE = 'title',
     INDEX = 'index'
 }
-enum LocatorType {
+export enum LocatorType {
     XPATH = 'xpath',
     CSSSELECTOR = 'cssselector'
 }
 
-interface Parameter {
+export interface Parameter {
     timeout? : number
     url? : string
     connectOption? : {

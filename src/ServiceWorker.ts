@@ -50,7 +50,7 @@ const initWebRecorder = (url : string) => {
     openView();
 }
 
-const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageSender , sendResponse : any) => {
+export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageSender , sendResponse : any) => {
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     const COMMAND = message.command;
     switch (COMMAND) {

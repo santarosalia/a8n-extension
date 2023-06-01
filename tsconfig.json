@@ -35,7 +35,7 @@
         "resolveJsonModule": true,
         "removeComments": true, //컴파일시 주석제거
         "noUnusedLocals": false, //쓰지않는 지역변수 있으면 에러내기
-        "noUnusedParameters": true, //쓰지않는 파라미터 있으면 에러내기
+        "noUnusedParameters": false, //쓰지않는 파라미터 있으면 에러내기
         "noImplicitAny": false,
         "strictNullChecks": false
     },
@@ -51,5 +51,4 @@
     "exclude": [
         "node_modules"
     ]
-    
 }
