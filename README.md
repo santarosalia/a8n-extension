@@ -18,8 +18,13 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 
 ### npm run zip
 - 크롬 스토어 게시용 압축파일 생성
-- dist 폴더 압축, 압축 된 파일 경로 build/
+- dist 폴더 압축, 압축 된 파일 경로 `build/`
 - build 폴더 수동으로 1회 생성 필요!
 
 ### npm run docs
-- typedoc 문서 생성 경로 docs/
+- typedoc 문서 생성 경로 `docs/`
+
+## Version
+
+- default `YY.MM.dd`
+- hotfix `YY.MM.dd.1` ...
