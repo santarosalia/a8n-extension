@@ -10,10 +10,12 @@ export class BrowserController {
     private browser : string
     private variable : string
     private page : Page
-    private elements : ElementController[]
-    constructor () {
+    private elementControllerArray : ElementController[]
+
+    constructor() {
 
     }
+
     get getVariable() {
         return this.variable;
     }
@@ -27,10 +29,13 @@ export class BrowserController {
         [this.page] = await this.instance.pages();
     }
 
-    private async create() {
+    private async open() {
         this.window = await createWindow();
         [this.tab] = await currentWindowTabs(this.window.id);
         await this.connect();
+    }
+    private async goto(url : string) {
+        await this.page.goto(url);
     }
 
     private async findTabByTitle(title : string) {
@@ -46,49 +51,50 @@ export class BrowserController {
         [this.tab] = await findTabsByUrl(url);
         await this.connect();
     }
-    async run(order : Order) {
-        await this.typeHandler(order);
+    async execute(msg : RequestMessage) {
+        await this.typeHandler(msg);
     }
 
-    private async typeHandler(order : Order) {
-        const type = order.type;
+    private async typeHandler(msg : RequestMessage) {
+        const type = msg.type;
 
         switch(type) {
             case Type.BROWSER : {
-                await this.browserHandler(order);
+                await this.browserHandler(msg);
 
-                if (order.returnVariable) {
-                    this.variable = order.returnVariable;
+                if (msg.returnVariable) {
+                    this.variable = msg.returnVariable;
                 }
                 break;
             }
             case Type.ELEMENT : {
-                await this.elementHandler(order);
+                await this.elementHandler(msg);
             }
         }
     }
 
-    private async browserHandler(order : Order) {
-        const action = order.action;
+    private async browserHandler(msg : RequestMessage) {
+        const action = msg.action;
         switch(action) {
             case Action.OPEN : {
-                this.create();
+                await this.open();
+                await this.goto(msg.parameter.url)
                 break;
             }
             case Action.CONNECT : {
-                const connectOptionType = order.parameter.connectOption.type;
-                const connectOptionValue = order.parameter.connectOption.value;
+                const connectOptionType = msg.parameter.connectOption.type;
+                const connectOptionValue = msg.parameter.connectOption.value;
                 switch (connectOptionType) {
                     case ConnectOptionType.URL : {
-                        this.findTabByUrl(connectOptionValue as string);
+                        await this.findTabByUrl(connectOptionValue as string);
                         break;
                     }
                     case ConnectOptionType.TITLE : {
-                        this.findTabByTitle(connectOptionValue as string);
+                        await this.findTabByTitle(connectOptionValue as string);
                         break;
                     }
                     case ConnectOptionType.INDEX : {
-                        this.findTabByIndex(connectOptionValue as number);
+                        await this.findTabByIndex(connectOptionValue as number);
                     }
 
                 }
@@ -96,45 +102,62 @@ export class BrowserController {
         }
     }
 
-    private async elementHandler(order : Order) {
-        const action = order.action;
-        const locatorType = order.parameter.locatorType;
-        const locator = order.parameter.locator;
-        const returnVariable = order.returnVariable;
-        const targetVariable = order.targetVariable;
-
+    private async elementHandler(msg : RequestMessage) {
+        const action = msg.action;
+        const locatorType = msg.parameter.locatorType;
+        const locator = msg.parameter.locator;
+        const returnVariable = msg.returnVariable;
+        const targetVariable = msg.targetVariable;
+        const value = msg.parameter.value;
         let elementController : ElementController;
         
+        if (targetVariable) {
+            elementController = this.elementControllerArray.find(elementController => elementController.variable === targetVariable);
+        } else {
+            elementController = await this.waitFor(msg);
+        }
         switch(action) {
             case Action.WAIT : {
-                switch(locatorType) {
-                    case LocatorType.XPATH : {
-                        const el = await this.page.waitForXPath(locator);
-                        elementController = new ElementController(el, returnVariable);
-                        this.elements.push(elementController);
-                        break;
-                    }
-                    case LocatorType.CSSSELECTOR : {
-                        const el = await this.page.waitForSelector(locator);
-                        elementController = new ElementController(el, returnVariable);
-                        this.elements.push(elementController);
-                        break;
-                    }
-                    case LocatorType.ELEMENT : {
-                        elementController = this.elements.find(element => element.variable === targetVariable);
-                    }
-                }
+                return elementController.variable;
                 break;
             }
             case Action.CLICK : {
-
+                elementController.click();
+                break;
+            }
+            case Action.HOVER : {
+                elementController.hover();
+                break;
+            }
+            case Action.TYPE : {
+                elementController.type(value);
             }
 
         }
     }
+
+    private async waitFor(msg : RequestMessage) {
+        const locator = msg.parameter.locator;
+        const locatorType = msg.parameter.locatorType;
+        const returnVariable = msg.returnVariable;
+
+        let elementHandle : ElementHandle;
+
+        switch(locatorType) {
+            case LocatorType.XPATH : {
+                elementHandle = await this.page.waitForXPath(locator);
+                break;
+            }
+            case LocatorType.CSSSELECTOR : {
+                elementHandle = await this.page.waitForSelector(locator);
+                break;
+            }
+        }
+        return new ElementController(elementHandle, returnVariable);
+    }
 }
 
-export interface Order {
+export interface RequestMessage {
     targetVariable? : string
     type : Type,
     action : Action
@@ -153,6 +176,7 @@ export enum Action {
     WAIT = 'wait',
     CLICK = 'click',
     HOVER = 'hover',
+    TYPE = 'type'
 }
 
 export enum ConnectOptionType {
@@ -174,17 +198,25 @@ export interface Parameter {
         value : string | number
     }
     locatorType? : LocatorType
-    locator : string
+    locator? : string
+    value? : string
 }
 
 export class ElementController {
-    element : ElementHandle
+    elementHandle : ElementHandle
     variable : string
-    constructor(el : ElementHandle, variable : string) {
-        this.element = el;
+
+    constructor(elementHandle : ElementHandle, variable : string) {
+        this.elementHandle = elementHandle;
         this.variable = variable;
     }
-    click() {
-        
+    async click() {
+        await this.elementHandle.click();
+    }
+    async hover() {
+        await this.elementHandle.hover();
+    }
+    async type(text : string) {
+        await this.elementHandle.type(text);
     }
 }

@@ -19,7 +19,7 @@ import { setItemFromLocalStorage,
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
-import { Action, BrowserController, Order, Type } from "./ts/class/CrxWebController";
+import { Action, BrowserController, LocatorType, RequestMessage, Type } from "@/ts/class/CrxWebController";
 
 
 const crxInfo = new CrxInfo();
@@ -235,22 +235,53 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 //     },
 //     tab => (tab.id ? run(tab.id) : null)
 // )
-
+const browserControllerArray : BrowserController[] = [];
+let browserController : BrowserController;
 chrome.action.onClicked.addListener(async () => {
     console.log("Sending:  start");
-    let order : Order;
-    const browserControllerArray : BrowserController[] = [];
-    let browserController : BrowserController;
+        const msgarr : RequestMessage[] = [
+        {
+            type : Type.BROWSER,
+            action : Action.OPEN,
+            parameter : {
+                timeout : 1000,
+                url : 'https://naver.com'
+            },
+            returnVariable : 'browser1'
+        },
+        {
+            targetVariable : 'browser1',
+            type : Type.ELEMENT,
+            action : Action.TYPE,
+            parameter : {
+                timeout : 1000,
+                locatorType : LocatorType.CSSSELECTOR,
+                locator : '#query',
+                value : 'abcde'
+            },
+        }
+    ]
     
-    if (order.targetVariable) {
-        browserController = browserControllerArray.find(browserController => browserController.getVariable === order.targetVariable);
-    } else {
-        browserController ? browserControllerArray.push(browserController) : null;
-        browserController = new BrowserController();
-    }
-    
-    //message receive
-    browserController.run(order);
-    
+    await run(msgarr[0]).then(async ()=>{
+        setTimeout(async () => {
+            await run(msgarr[1])
+        }, 2000);
+        
+    })
 
-})
+    
+});
+
+const run = async (msg : RequestMessage) => {
+        console.log(msg.targetVariable)
+        if (msg.targetVariable) {
+            browserController = browserControllerArray.find(browserController => browserController.getVariable === msg.targetVariable);
+            console.log(browserControllerArray)
+        } else {
+            browserController = new BrowserController();
+            browserControllerArray.push(browserController);
+        }
+        console.log(browserController)
+        //message receive
+        await browserController.execute(msg);
+}
