@@ -23,13 +23,6 @@
           "match_origin_as_fallback": true,
           "all_frames" : true,
           "runAt" : "document_start"
-        },
-        {
-          "matches": ["*://*/*"],
-          "js":["src/ts/contents/WebController.ts"],
-          "match_origin_as_fallback": true,
-          "all_frames" : false,
-          "runAt" : "document_start"
         }
     ],
     "devtools_page" : "src/DevToolsPlugin.html",

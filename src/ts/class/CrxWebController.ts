@@ -10,10 +10,7 @@ export class BrowserController {
     private browser : string
     private variable : string
     private page : Page
-    private elArray : {
-        instance : ElementHandle,
-        variable : string
-    }[]
+    private elements : ElementController[]
     constructor () {
 
     }
@@ -103,25 +100,28 @@ export class BrowserController {
         const action = order.action;
         const locatorType = order.parameter.locatorType;
         const locator = order.parameter.locator;
-        const variable = order.returnVariable;
+        const returnVariable = order.returnVariable;
+        const targetVariable = order.targetVariable;
+
+        let elementController : ElementController;
+        
         switch(action) {
             case Action.WAIT : {
                 switch(locatorType) {
                     case LocatorType.XPATH : {
                         const el = await this.page.waitForXPath(locator);
-                        this.elArray.push({
-                            instance : el,
-                            variable : variable
-                        });
+                        elementController = new ElementController(el, returnVariable);
+                        this.elements.push(elementController);
                         break;
                     }
                     case LocatorType.CSSSELECTOR : {
                         const el = await this.page.waitForSelector(locator);
-                        this.elArray.push({
-                            instance : el,
-                            variable : variable
-                        });
+                        elementController = new ElementController(el, returnVariable);
+                        this.elements.push(elementController);
                         break;
+                    }
+                    case LocatorType.ELEMENT : {
+                        elementController = this.elements.find(element => element.variable === targetVariable);
                     }
                 }
                 break;
@@ -162,7 +162,8 @@ export enum ConnectOptionType {
 }
 export enum LocatorType {
     XPATH = 'xpath',
-    CSSSELECTOR = 'cssselector'
+    CSSSELECTOR = 'cssselector',
+    ELEMENT = 'element'
 }
 
 export interface Parameter {
@@ -176,3 +177,14 @@ export interface Parameter {
     locator : string
 }
 
+export class ElementController {
+    element : ElementHandle
+    variable : string
+    constructor(el : ElementHandle, variable : string) {
+        this.element = el;
+        this.variable = variable;
+    }
+    click() {
+        
+    }
+}
