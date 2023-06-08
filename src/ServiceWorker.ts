@@ -239,49 +239,112 @@ const browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
 chrome.action.onClicked.addListener(async () => {
     console.log("Sending:  start");
-        const msgarr : RequestMessage[] = [
+    //     const msgarr : RequestMessage[] = [
+    //     {
+    //         type : Type.BROWSER,
+    //         action : Action.OPEN,
+    //         parameter : {
+    //             timeout : 1000,
+    //             url : 'https://naver.com'
+    //         },
+    //         returnVariable : 'browser1'
+    //     },
+    //     {
+    //         targetVariable : 'browser1',
+    //         type : Type.ELEMENT,
+    //         action : Action.TYPE,
+    //         parameter : {
+    //             timeout : 1000,
+    //             locatorType : LocatorType.CSSSELECTOR,
+    //             locator : '#query',
+    //             value : 'abcde'
+    //         },
+    //     },
+    //     {
+    //         targetVariable : 'browser1',
+    //         type : Type.ELEMENT,
+    //         action : Action.WAIT,
+    //         parameter : {
+    //             timeout : 1000,
+    //             locatorType : LocatorType.CSSSELECTOR,
+    //             locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
+    //         },
+    //         returnVariable : 'element31'
+    //     },
+    //     {
+    //         targetVariable : 'element31',
+    //         type : Type.ELEMENT,
+    //         action : Action.READ,
+    //         parameter : {
+    //             timeout : 1000,
+    //             locatorType : LocatorType.CSSSELECTOR,
+    //             locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
+    //         },
+    //         returnVariable : 'element31'
+    //     },
+    //     {
+    //         targetVariable : 'browser1',
+    //         type : Type.ELEMENT,
+    //         action : Action.READ,
+    //         parameter : {
+    //             timeout : 1000,
+    //             locatorType : LocatorType.XPATH,
+    //             locator : '//*[@id="shortcutArea"]/ul/li[1]/a/span[2]'
+    //         },
+    //         returnVariable : 'element20'
+    //     }
+    // ]
+
+    const msgarr : RequestMessage[] = [
         {
             type : Type.BROWSER,
             action : Action.OPEN,
             parameter : {
                 timeout : 1000,
-                url : 'https://naver.com'
+                url : 'https://www.11st.co.kr/'
             },
             returnVariable : 'browser1'
         },
         {
             targetVariable : 'browser1',
             type : Type.ELEMENT,
-            action : Action.TYPE,
+            action : Action.CLICK,
             parameter : {
                 timeout : 1000,
                 locatorType : LocatorType.CSSSELECTOR,
-                locator : '#query',
-                value : 'abcde'
+                locator : '#gnb > div > div.b_header_gnb.b_header_gnb_logoday > div > div.c_gnb_button_category > button',
             },
-        }
+        },
+        {
+            targetVariable : 'browser1',
+            type : Type.ELEMENT,
+            action : Action.HOVER,
+            parameter : {
+                timeout : 1000,
+                locatorType : LocatorType.CSSSELECTOR,
+                locator : '#gnbCategory > div > div.inner > div:nth-child(3) > nav > ul > li.brand > a',
+            },
+        },
     ]
     
-    await run(msgarr[0]).then(async ()=>{
-        setTimeout(async () => {
-            await run(msgarr[1])
-        }, 2000);
-        
-    })
-
-    
+    for (let msg of msgarr) {
+        const result = await run(msg).then();
+        console.log(result)
+    }
 });
 
 const run = async (msg : RequestMessage) => {
-        console.log(msg.targetVariable)
         if (msg.targetVariable) {
             browserController = browserControllerArray.find(browserController => browserController.getVariable === msg.targetVariable);
-            console.log(browserControllerArray)
         } else {
             browserController = new BrowserController();
             browserControllerArray.push(browserController);
         }
-        console.log(browserController)
+
+        if (!browserController) {
+            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.variable === msg.targetVariable));
+        }
         //message receive
-        await browserController.execute(msg);
+        const result = await browserController.execute(msg);
+        return result;
 }

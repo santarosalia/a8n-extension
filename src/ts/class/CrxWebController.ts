@@ -13,11 +13,14 @@ export class BrowserController {
     private elementControllerArray : ElementController[]
 
     constructor() {
-
+        this.elementControllerArray = [];
     }
 
     get getVariable() {
         return this.variable;
+    }
+    get getElementControllerArray() {
+        return this.elementControllerArray;
     }
 
     private async connect() {
@@ -52,7 +55,8 @@ export class BrowserController {
         await this.connect();
     }
     async execute(msg : RequestMessage) {
-        await this.typeHandler(msg);
+        const result = await this.typeHandler(msg);
+        return result;
     }
 
     private async typeHandler(msg : RequestMessage) {
@@ -68,7 +72,8 @@ export class BrowserController {
                 break;
             }
             case Type.ELEMENT : {
-                await this.elementHandler(msg);
+                const result = await this.elementHandler(msg);
+                return result;
             }
         }
     }
@@ -113,8 +118,11 @@ export class BrowserController {
         
         if (targetVariable) {
             elementController = this.elementControllerArray.find(elementController => elementController.variable === targetVariable);
-        } else {
+        }
+
+        if (!elementController) {
             elementController = await this.waitFor(msg);
+            this.elementControllerArray.push(elementController);
         }
         switch(action) {
             case Action.WAIT : {
@@ -131,6 +139,11 @@ export class BrowserController {
             }
             case Action.TYPE : {
                 elementController.type(value);
+                break;
+            }
+            case Action.READ : {
+                const result = elementController.read();
+                return result;
             }
 
         }
@@ -176,7 +189,8 @@ export enum Action {
     WAIT = 'wait',
     CLICK = 'click',
     HOVER = 'hover',
-    TYPE = 'type'
+    TYPE = 'type',
+    READ = 'read'
 }
 
 export enum ConnectOptionType {
@@ -218,5 +232,9 @@ export class ElementController {
     }
     async type(text : string) {
         await this.elementHandle.type(text);
+    }
+    async read() {
+        const result = await (await this.elementHandle.getProperty('textContent')).jsonValue() as string;
+        return result;
     }
 }
