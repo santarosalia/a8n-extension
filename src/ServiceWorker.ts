@@ -19,7 +19,7 @@ import { setItemFromLocalStorage,
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
-import { Action, BrowserController, LocatorType, RequestMessage, Type } from "@/ts/class/CrxWebController";
+import {BrowserAction, BrowserController, ElementAction, LocatorType, RequestMessage, Type } from "@/ts/class/CrxWebController";
 
 
 const crxInfo = new CrxInfo();
@@ -242,7 +242,7 @@ chrome.action.onClicked.addListener(async () => {
     //     const msgarr : RequestMessage[] = [
     //     {
     //         type : Type.BROWSER,
-    //         action : Action.OPEN,
+    //         action : BrowserAction.OPEN,
     //         parameter : {
     //             timeout : 1000,
     //             url : 'https://naver.com'
@@ -252,7 +252,7 @@ chrome.action.onClicked.addListener(async () => {
     //     {
     //         targetVariable : 'browser1',
     //         type : Type.ELEMENT,
-    //         action : Action.TYPE,
+    //         action : ElementAction.TYPE,
     //         parameter : {
     //             timeout : 1000,
     //             locatorType : LocatorType.CSSSELECTOR,
@@ -263,7 +263,7 @@ chrome.action.onClicked.addListener(async () => {
     //     {
     //         targetVariable : 'browser1',
     //         type : Type.ELEMENT,
-    //         action : Action.WAIT,
+    //         action : ElementAction.WAIT,
     //         parameter : {
     //             timeout : 1000,
     //             locatorType : LocatorType.CSSSELECTOR,
@@ -274,7 +274,7 @@ chrome.action.onClicked.addListener(async () => {
     //     {
     //         targetVariable : 'element31',
     //         type : Type.ELEMENT,
-    //         action : Action.READ,
+    //         action : ElementAction.READ,
     //         parameter : {
     //             timeout : 1000,
     //             locatorType : LocatorType.CSSSELECTOR,
@@ -285,20 +285,28 @@ chrome.action.onClicked.addListener(async () => {
     //     {
     //         targetVariable : 'browser1',
     //         type : Type.ELEMENT,
-    //         action : Action.READ,
+    //         action : ElementAction.READ,
     //         parameter : {
     //             timeout : 1000,
     //             locatorType : LocatorType.XPATH,
     //             locator : '//*[@id="shortcutArea"]/ul/li[1]/a/span[2]'
     //         },
     //         returnVariable : 'element20'
+    //     },
+    //     {
+    //         targetVariable : 'browser1',
+    //         type : Type.BROWSER,
+    //         action : BrowserAction.CLOSE,
+    //         parameter : {
+    //             timeout : 1000,
+    //         }
     //     }
     // ]
 
     const msgarr : RequestMessage[] = [
         {
             type : Type.BROWSER,
-            action : Action.OPEN,
+            action : BrowserAction.OPEN,
             parameter : {
                 timeout : 1000,
                 url : 'https://www.11st.co.kr/'
@@ -308,27 +316,60 @@ chrome.action.onClicked.addListener(async () => {
         {
             targetVariable : 'browser1',
             type : Type.ELEMENT,
-            action : Action.CLICK,
+            action : ElementAction.CLICK,
             parameter : {
                 timeout : 1000,
-                locatorType : LocatorType.CSSSELECTOR,
+                locatorType : LocatorType.CSS_SELECTOR,
                 locator : '#gnb > div > div.b_header_gnb.b_header_gnb_logoday > div > div.c_gnb_button_category > button',
             },
         },
         {
             targetVariable : 'browser1',
             type : Type.ELEMENT,
-            action : Action.HOVER,
+            action : ElementAction.GET_PROPERTY,
             parameter : {
                 timeout : 1000,
-                locatorType : LocatorType.CSSSELECTOR,
+                locatorType : LocatorType.CSS_SELECTOR,
                 locator : '#gnbCategory > div > div.inner > div:nth-child(3) > nav > ul > li.brand > a',
+                value : 'href'
             },
         },
     ]
-    
+
+    // const msgarr : RequestMessage[] = [
+    //     {
+    //         type : Type.BROWSER,
+    //         action : BrowserAction.OPEN,
+    //         parameter : {
+    //             timeout : 1000,
+    //             url : 'https://www.g2b.go.kr/pt/menu/selectSubFrame.do?framesrc=/pt/menu/frameTgong.do?url=https://www.g2b.go.kr:8101/ep/tbid/tbidList.do?taskClCds=&bidNm=&searchDtType=1&fromBidDt=2023/04/22&toBidDt=2023/05/22&fromOpenBidDt=&toOpenBidDt=&radOrgan=1&instNm=&area=&regYn=Y&bidSearchType=1&searchType=1'
+    //         },
+    //         returnVariable : 'browser1'
+    //     },
+    //     {
+    //         targetVariable : 'browser1',
+    //         type : Type.BROWSER,
+    //         action : BrowserAction.FRAME,
+    //         parameter : {
+    //             timeout : 1000,
+    //             frameName : 'sub'
+    //         }
+    //     },
+    //     {
+    //         targetVariable : 'browser1',
+    //         type : Type.BROWSER,
+    //         action : BrowserAction.FRAME,
+    //         parameter : {
+    //             timeout : 1000,
+    //             frameName : 'main'
+    //         }
+    //     }
+    // ]
+
+
     for (let msg of msgarr) {
         const result = await run(msg).then();
+        await sleep(2000);
         console.log(result)
     }
 });
@@ -347,4 +388,8 @@ const run = async (msg : RequestMessage) => {
         //message receive
         const result = await browserController.execute(msg);
         return result;
+}
+
+const sleep = (ms : number) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }

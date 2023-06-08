@@ -1,5 +1,5 @@
-import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl } from "@CrxApi";
-import { Browser, Page, ElementHandle } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
+import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow } from "@CrxApi";
+import { Browser, Page, ElementHandle, Frame, KeyInput } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
 
@@ -7,10 +7,10 @@ export class BrowserController {
     private window : chrome.windows.Window
     private tab : chrome.tabs.Tab
     private instance : Browser
-    private browser : string
     private variable : string
     private page : Page
     private elementControllerArray : ElementController[]
+    private frame : Frame
 
     constructor() {
         this.elementControllerArray = [];
@@ -30,6 +30,7 @@ export class BrowserController {
             defaultViewport : null
         });
         [this.page] = await this.instance.pages();
+        this.frame = this.page.mainFrame();
     }
 
     private async open() {
@@ -81,12 +82,12 @@ export class BrowserController {
     private async browserHandler(msg : RequestMessage) {
         const action = msg.action;
         switch(action) {
-            case Action.OPEN : {
+            case BrowserAction.OPEN : {
                 await this.open();
-                await this.goto(msg.parameter.url)
+                await this.goto(msg.parameter.url);
                 break;
             }
-            case Action.CONNECT : {
+            case BrowserAction.CONNECT : {
                 const connectOptionType = msg.parameter.connectOption.type;
                 const connectOptionValue = msg.parameter.connectOption.value;
                 switch (connectOptionType) {
@@ -100,9 +101,20 @@ export class BrowserController {
                     }
                     case ConnectOptionType.INDEX : {
                         await this.findTabByIndex(connectOptionValue as number);
+                        break;
                     }
-
                 }
+                break;
+            }
+            case BrowserAction.CLOSE : {
+                await closeWindow(this.window.id);
+                break;
+            }
+            case BrowserAction.SWITCH_FRAME : {
+                await this.switchFrame(msg);
+            }
+            case BrowserAction.RESET_FRAME : {
+                await this.resetFrame();
             }
         }
     }
@@ -125,27 +137,54 @@ export class BrowserController {
             this.elementControllerArray.push(elementController);
         }
         switch(action) {
-            case Action.WAIT : {
+            case ElementAction.WAIT : {
                 return elementController.variable;
                 break;
             }
-            case Action.CLICK : {
-                elementController.click();
+            case ElementAction.CLICK : {
+                await elementController.click();
                 break;
             }
-            case Action.HOVER : {
-                elementController.hover();
+            case ElementAction.HOVER : {
+                await elementController.hover();
                 break;
             }
-            case Action.TYPE : {
-                elementController.type(value);
+            case ElementAction.TYPE : {
+                await elementController.type(value);
                 break;
             }
-            case Action.READ : {
-                const result = elementController.read();
+            case ElementAction.READ : {
+                const result = await elementController.read();
                 return result;
             }
-
+            case ElementAction.EXISTS : {
+                const exists = elementController ? true : false;
+                return exists;
+            }
+            case ElementAction.GET_PROPERTY : {
+                const result = await elementController.getProperty(value);
+                return result;
+            }
+            case ElementAction.PRESS : {
+                await elementController.press(value as KeyInput);
+                break;
+            }
+            case ElementAction.BOUNDING_BOX : {
+                const result = await elementController.boundingBox();
+                return result;
+            }
+            case ElementAction.READ_TAG : {
+                const result = await elementController.readTag();
+                return result;
+            }
+            case ElementAction.BOX_MODEL : {
+                const result = await elementController.boxModel();
+                return result;
+            }
+            case ElementAction.CLEAR : {
+                await elementController.clear();
+                break;
+            }
         }
     }
 
@@ -153,20 +192,32 @@ export class BrowserController {
         const locator = msg.parameter.locator;
         const locatorType = msg.parameter.locatorType;
         const returnVariable = msg.returnVariable;
-
+        const timeout = msg.parameter.timeout;
         let elementHandle : ElementHandle;
 
         switch(locatorType) {
             case LocatorType.XPATH : {
-                elementHandle = await this.page.waitForXPath(locator);
+                elementHandle = await this.frame.waitForXPath(locator, {
+                    timeout : timeout
+                });
                 break;
             }
-            case LocatorType.CSSSELECTOR : {
-                elementHandle = await this.page.waitForSelector(locator);
+            case LocatorType.CSS_SELECTOR : {
+                elementHandle = await this.frame.waitForSelector(locator, {
+                    timeout : timeout
+                });
                 break;
             }
         }
         return new ElementController(elementHandle, returnVariable);
+    }
+    private async switchFrame(msg : RequestMessage) {
+        const frameName = msg.parameter.frameName;
+        const frames = this.frame.childFrames();
+        this.frame = frames.find(frame => frame.name() === frameName);
+    }
+    private async resetFrame() {
+        this.frame = this.page.mainFrame();
     }
 }
 
@@ -183,15 +234,30 @@ export enum Type {
     ELEMENT = 'Element',
 }
 
-export enum Action {
+export enum BrowserAction {
     OPEN = 'open',
     CONNECT = 'connect',
+    SWITCH_FRAME = 'switchframe',
+    RESET_FRAME = 'resetframe',
+    CLOSE = 'close'
+}
+
+export enum ElementAction {
     WAIT = 'wait',
     CLICK = 'click',
     HOVER = 'hover',
     TYPE = 'type',
-    READ = 'read'
+    READ = 'read',
+    EXISTS = 'exists',
+    GET_PROPERTY = 'getproperty',
+    PRESS = 'press',
+    BOUNDING_BOX = 'boundingbox',
+    READ_TAG = 'readtag',
+    BOX_MODEL = 'boxmodel',
+    CLEAR = 'clear'
 }
+
+export type Action = BrowserAction | ElementAction;
 
 export enum ConnectOptionType {
     URL = 'url',
@@ -200,8 +266,7 @@ export enum ConnectOptionType {
 }
 export enum LocatorType {
     XPATH = 'xpath',
-    CSSSELECTOR = 'cssselector',
-    ELEMENT = 'element'
+    CSS_SELECTOR = 'css'
 }
 
 export interface Parameter {
@@ -214,6 +279,7 @@ export interface Parameter {
     locatorType? : LocatorType
     locator? : string
     value? : string
+    frameName? : string
 }
 
 export class ElementController {
@@ -236,5 +302,27 @@ export class ElementController {
     async read() {
         const result = await (await this.elementHandle.getProperty('textContent')).jsonValue() as string;
         return result;
+    }
+    async getProperty(propertyName : string) {
+        const property = await (await this.elementHandle.getProperty(propertyName)).jsonValue() as string;
+        return property;
+    }
+    async press(keyInput : KeyInput) {
+        await this.elementHandle.press(keyInput);
+    }
+    async boundingBox() {
+        const boundingBox = await this.elementHandle.boundingBox();
+        return boundingBox;
+    }
+    async readTag() {
+        const tag = await this.elementHandle.evaluate(node => node.tagName);
+        return tag;
+    }
+    async boxModel() {
+        const boxModel = await this.elementHandle.boxModel();
+        return boxModel;
+    }
+    async clear() {
+        await this.elementHandle.evaluate(node => node.textContent = '');
     }
 }
