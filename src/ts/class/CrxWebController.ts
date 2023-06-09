@@ -1,4 +1,4 @@
-import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow } from "@CrxApi";
+import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, KeyInput } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
@@ -38,7 +38,7 @@ export class BrowserController {
         [this.tab] = await currentWindowTabs(this.window.id);
         await this.connect();
     }
-    private async goto(url : string) {
+    private async goTo(url : string) {
         await this.page.goto(url);
     }
 
@@ -54,6 +54,26 @@ export class BrowserController {
     private async findTabByUrl(url : string) {
         [this.tab] = await findTabsByUrl(url);
         await this.connect();
+    }
+    private async maximize() {
+        await maximizeWindow(this.window.id);
+    }
+    private async minimize() {
+        await minimizeWindow(this.window.id);
+    }
+    private async scrollTo(x : number, y : number) {
+        await this.page.mouse.wheel({
+            deltaX : x,
+            deltaY : y
+        });
+    }
+    private async back() {
+        await this.page.goBack();
+    }
+    private async handleAlert() {
+        this.page.on('dialog', dialog => {
+            dialog.accept();
+        });
     }
     async execute(msg : RequestMessage) {
         const result = await this.typeHandler(msg);
@@ -81,10 +101,13 @@ export class BrowserController {
 
     private async browserHandler(msg : RequestMessage) {
         const action = msg.action;
+        const value = msg.parameter.value;
+        const x = msg.parameter.x;
+        const y = msg.parameter.y;
         switch(action) {
             case BrowserAction.OPEN : {
                 await this.open();
-                await this.goto(msg.parameter.url);
+                await this.goTo(msg.parameter.url);
                 break;
             }
             case BrowserAction.CONNECT : {
@@ -92,15 +115,11 @@ export class BrowserController {
                 const connectOptionValue = msg.parameter.connectOption.value;
                 switch (connectOptionType) {
                     case ConnectOptionType.URL : {
-                        await this.findTabByUrl(connectOptionValue as string);
+                        await this.findTabByUrl(connectOptionValue);
                         break;
                     }
                     case ConnectOptionType.TITLE : {
-                        await this.findTabByTitle(connectOptionValue as string);
-                        break;
-                    }
-                    case ConnectOptionType.INDEX : {
-                        await this.findTabByIndex(connectOptionValue as number);
+                        await this.findTabByTitle(connectOptionValue);
                         break;
                     }
                 }
@@ -116,6 +135,30 @@ export class BrowserController {
             case BrowserAction.RESET_FRAME : {
                 await this.resetFrame();
             }
+            case BrowserAction.GO_TO : {
+                await this.goTo(value as string);
+                break;
+            }
+            case BrowserAction.BACK : {
+                await this.back();
+                break;
+            }
+            case BrowserAction.MAXIMIZE : {
+                await this.maximize();
+                break;
+            }
+            case BrowserAction.MINIMIZE : {
+                await this.minimize();
+                break;
+            }
+            case BrowserAction.SCROLL_TO : {
+                await this.scrollTo(x, y);
+                break;
+            }
+            case BrowserAction.SWITCH_TAB : {
+                await this.findTabByIndex(value as number);
+                break;
+            }
         }
     }
 
@@ -126,6 +169,7 @@ export class BrowserController {
         const returnVariable = msg.returnVariable;
         const targetVariable = msg.targetVariable;
         const value = msg.parameter.value;
+        const bool = msg.parameter.bool;
         let elementController : ElementController;
         
         if (targetVariable) {
@@ -150,7 +194,7 @@ export class BrowserController {
                 break;
             }
             case ElementAction.TYPE : {
-                await elementController.type(value);
+                await elementController.type(value as string);
                 break;
             }
             case ElementAction.READ : {
@@ -162,7 +206,7 @@ export class BrowserController {
                 return exists;
             }
             case ElementAction.GET_PROPERTY : {
-                const result = await elementController.getProperty(value);
+                const result = await elementController.getProperty(value as string);
                 return result;
             }
             case ElementAction.PRESS : {
@@ -183,6 +227,14 @@ export class BrowserController {
             }
             case ElementAction.CLEAR : {
                 await elementController.clear();
+                break;
+            }
+            case ElementAction.SET_CHECK_BOX_STATE : {
+                await elementController.setCheckBoxState(bool);
+                break;
+            }
+            case ElementAction.SET_SELECT_BOX_VALUE : {
+                await elementController.setSelectBoxValue(value as string);
                 break;
             }
         }
@@ -237,9 +289,15 @@ export enum Type {
 export enum BrowserAction {
     OPEN = 'open',
     CONNECT = 'connect',
-    SWITCH_FRAME = 'switchframe',
-    RESET_FRAME = 'resetframe',
-    CLOSE = 'close'
+    SWITCH_FRAME = 'switchFrame',
+    RESET_FRAME = 'resetFrame',
+    CLOSE = 'close',
+    MAXIMIZE = 'maximize',
+    MINIMIZE = 'minimize',
+    SCROLL_TO = 'scrollTo',
+    GO_TO = 'goTo',
+    BACK = 'back',
+    SWITCH_TAB = 'switchTab'
 }
 
 export enum ElementAction {
@@ -249,24 +307,25 @@ export enum ElementAction {
     TYPE = 'type',
     READ = 'read',
     EXISTS = 'exists',
-    GET_PROPERTY = 'getproperty',
+    GET_PROPERTY = 'getProperty',
     PRESS = 'press',
-    BOUNDING_BOX = 'boundingbox',
-    READ_TAG = 'readtag',
-    BOX_MODEL = 'boxmodel',
-    CLEAR = 'clear'
+    BOUNDING_BOX = 'boundingBox',
+    READ_TAG = 'readTag',
+    BOX_MODEL = 'boxModel',
+    CLEAR = 'clear',
+    SET_CHECK_BOX_STATE = 'setCheckBoxState',
+    SET_SELECT_BOX_VALUE = 'setSelectBoxValue'
 }
 
 export type Action = BrowserAction | ElementAction;
 
 export enum ConnectOptionType {
     URL = 'url',
-    TITLE = 'title',
-    INDEX = 'index'
+    TITLE = 'title'
 }
 export enum LocatorType {
     XPATH = 'xpath',
-    CSS_SELECTOR = 'css'
+    CSS_SELECTOR = 'cssSelector'
 }
 
 export interface Parameter {
@@ -274,12 +333,15 @@ export interface Parameter {
     url? : string
     connectOption? : {
         type : ConnectOptionType,
-        value : string | number
+        value : string
     }
     locatorType? : LocatorType
     locator? : string
-    value? : string
+    value? : string | number
     frameName? : string
+    bool? : boolean
+    x? : number
+    y? : number
 }
 
 export class ElementController {
@@ -324,5 +386,18 @@ export class ElementController {
     }
     async clear() {
         await this.elementHandle.evaluate(node => node.textContent = '');
+    }
+    async setCheckBoxState(value : boolean) {
+        await this.elementHandle.evaluate(node => {
+            const element = node as HTMLInputElement;
+            element.checked = value;
+        });
+    }
+    async setSelectBoxValue(value : string) {
+        await this.elementHandle.select(value);
+    }
+    async screenshot() {
+        // 스크린샷 처리 어떻게할지 고민
+        await this.elementHandle.screenshot();
     }
 }

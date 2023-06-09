@@ -458,3 +458,15 @@ export const findTabsByUrl = (url : string) => {
         url : url
     });
 }
+
+export const maximizeWindow = (windowId : number) => {
+    return chrome.windows.update(windowId, {
+        state : 'maximized'
+    });
+}
+
+export const minimizeWindow = (windowId : number) => {
+    return chrome.windows.update(windowId, {
+        state : 'minimized'
+    });
+}
