@@ -239,102 +239,102 @@ const browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
 chrome.action.onClicked.addListener(async () => {
     console.log("Sending:  start");
-    //     const msgarr : RequestMessage[] = [
-    //     {
-    //         type : Type.BROWSER,
-    //         action : BrowserAction.OPEN,
-    //         parameter : {
-    //             timeout : 1000,
-    //             url : 'https://naver.com'
-    //         },
-    //         returnVariable : 'browser1'
-    //     },
-    //     {
-    //         targetVariable : 'browser1',
-    //         type : Type.ELEMENT,
-    //         action : ElementAction.TYPE,
-    //         parameter : {
-    //             timeout : 1000,
-    //             locatorType : LocatorType.CSSSELECTOR,
-    //             locator : '#query',
-    //             value : 'abcde'
-    //         },
-    //     },
-    //     {
-    //         targetVariable : 'browser1',
-    //         type : Type.ELEMENT,
-    //         action : ElementAction.WAIT,
-    //         parameter : {
-    //             timeout : 1000,
-    //             locatorType : LocatorType.CSSSELECTOR,
-    //             locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
-    //         },
-    //         returnVariable : 'element31'
-    //     },
-    //     {
-    //         targetVariable : 'element31',
-    //         type : Type.ELEMENT,
-    //         action : ElementAction.READ,
-    //         parameter : {
-    //             timeout : 1000,
-    //             locatorType : LocatorType.CSSSELECTOR,
-    //             locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
-    //         },
-    //         returnVariable : 'element31'
-    //     },
-    //     {
-    //         targetVariable : 'browser1',
-    //         type : Type.ELEMENT,
-    //         action : ElementAction.READ,
-    //         parameter : {
-    //             timeout : 1000,
-    //             locatorType : LocatorType.XPATH,
-    //             locator : '//*[@id="shortcutArea"]/ul/li[1]/a/span[2]'
-    //         },
-    //         returnVariable : 'element20'
-    //     },
-    //     {
-    //         targetVariable : 'browser1',
-    //         type : Type.BROWSER,
-    //         action : BrowserAction.CLOSE,
-    //         parameter : {
-    //             timeout : 1000,
-    //         }
-    //     }
-    // ]
-
-    const msgarr : RequestMessage[] = [
+        const msgarr : RequestMessage[] = [
         {
             type : Type.BROWSER,
             action : BrowserAction.OPEN,
             parameter : {
                 timeout : 1000,
-                url : 'https://www.11st.co.kr/'
+                url : 'https://naver.com'
             },
             returnVariable : 'browser1'
         },
         {
             targetVariable : 'browser1',
             type : Type.ELEMENT,
-            action : ElementAction.CLICK,
+            action : ElementAction.TYPE,
             parameter : {
                 timeout : 1000,
                 locatorType : LocatorType.CSS_SELECTOR,
-                locator : '#gnb > div > div.b_header_gnb.b_header_gnb_logoday > div > div.c_gnb_button_category > button',
+                locator : '#query',
+                value : 'abcde'
             },
         },
         {
             targetVariable : 'browser1',
             type : Type.ELEMENT,
-            action : ElementAction.GET_PROPERTY,
+            action : ElementAction.WAIT,
             parameter : {
                 timeout : 1000,
                 locatorType : LocatorType.CSS_SELECTOR,
-                locator : '#gnbCategory > div > div.inner > div:nth-child(3) > nav > ul > li.brand > a',
-                value : 'href'
+                locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
             },
+            returnVariable : 'element31'
         },
+        {
+            targetVariable : 'element31',
+            type : Type.ELEMENT,
+            action : ElementAction.READ,
+            parameter : {
+                timeout : 1000,
+                locatorType : LocatorType.CSS_SELECTOR,
+                locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
+            },
+            returnVariable : 'element31'
+        },
+        {
+            targetVariable : 'browser1',
+            type : Type.ELEMENT,
+            action : ElementAction.READ,
+            parameter : {
+                timeout : 1000,
+                locatorType : LocatorType.XPATH,
+                locator : '//*[@id="shortcutArea"]/ul/li[1]/a/span[2]'
+            },
+            returnVariable : 'element20'
+        },
+        {
+            targetVariable : 'browser1',
+            type : Type.BROWSER,
+            action : BrowserAction.CLOSE,
+            parameter : {
+                timeout : 1000,
+            }
+        }
     ]
+
+    // const msgarr : RequestMessage[] = [
+    //     {
+    //         type : Type.BROWSER,
+    //         action : BrowserAction.OPEN,
+    //         parameter : {
+    //             timeout : 1000,
+    //             url : 'https://www.11st.co.kr/'
+    //         },
+    //         returnVariable : 'browser1'
+    //     },
+    //     {
+    //         targetVariable : 'browser1',
+    //         type : Type.ELEMENT,
+    //         action : ElementAction.CLICK,
+    //         parameter : {
+    //             timeout : 1000,
+    //             locatorType : LocatorType.CSS_SELECTOR,
+    //             locator : '#gnb > div > div.b_header_gnb.b_header_gnb_logoday > div > div.c_gnb_button_category > button',
+    //         },
+    //     },
+    //     {
+    //         targetVariable : 'browser1',
+    //         type : Type.ELEMENT,
+    //         action : ElementAction.GET_PROPERTY,
+    //         parameter : {
+    //             timeout : 1000,
+    //             locatorType : LocatorType.CSS_SELECTOR,
+    //             locator : '#gnbCategory > div > div.inner > div:nth-child(3) > nav > ul > li.brand > a',
+    //             value : 'href'
+    //         },
+    //     },
+    // ]
 
     // const msgarr : RequestMessage[] = [
     //     {

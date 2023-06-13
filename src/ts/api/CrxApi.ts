@@ -7,7 +7,7 @@ import { CRX_COMMAND, CrxMessage } from '@CrxInterface'
  * Chrome Local Storage 에서 주어진 키들에 해당하는 값을 불러옵니다.
  *
  * @param key Storage 에서 검색할 key
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -24,7 +24,7 @@ export const getItemFromLocalStorage = (key : string[]) => {
  *
  * @param key Storage 에 저장 할 key
  * @param value Storage 에 저장 할 value
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -41,7 +41,7 @@ export const setItemFromLocalStorage = (key : string , value : any) => {
 /**
  * Recording History Tab 을 생성합니다
  *
- * @category Chrome Api
+ * @category Recorder
  */
 export const createViewTab = () => {
     return chrome.tabs.create({
@@ -54,7 +54,7 @@ export const createViewTab = () => {
  * Recording History Window 를 생성합니다.
  *
  * @param tab window 에 연결할 Tab
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -75,7 +75,7 @@ export const openViewWindow = (tab : chrome.tabs.Tab) => {
  * Recording Target Tab 을 생성합니다.
  *
  * @param url 생성할 탭의 url
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -94,7 +94,7 @@ export const createRecordingTargetTab = (url : string) => {
  * Recording Target Window 를 생성합니다.
  *
  * @param tab 생성 할 window 의 tab
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -116,7 +116,7 @@ export const openRecordingTargetWindow = (tab : chrome.tabs.Tab) => {
  * @param windowId Recording Target Window ID
  * @param command 메시지 커맨드
  * @param payload payload
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -142,7 +142,8 @@ export const sendMessageByWindowId = async (windowId : number, command : CRX_COM
  * Window 에 존재하는 Tab 배열을 반환합니다.
  *
  * @param windowId Window ID
- * @category Chrome Api
+ * @category Recorder
+ * @category Controller
  * @example
   ```
     async () => {
@@ -158,7 +159,7 @@ export const currentWindowTabs = (windowId : number) => {
  * Tab 활성화를 감지하여 Move Tab 액션을 Record 합니다.
  *
  * @param windowId Window ID
- * @category Chrome Api
+ * @category Recorder
  */
 export const onHighlightedTab = (windowId : number) => {
     setTimeout(() => {
@@ -188,7 +189,7 @@ export const switchFrame = (e : CapturedEvent) => {
  * Window 를 활성화 합니다
  *
  * @param windowId Window ID
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -206,7 +207,7 @@ export const windowFocus = (windowId : number) => {
  * @param cmd 메시지 커맨드
  * @param payload payload
  * @param callback callback function
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -227,7 +228,7 @@ export const sendMessageToServiceWorker = (cmd : CRX_COMMAND, payload? : any, ca
  *
  * @param windowId Window ID
  * @returns 이미지 data string
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -244,7 +245,7 @@ export const captureImage = (windowId : number) => {
  *
  * @param image 이미지
  * @param rect 엘리먼트 크기 정보
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -275,7 +276,7 @@ export const editImage = (image : string, rect : DOMRect) => {
  * @param windowId Recording History Window ID
  * @param command 메시지 커맨드
  * @param paylaod payload
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -301,7 +302,8 @@ export const sendMessageToView = async (windowId : number, command : CRX_COMMAND
  * Window ID 에 해당하는 Window를 종료합니다.
  *
  * @param windowId Window ID
- * @category Chrome Api
+ * @category Recorder
+ * @category Controller
  * @example
   ```
     async () => {
@@ -320,7 +322,7 @@ export const closeWindow = (windowId : number) => {
  * @param command 메시지 커맨드
  * @param payload payload
  * @returns response
- * @category Chrome Api
+ * @category Recorder
  * @example
   ```
     async () => {
@@ -407,7 +409,8 @@ export const sendMessageByWindowIdToFocusedTab = async (windowId : number, comma
  * 모든 탭에서 주어진 title 에 해당하는 tab 배열을 반환합니다.
  *
  * @param title 찾을 title
- * @category Chrome Api
+ * @category Recorder
+ * @category Controller
  * @example
   ```
     async () => {
@@ -426,7 +429,8 @@ export const findTabsByTitle = async (title : string) => {
  *
  * @param windowId 찾을 windowId
  * @param index 찾을 index
- * @category Chrome Api
+ * @category Recorder
+ * @category Controller
  * @example
   ```
     async () => {
@@ -445,7 +449,8 @@ export const findTabsByIndex = (windowId : number, index : number) => {
  * 모든 탭에서 주어진 url을 찾아 tab 배열을 반환합니다.
  *
  * @param url 찾을 url
- * @category Chrome Api
+ * @category Recorder
+ * @categery Controller
  * @example
   ```
     async () => {
@@ -458,13 +463,24 @@ export const findTabsByUrl = (url : string) => {
         url : url
     });
 }
-
+/**
+ * 
+ * @category Controller
+ * @param windowId 
+ * @returns 
+ */
 export const maximizeWindow = (windowId : number) => {
     return chrome.windows.update(windowId, {
         state : 'maximized'
     });
 }
 
+/**
+ * 
+ * @category Controller
+ * @param windowId 
+ * @returns 
+ */
 export const minimizeWindow = (windowId : number) => {
     return chrome.windows.update(windowId, {
         state : 'minimized'
