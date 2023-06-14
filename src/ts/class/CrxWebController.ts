@@ -1,5 +1,5 @@
 import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow } from "@CrxApi";
-import { Browser, Page, ElementHandle, Frame, KeyInput } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
+import { Browser, Page, ElementHandle, Frame, KeyInput, BoundingBox, BoxModel } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
 
@@ -279,6 +279,17 @@ export interface RequestMessage {
     action : Action
     parameter : Parameter
     returnVariable? : string
+}
+
+export interface ResponseMessage {
+    status : Status,
+    value : string | boolean | BoundingBox | BoxModel,
+    
+}
+
+export enum Status {
+    SUCCESS = 'success',
+    ERROR = 'error',
 }
 
 export enum Type {

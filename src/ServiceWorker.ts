@@ -19,7 +19,7 @@ import { setItemFromLocalStorage,
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
-import {BrowserAction, BrowserController, ElementAction, LocatorType, RequestMessage, Type } from "@/ts/class/CrxWebController";
+import {BrowserAction, BrowserController, ElementAction, LocatorType, RequestMessage, ResponseMessage, Status, Type } from "@/ts/class/CrxWebController";
 
 
 const crxInfo = new CrxInfo();
@@ -188,34 +188,20 @@ chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 // Native Messaging
-// var port = chrome.runtime.connectNative('crx');
+var port = chrome.runtime.connectNative('crx');
 
-// port.onMessage.addListener((message : CrxMessage) => {
-//     const window = this as Window;
-//     if (window.navigator.userAgent.indexOf('Edg') > -1) {
-//         //edge 일 때 브라우저 edge 아니면 리턴
-//         if (message.payload.browser !== 'Edge') return;
-//     } else {
-//         // chrome 일 때 크롬 아니면 리턴
-//         if (message.payload.browser !== 'Chrome') return;
-//     }
-
-//     switch (message.command) {
-//         case CRX_COMMAND.CMD_OPEN_BROWSER : {
-            
-
-//             createWindow().then(window => {
-//                 crxInfo.CONTROLLER_WINDOW_ID = window.id;
-//             });
-
-//             break;
-//         }
-//         case CRX_COMMAND.CMD_WEB_CONTROL : {
-//             sendMessageByWindowIdToFocusedTab(crxInfo.CONTROLLER_WINDOW_ID, CRX_COMMAND.CMD_WEB_CONTROL, message.payload);
-//             break;
-//         }
-//     }
-// });
+port.onMessage.addListener(async (message : RequestMessage) => {
+    // const window = this as Window;
+    // if (window.navigator.userAgent.indexOf('Edg') > -1) {
+    //     //edge 일 때 브라우저 edge 아니면 리턴
+    //     if (message.payload.browser !== 'Edge') return;
+    // } else {
+    //     // chrome 일 때 크롬 아니면 리턴
+    //     if (message.payload.browser !== 'Chrome') return;
+    // }
+    const responseMessage = await run(message);
+    port.postMessage(responseMessage);
+});
 
 // port.onDisconnect.addListener(()=>{
 //     console.log('discon')
@@ -265,7 +251,7 @@ chrome.action.onClicked.addListener(async () => {
             type : Type.ELEMENT,
             action : ElementAction.WAIT,
             parameter : {
-                timeout : 1000,
+                timeout : 3000,
                 locatorType : LocatorType.CSS_SELECTOR,
                 locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
             },
@@ -276,16 +262,15 @@ chrome.action.onClicked.addListener(async () => {
             type : Type.ELEMENT,
             action : ElementAction.READ,
             parameter : {
-                timeout : 1000,
+                timeout : 10000,
                 locatorType : LocatorType.CSS_SELECTOR,
                 locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
             },
-            returnVariable : 'element31'
         },
         {
             targetVariable : 'browser1',
             type : Type.ELEMENT,
-            action : ElementAction.READ,
+            action : ElementAction.BOUNDING_BOX,
             parameter : {
                 timeout : 1000,
                 locatorType : LocatorType.XPATH,
@@ -368,8 +353,8 @@ chrome.action.onClicked.addListener(async () => {
 
 
     for (let msg of msgarr) {
-        const result = await run(msg).then();
-        await sleep(2000);
+        const result = await run(msg);
+        await sleep(1000);
         console.log(result)
     }
 });
@@ -386,8 +371,22 @@ const run = async (msg : RequestMessage) => {
             browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.variable === msg.targetVariable));
         }
         //message receive
-        const result = await browserController.execute(msg);
-        return result;
+        let responseMessage : ResponseMessage;
+    
+        try {
+            const result = await browserController.execute(msg);
+            
+            responseMessage = {
+                status : Status.SUCCESS,
+                value : result
+            }
+        } catch (e : any) {
+            responseMessage = {
+                status : Status.ERROR,
+                value : e.message
+            }
+        }
+        return responseMessage;
 }
 
 const sleep = (ms : number) => {
