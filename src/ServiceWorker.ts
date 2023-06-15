@@ -19,7 +19,7 @@ import { setItemFromLocalStorage,
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
-import {BrowserAction, BrowserController, ElementAction, LocatorType, RequestMessage, ResponseMessage, Status, Type } from "@/ts/class/CrxWebController";
+import {BrowserAction, BrowserController, ElementAction, LocatorType, RequestMessage, ResponseMessage, Status } from "@/ts/class/CrxWebController";
 
 
 const crxInfo = new CrxInfo();
@@ -199,6 +199,7 @@ port.onMessage.addListener(async (message : RequestMessage) => {
     //     // chrome 일 때 크롬 아니면 리턴
     //     if (message.payload.browser !== 'Chrome') return;
     // }
+    console.log(message)
     const responseMessage = await run(message);
     port.postMessage(responseMessage);
 });
@@ -208,169 +209,21 @@ port.onMessage.addListener(async (message : RequestMessage) => {
 //     // port = chrome.runtime.connectNative('crx');
 // })
 
-// chrome.action.onClicked.addListener(()=>{
-//     console.log("Sending:  start");
-
-//     port.postMessage("start");
-// })
-
-// chrome.tabs.create(
-//     {
-//         active: true,
-//         url: 'https://www.google.co.in',
-//     },
-//     tab => (tab.id ? run(tab.id) : null)
-// )
 const browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
-chrome.action.onClicked.addListener(async () => {
-    console.log("Sending:  start");
-        const msgarr : RequestMessage[] = [
-        {
-            type : Type.BROWSER,
-            action : BrowserAction.OPEN,
-            parameter : {
-                timeout : 1000,
-                url : 'https://naver.com'
-            },
-            returnVariable : 'browser1'
-        },
-        {
-            targetVariable : 'browser1',
-            type : Type.ELEMENT,
-            action : ElementAction.TYPE,
-            parameter : {
-                timeout : 1000,
-                locatorType : LocatorType.CSS_SELECTOR,
-                locator : '#query',
-                value : 'abcde'
-            },
-        },
-        {
-            targetVariable : 'browser1',
-            type : Type.ELEMENT,
-            action : ElementAction.WAIT,
-            parameter : {
-                timeout : 3000,
-                locatorType : LocatorType.CSS_SELECTOR,
-                locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
-            },
-            returnVariable : 'element31'
-        },
-        {
-            targetVariable : 'element31',
-            type : Type.ELEMENT,
-            action : ElementAction.READ,
-            parameter : {
-                timeout : 10000,
-                locatorType : LocatorType.CSS_SELECTOR,
-                locator : '#special-input-logo > a.link_naver.type_motion_n.is_fadein > span.blind'
-            },
-        },
-        {
-            targetVariable : 'browser1',
-            type : Type.ELEMENT,
-            action : ElementAction.BOUNDING_BOX,
-            parameter : {
-                timeout : 1000,
-                locatorType : LocatorType.XPATH,
-                locator : '//*[@id="shortcutArea"]/ul/li[1]/a/span[2]'
-            },
-            returnVariable : 'element20'
-        },
-        {
-            targetVariable : 'browser1',
-            type : Type.BROWSER,
-            action : BrowserAction.CLOSE,
-            parameter : {
-                timeout : 1000,
-            }
-        }
-    ]
-
-    // const msgarr : RequestMessage[] = [
-    //     {
-    //         type : Type.BROWSER,
-    //         action : BrowserAction.OPEN,
-    //         parameter : {
-    //             timeout : 1000,
-    //             url : 'https://www.11st.co.kr/'
-    //         },
-    //         returnVariable : 'browser1'
-    //     },
-    //     {
-    //         targetVariable : 'browser1',
-    //         type : Type.ELEMENT,
-    //         action : ElementAction.CLICK,
-    //         parameter : {
-    //             timeout : 1000,
-    //             locatorType : LocatorType.CSS_SELECTOR,
-    //             locator : '#gnb > div > div.b_header_gnb.b_header_gnb_logoday > div > div.c_gnb_button_category > button',
-    //         },
-    //     },
-    //     {
-    //         targetVariable : 'browser1',
-    //         type : Type.ELEMENT,
-    //         action : ElementAction.GET_PROPERTY,
-    //         parameter : {
-    //             timeout : 1000,
-    //             locatorType : LocatorType.CSS_SELECTOR,
-    //             locator : '#gnbCategory > div > div.inner > div:nth-child(3) > nav > ul > li.brand > a',
-    //             value : 'href'
-    //         },
-    //     },
-    // ]
-
-    // const msgarr : RequestMessage[] = [
-    //     {
-    //         type : Type.BROWSER,
-    //         action : BrowserAction.OPEN,
-    //         parameter : {
-    //             timeout : 1000,
-    //             url : 'https://www.g2b.go.kr/pt/menu/selectSubFrame.do?framesrc=/pt/menu/frameTgong.do?url=https://www.g2b.go.kr:8101/ep/tbid/tbidList.do?taskClCds=&bidNm=&searchDtType=1&fromBidDt=2023/04/22&toBidDt=2023/05/22&fromOpenBidDt=&toOpenBidDt=&radOrgan=1&instNm=&area=&regYn=Y&bidSearchType=1&searchType=1'
-    //         },
-    //         returnVariable : 'browser1'
-    //     },
-    //     {
-    //         targetVariable : 'browser1',
-    //         type : Type.BROWSER,
-    //         action : BrowserAction.FRAME,
-    //         parameter : {
-    //             timeout : 1000,
-    //             frameName : 'sub'
-    //         }
-    //     },
-    //     {
-    //         targetVariable : 'browser1',
-    //         type : Type.BROWSER,
-    //         action : BrowserAction.FRAME,
-    //         parameter : {
-    //             timeout : 1000,
-    //             frameName : 'main'
-    //         }
-    //     }
-    // ]
-
-
-    for (let msg of msgarr) {
-        const result = await run(msg);
-        await sleep(1000);
-        console.log(result)
-    }
-});
 
 const run = async (msg : RequestMessage) => {
-        if (msg.targetVariable) {
-            browserController = browserControllerArray.find(browserController => browserController.getVariable === msg.targetVariable);
+        if (msg.targetInstanceId) {
+            browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.targetInstanceId);
         } else {
             browserController = new BrowserController();
             browserControllerArray.push(browserController);
         }
 
         if (!browserController) {
-            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.variable === msg.targetVariable));
+            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.targetInstanceId));
         }
-        //message receive
+
         let responseMessage : ResponseMessage;
     
         try {
@@ -381,6 +234,7 @@ const run = async (msg : RequestMessage) => {
                 value : result
             }
         } catch (e : any) {
+            console.log(e)
             responseMessage = {
                 status : Status.ERROR,
                 value : e.message

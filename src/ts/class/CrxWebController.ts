@@ -7,7 +7,7 @@ export class BrowserController {
     private window : chrome.windows.Window
     private tab : chrome.tabs.Tab
     private instance : Browser
-    private variable : string
+    private instanceId : string
     private page : Page
     private elementControllerArray : ElementController[]
     private frame : Frame
@@ -16,8 +16,8 @@ export class BrowserController {
         this.elementControllerArray = [];
     }
 
-    get getVariable() {
-        return this.variable;
+    get getInstanceId() {
+        return this.instanceId;
     }
     get getElementControllerArray() {
         return this.elementControllerArray;
@@ -76,34 +76,37 @@ export class BrowserController {
         });
     }
     async execute(msg : RequestMessage) {
-        const result = await this.typeHandler(msg);
+        const result = await this.actionHandler(msg);
         return result;
     }
 
-    private async typeHandler(msg : RequestMessage) {
-        const type = msg.type;
-
-        switch(type) {
-            case Type.BROWSER : {
-                await this.browserHandler(msg);
-
-                if (msg.returnVariable) {
-                    this.variable = msg.returnVariable;
-                }
-                break;
-            }
-            case Type.ELEMENT : {
-                const result = await this.elementHandler(msg);
-                return result;
-            }
-        }
-    }
-
-    private async browserHandler(msg : RequestMessage) {
+    private async actionHandler(msg : RequestMessage) {
         const action = msg.action;
         const value = msg.parameter.value;
         const x = msg.parameter.x;
         const y = msg.parameter.y;
+        const returnInstanceId = msg.returnInstanceId;
+        const targetInstanceId = msg.targetInstanceId;
+        const bool = msg.parameter.bool;
+
+        let elementController : ElementController;
+        const isElement = Object.values(ElementAction).includes(action as any);
+
+        if (isElement) {
+            if (targetInstanceId) {
+                elementController = this.elementControllerArray.find(elementController => elementController.instanceId === targetInstanceId);
+            }
+    
+            if (!elementController) {
+                elementController = await this.waitFor(msg);
+                this.elementControllerArray.push(elementController);
+            }
+        }
+
+        if (!isElement && returnInstanceId) {
+            this.instanceId = returnInstanceId;
+        }
+
         switch(action) {
             case BrowserAction.OPEN : {
                 await this.open();
@@ -159,30 +162,8 @@ export class BrowserController {
                 await this.findTabByIndex(value as number);
                 break;
             }
-        }
-    }
-
-    private async elementHandler(msg : RequestMessage) {
-        const action = msg.action;
-        const locatorType = msg.parameter.locatorType;
-        const locator = msg.parameter.locator;
-        const returnVariable = msg.returnVariable;
-        const targetVariable = msg.targetVariable;
-        const value = msg.parameter.value;
-        const bool = msg.parameter.bool;
-        let elementController : ElementController;
-        
-        if (targetVariable) {
-            elementController = this.elementControllerArray.find(elementController => elementController.variable === targetVariable);
-        }
-
-        if (!elementController) {
-            elementController = await this.waitFor(msg);
-            this.elementControllerArray.push(elementController);
-        }
-        switch(action) {
             case ElementAction.WAIT : {
-                return elementController.variable;
+                return elementController.instanceId;
                 break;
             }
             case ElementAction.CLICK : {
@@ -238,12 +219,13 @@ export class BrowserController {
                 break;
             }
         }
+
     }
 
     private async waitFor(msg : RequestMessage) {
         const locator = msg.parameter.locator;
         const locatorType = msg.parameter.locatorType;
-        const returnVariable = msg.returnVariable;
+        const returnVariable = msg.returnInstanceId;
         const timeout = msg.parameter.timeout;
         let elementHandle : ElementHandle;
 
@@ -274,11 +256,10 @@ export class BrowserController {
 }
 
 export interface RequestMessage {
-    targetVariable? : string
-    type : Type,
+    targetInstanceId? : string
     action : Action
     parameter : Parameter
-    returnVariable? : string
+    returnInstanceId? : string
 }
 
 export interface ResponseMessage {
@@ -292,10 +273,6 @@ export enum Status {
     ERROR = 'error',
 }
 
-export enum Type {
-    BROWSER = 'Browser',
-    ELEMENT = 'Element',
-}
 
 export enum BrowserAction {
     OPEN = 'open',
@@ -357,11 +334,11 @@ export interface Parameter {
 
 export class ElementController {
     elementHandle : ElementHandle
-    variable : string
+    instanceId : string
 
-    constructor(elementHandle : ElementHandle, variable : string) {
+    constructor(elementHandle : ElementHandle, instanceId : string) {
         this.elementHandle = elementHandle;
-        this.variable = variable;
+        this.instanceId = instanceId;
     }
     async click() {
         await this.elementHandle.click();
