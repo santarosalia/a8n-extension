@@ -11,6 +11,7 @@ export class BrowserController {
     private page : Page
     private elementControllerArray : ElementController[]
     private frame : Frame
+    private browserType : BrowserType
 
     constructor() {
         this.elementControllerArray = [];
@@ -21,6 +22,9 @@ export class BrowserController {
     }
     get getElementControllerArray() {
         return this.elementControllerArray;
+    }
+    get getBrowserType() {
+        return this.browserType;
     }
 
     private async connect() {
@@ -88,6 +92,7 @@ export class BrowserController {
         const returnInstanceId = msg.returnInstanceId;
         const targetInstanceId = msg.targetInstanceId;
         const bool = msg.parameter.bool;
+        const browserType = msg.parameter.browserType;
 
         let elementController : ElementController;
         const isElement = Object.values(ElementAction).includes(action as any);
@@ -105,6 +110,7 @@ export class BrowserController {
 
         if (!isElement && returnInstanceId) {
             this.instanceId = returnInstanceId;
+            this.browserType = browserType;
         }
 
         switch(action) {
@@ -316,6 +322,11 @@ export enum LocatorType {
     CSS_SELECTOR = 'cssSelector'
 }
 
+export enum BrowserType {
+    CHROME = 'Chrome',
+    EDGE = 'Edge'
+}
+
 export interface Parameter {
     timeout? : number
     url? : string
@@ -330,6 +341,7 @@ export interface Parameter {
     bool? : boolean
     x? : number
     y? : number
+    browserType? : BrowserType
 }
 
 export class ElementController {

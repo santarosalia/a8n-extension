@@ -191,15 +191,13 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 var port = chrome.runtime.connectNative('crx');
 
 port.onMessage.addListener(async (message : RequestMessage) => {
-    // const window = this as Window;
-    // if (window.navigator.userAgent.indexOf('Edg') > -1) {
-    //     //edge 일 때 브라우저 edge 아니면 리턴
-    //     if (message.payload.browser !== 'Edge') return;
-    // } else {
-    //     // chrome 일 때 크롬 아니면 리턴
-    //     if (message.payload.browser !== 'Chrome') return;
-    // }
-    console.log(message)
+    const window = this as Window;
+    if (window.navigator.userAgent.indexOf('Edg') > -1) {
+        //edge 일 때 브라우저 edge 아니면 리턴
+        //edge browser
+    } else {
+        // chrome browser
+    }
     const responseMessage = await run(message);
     port.postMessage(responseMessage);
 });
@@ -224,6 +222,8 @@ const run = async (msg : RequestMessage) => {
             browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.targetInstanceId));
         }
 
+        if (msg.parameter.browserType !== null && browserController.getBrowserType !== msg.parameter.browserType) return;
+        
         let responseMessage : ResponseMessage;
     
         try {
