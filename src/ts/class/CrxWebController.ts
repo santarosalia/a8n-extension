@@ -92,7 +92,6 @@ export class BrowserController {
         const returnInstanceId = msg.returnInstanceId;
         const targetInstanceId = msg.targetInstanceId;
         const bool = msg.parameter.bool;
-        const browserType = msg.parameter.browserType;
 
         let elementController : ElementController;
         const isElement = Object.values(ElementAction).includes(action as any);
@@ -110,13 +109,15 @@ export class BrowserController {
 
         if (!isElement && returnInstanceId) {
             this.instanceId = returnInstanceId;
-            this.browserType = browserType;
         }
 
         switch(action) {
             case BrowserAction.OPEN : {
                 await this.open();
                 await this.goTo(msg.parameter.url);
+                this.browserType = await this.page.evaluate(() => {
+                    return window.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
+                });
                 break;
             }
             case BrowserAction.CONNECT : {

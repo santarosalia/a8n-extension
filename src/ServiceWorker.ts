@@ -19,7 +19,7 @@ import { setItemFromLocalStorage,
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
-import {BrowserAction, BrowserController, ElementAction, LocatorType, RequestMessage, ResponseMessage, Status } from "@/ts/class/CrxWebController";
+import {BrowserAction, BrowserController, BrowserType, ElementAction, LocatorType, RequestMessage, ResponseMessage, Status } from "@/ts/class/CrxWebController";
 
 
 const crxInfo = new CrxInfo();
@@ -191,13 +191,7 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 var port = chrome.runtime.connectNative('crx');
 
 port.onMessage.addListener(async (message : RequestMessage) => {
-    const window = this as Window;
-    if (window.navigator.userAgent.indexOf('Edg') > -1) {
-        //edge 일 때 브라우저 edge 아니면 리턴
-        //edge browser
-    } else {
-        // chrome browser
-    }
+    
     const responseMessage = await run(message);
     port.postMessage(responseMessage);
 });
@@ -211,6 +205,7 @@ const browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
 
 const run = async (msg : RequestMessage) => {
+        
         if (msg.targetInstanceId) {
             browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.targetInstanceId);
         } else {
@@ -222,10 +217,15 @@ const run = async (msg : RequestMessage) => {
             browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.targetInstanceId));
         }
 
-        if (msg.parameter.browserType !== null && browserController.getBrowserType !== msg.parameter.browserType) return;
+        if (msg.parameter.browserType === null) {
+            if (browserController.getBrowserType !== msg.parameter.browserType) return;
+        } else {
+            const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
+            if (browserType !== msg.parameter.browserType) return;
+        }
         
         let responseMessage : ResponseMessage;
-    
+
         try {
             const result = await browserController.execute(msg);
             
