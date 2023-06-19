@@ -195,7 +195,16 @@ port.onMessage.addListener(async (message : RequestMessage) => {
     const responseMessage = await run(message);
     port.postMessage(responseMessage);
 });
+port.onDisconnect.addListener(() => {
+    reConnect();
+})
 
+const reConnect = () => {
+    port = chrome.runtime.connectNative('crx');
+    port.onDisconnect.addListener(() => {
+        reConnect();
+    })
+}
 // port.onDisconnect.addListener(()=>{
 //     console.log('discon')
 //     // port = chrome.runtime.connectNative('crx');
