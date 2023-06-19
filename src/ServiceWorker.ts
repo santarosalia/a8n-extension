@@ -206,22 +206,22 @@ let browserController : BrowserController;
 
 const run = async (msg : RequestMessage) => {
         
-        if (msg.targetInstanceId) {
-            browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.targetInstanceId);
+        if (msg.object.targetInstanceId) {
+            browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.object.targetInstanceId);
         } else {
             browserController = new BrowserController();
             browserControllerArray.push(browserController);
         }
 
         if (!browserController) {
-            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.targetInstanceId));
+            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.object.targetInstanceId));
         }
 
-        if (msg.parameter.browserType === null) {
-            if (browserController.getBrowserType !== msg.parameter.browserType) return;
+        if (msg.object.parameter.browserType === null) {
+            if (browserController.getBrowserType !== msg.object.parameter.browserType) return;
         } else {
             const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
-            if (browserType !== msg.parameter.browserType) return;
+            if (browserType !== msg.object.parameter.browserType) return;
         }
         
         let responseMessage : ResponseMessage;
@@ -230,14 +230,19 @@ const run = async (msg : RequestMessage) => {
             const result = await browserController.execute(msg);
             
             responseMessage = {
-                status : Status.SUCCESS,
-                value : result
+                command : CRX_COMMAND.CMD_WB_NEXT_ACTION,
+                object : {
+                    status : Status.SUCCESS,
+                    value : result
+                }
             }
         } catch (e : any) {
-            console.log(e)
             responseMessage = {
-                status : Status.ERROR,
-                value : e.message
+                command : CRX_COMMAND.CMD_WB_NEXT_ACTION,
+                object : {
+                    status : Status.ERROR,
+                    value : e.message
+                }
             }
         }
         return responseMessage;

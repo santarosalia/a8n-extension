@@ -172,12 +172,22 @@ export const onHighlightedTab = (windowId : number) => {
     }, 100);
 }
 
+/**
+ * 프레임 초기화 액션을 반환합니다.
+ * @category Recorder
+ * @returns 
+ */
 export const resetFrame = () => {
     return {
         type : EVENT.RESETFRAME
     }
 }
 
+/**
+ * frameStack 을 포함한 프레임 이동 액션을 반환합니다.
+ * @param e CapturedEvent
+ * @returns 
+ */
 export const switchFrame = (e : CapturedEvent) => {
     return {
         type : EVENT.SWITCHFRAME,
@@ -338,6 +348,15 @@ export const sendMessageToContentScript = (tabId : number, command : CRX_COMMAND
     });
 }
 
+/**
+ * Selector 에 메시지를 전달합니다.
+ * 
+ * @category Selector
+ * @param command CRX_COMMAND
+ * @param payload payload
+ * @param launcherTabId WorkDesigner Tab ID
+ * @returns 
+ */
 export const sendMessageToSelector = async (command : CRX_COMMAND, payload? : any, launcherTabId? : number) => {
     return chrome.tabs.query({}).then(tabs => {
         tabs.filter(tab => tab.id !== launcherTabId).forEach(tab => {
@@ -350,6 +369,12 @@ export const sendMessageToSelector = async (command : CRX_COMMAND, payload? : an
     });
 }
 
+/**
+ * Toast Message Notification 을 출력합니다.
+ * @param title 제목
+ * @param message 메시지
+ * @returns 
+ */
 export const showNotification = (title :string, message : string) => {
     if (!chrome.notifications) {
         return sendMessageToServiceWorker(CRX_COMMAND.CMD_SHOW_NOTIFICATION, {
@@ -371,10 +396,18 @@ export const showNotification = (title :string, message : string) => {
     });
   }
 
+/**
+ * 주어진 Tab ID 를 가진 탭을 활성화 합니다.
+ * @category Selector
+ * @param tabId 
+ */
 export const focusTab = (tabId : number) => {
     chrome.tabs.update(tabId, {active : true});
 }
 
+/**
+ * 모든 탭을 새로고침합니다.
+ */
 export const allTabReload = () => {
     chrome.tabs.query({}).then(tabs => {
         tabs.forEach(tab => {
@@ -383,6 +416,11 @@ export const allTabReload = () => {
     });
 }
 
+/**
+ * 자동화 할 윈도우를 생성합니다.
+ * @category Controller
+ * @returns 
+ */
 export const createWindow = () => {
     return chrome.windows.create({
         type : 'normal',
@@ -391,7 +429,14 @@ export const createWindow = () => {
     })
 }
 
-
+/**
+ * 주어진 Window ID 를 가진 Window 에 메시지를 전달합니다.
+ * @category Recorder
+ * @param windowId 
+ * @param command 
+ * @param payload 
+ * @returns 
+ */
 export const sendMessageByWindowIdToFocusedTab = async (windowId : number, command : CRX_COMMAND, payload? : any) => {
     return currentWindowTabs(windowId).then(tabs => {
         if (tabs.length === 0) throw new Error("Window is Closed");
