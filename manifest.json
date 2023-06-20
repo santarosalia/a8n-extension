@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Worktronics Web Recorder",
+    "name": "Worktronics Browser Automation",
     "version": "2306.27.0",
     "icons": {
       "16": "icons/recIcon_default16.png",

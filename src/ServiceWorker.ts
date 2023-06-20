@@ -196,19 +196,18 @@ port.onMessage.addListener(async (message : RequestMessage) => {
     port.postMessage(responseMessage);
 });
 port.onDisconnect.addListener(() => {
+    console.log('Native Messaging Disconnected');
     reConnect();
 })
 
 const reConnect = () => {
     port = chrome.runtime.connectNative('crx');
+    console.log('Native Messaging Connected');
     port.onDisconnect.addListener(() => {
+        console.log('Native Messaging Disconnected');
         reConnect();
     })
 }
-// port.onDisconnect.addListener(()=>{
-//     console.log('discon')
-//     // port = chrome.runtime.connectNative('crx');
-// })
 
 const browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
