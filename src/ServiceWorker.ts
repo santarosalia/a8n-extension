@@ -190,15 +190,17 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 // Native Messaging
 var port = chrome.runtime.connectNative('crx');
 
-port.onMessage.addListener(async (message : RequestMessage) => {
-    
-    const responseMessage = await run(message);
+port.onMessage.addListener(async (message : string) => {
+    const msg = JSON.parse(message)
+    console.log(msg)
+    const responseMessage = await run(msg as RequestMessage);
+    console.log(responseMessage)
     port.postMessage(responseMessage);
 });
 port.onDisconnect.addListener(() => {
     console.log('Native Messaging Disconnected');
-    reConnect();
-})
+    // reConnect();
+});
 
 const reConnect = () => {
     port = chrome.runtime.connectNative('crx');
@@ -225,12 +227,13 @@ const run = async (msg : RequestMessage) => {
             browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.object.targetInstanceId));
         }
 
-        if (msg.object.parameter.browserType === null) {
-            if (browserController.getBrowserType !== msg.object.parameter.browserType) return;
-        } else {
-            const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
-            if (browserType !== msg.object.parameter.browserType) return;
-        }
+        // if (!!!msg.object.parameter.browserType) {
+        //     console.log(browserController.getBrowserType);
+        //     if (browserController.getBrowserType !== msg.object.parameter.browserType) return;
+        // } else {
+        //     const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
+        //     if (browserType !== msg.object.parameter.browserType) return;
+        // }
         
         let responseMessage : ResponseMessage;
 

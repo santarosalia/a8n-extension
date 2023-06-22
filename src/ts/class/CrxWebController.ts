@@ -369,7 +369,7 @@ export class BrowserController {
 }
 
 export interface RequestMessage {
-    command : CRX_COMMAND.CMD_CRX_ACTION
+    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY
     object : {
         targetInstanceId? : string
         action : Action
