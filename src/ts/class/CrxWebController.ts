@@ -326,7 +326,7 @@ export class BrowserController {
     private async waitFor(msg : RequestMessage) {
         const locator = msg.object.parameter.locator;
         const locatorType = msg.object.parameter.locatorType;
-        const returnVariable = msg.object.returnInstanceId;
+        const returnInstanceId = msg.object.returnInstanceId;
         const timeout = msg.object.parameter.timeout;
         let elementHandle : ElementHandle;
 
@@ -344,7 +344,7 @@ export class BrowserController {
                 break;
             }
         }
-        return new ElementController(elementHandle, returnVariable);
+        return new ElementController(elementHandle, returnInstanceId);
     }
 
     /**
@@ -369,7 +369,7 @@ export class BrowserController {
 }
 
 export interface RequestMessage {
-    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY
+    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY | CRX_COMMAND.CMD_CRX_START_PROCESS | CRX_COMMAND.CMD_CRX_END_PROCESS
     object : {
         targetInstanceId? : string
         action : Action
@@ -379,7 +379,7 @@ export interface RequestMessage {
 }
 
 export interface ResponseMessage {
-    command : CRX_COMMAND.CMD_WB_NEXT_ACTION
+    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY
     object : {
         status : Status,
         value : string | boolean | BoundingBox | BoxModel,
@@ -463,7 +463,9 @@ export class ElementController {
 
     constructor(elementHandle : ElementHandle, instanceId : string) {
         this.elementHandle = elementHandle;
-        this.instanceId = instanceId;
+        if (instanceId) {
+            this.instanceId = instanceId;
+        }
     }
     /**
      * 엘리먼트 클릭

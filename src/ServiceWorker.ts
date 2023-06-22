@@ -191,8 +191,9 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 var port = chrome.runtime.connectNative('crx');
 
 port.onMessage.addListener(async (message : string) => {
-    const msg = JSON.parse(message)
+    const msg : RequestMessage = JSON.parse(message)
     console.log(msg)
+    if (msg.command === CRX_COMMAND.CMD_CRX_START_PROCESS || msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) return;
     const responseMessage = await run(msg as RequestMessage);
     console.log(responseMessage)
     port.postMessage(responseMessage);
@@ -215,17 +216,21 @@ const browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
 
 const run = async (msg : RequestMessage) => {
-        
+        console.log(msg.object.targetInstanceId)
         if (msg.object.targetInstanceId) {
+            console.log('드렁왔음')
             browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.object.targetInstanceId);
+            console.log('find?')
+            console.log(browserController);
+            if (!browserController) {
+                browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.object.targetInstanceId));
+            }
         } else {
             browserController = new BrowserController();
             browserControllerArray.push(browserController);
         }
 
-        if (!browserController) {
-            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.object.targetInstanceId));
-        }
+        
 
         // if (!!!msg.object.parameter.browserType) {
         //     console.log(browserController.getBrowserType);
@@ -235,13 +240,14 @@ const run = async (msg : RequestMessage) => {
         //     if (browserType !== msg.object.parameter.browserType) return;
         // }
         
+        console.log(browserController)
         let responseMessage : ResponseMessage;
 
         try {
             const result = await browserController.execute(msg);
             
             responseMessage = {
-                command : CRX_COMMAND.CMD_WB_NEXT_ACTION,
+                command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
                 object : {
                     status : Status.SUCCESS,
                     value : result
@@ -249,7 +255,7 @@ const run = async (msg : RequestMessage) => {
             }
         } catch (e : any) {
             responseMessage = {
-                command : CRX_COMMAND.CMD_WB_NEXT_ACTION,
+                command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
                 object : {
                     status : Status.ERROR,
                     value : e.message
