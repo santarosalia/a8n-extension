@@ -535,3 +535,10 @@ export const minimizeWindow = (windowId : number) => {
 export const sleep = (ms : number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export const detachDebugger = async () => {
+    const targets = (await chrome.debugger.getTargets()).filter(target => target.attached);
+    return targets.forEach(async (target) => {    
+        await chrome.debugger.detach({targetId : target.id}).catch(() => {});
+    });
+}

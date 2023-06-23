@@ -15,7 +15,8 @@ import { setItemFromLocalStorage,
     showNotification,
     focusTab,
     allTabReload,
-    sendMessageByWindowIdToFocusedTab
+    sendMessageByWindowIdToFocusedTab,
+    detachDebugger
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
@@ -206,10 +207,7 @@ port.onMessage.addListener(async (message : string) => {
             }
         }
         if (msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
-            const targets = (await chrome.debugger.getTargets()).filter(target => target.attached);
-                targets.forEach((target) => {    
-                    chrome.debugger.detach({targetId : target.id}).catch(() => {});
-                });
+            await detachDebugger();
         }
         return port.postMessage(responseMessage);
     }
