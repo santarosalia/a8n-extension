@@ -1,4 +1,4 @@
-import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow } from "@CrxApi";
+import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow, sleep } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, KeyInput, BoundingBox, BoxModel } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
@@ -359,6 +359,7 @@ export class BrowserController {
         const frameName = msg.object.parameter.frameName;
         const frames = this.frame.childFrames();
         this.frame = frames.find(frame => frame.name() === frameName);
+        await sleep(1000);
     }
     /**
      * 프레임 초기화
@@ -367,6 +368,7 @@ export class BrowserController {
      */
     private async resetFrame() {
         this.frame = this.page.mainFrame();
+        await sleep(1000);
     }
 }
 

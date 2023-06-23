@@ -271,7 +271,3 @@ const execute = async (msg : RequestMessage) => {
     }
     return responseMessage;
 }
-
-const sleep = (ms : number) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
