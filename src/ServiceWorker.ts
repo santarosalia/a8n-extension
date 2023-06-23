@@ -193,14 +193,21 @@ var port = chrome.runtime.connectNative('crx');
 port.onMessage.addListener(async (message : string) => {
     const msg : RequestMessage = JSON.parse(message)
     console.log('^^^^^^^^^^^^^^^^Request^^^^^^^^^^^^^^^^')
-    console.log(msg.object.action)
     console.log(msg)
     console.log('vvvvvvvvvvvvvvvvRequestvvvvvvvvvvvvvvvv')
     if (msg.command === CRX_COMMAND.CMD_CRX_START_PROCESS || msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
         browserControllerArray = [];
         browserController = null;
+        const responseMessage = {
+            command : msg.command,
+            object : {
+                status : Status.SUCCESS,
+                value : null
+            }
+        }
+        return port.postMessage(responseMessage);
     }
-    const responseMessage = await run(msg as RequestMessage);
+    const responseMessage = await execute(msg as RequestMessage);
     console.log('^^^^^^^^^^^^^^^^Response^^^^^^^^^^^^^^^^')
     console.log(responseMessage)
     console.log('vvvvvvvvvvvvvvvvResponsevvvvvvvvvvvvvvvv')
@@ -223,7 +230,7 @@ const reConnect = () => {
 let browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
 
-const run = async (msg : RequestMessage) => {
+const execute = async (msg : RequestMessage) => {
     if (msg.object.targetInstanceId) {
         browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.object.targetInstanceId);
         if (!browserController) {
@@ -233,8 +240,6 @@ const run = async (msg : RequestMessage) => {
         browserController = new BrowserController();
         browserControllerArray.push(browserController);
     }
-
-        
 
     // if (!!!msg.object.parameter.browserType) {
     //     console.log(browserController.getBrowserType);
