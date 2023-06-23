@@ -192,10 +192,18 @@ var port = chrome.runtime.connectNative('crx');
 
 port.onMessage.addListener(async (message : string) => {
     const msg : RequestMessage = JSON.parse(message)
+    console.log('^^^^^^^^^^^^^^^^Request^^^^^^^^^^^^^^^^')
+    console.log(msg.object.action)
     console.log(msg)
-    if (msg.command === CRX_COMMAND.CMD_CRX_START_PROCESS || msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) return;
+    console.log('vvvvvvvvvvvvvvvvRequestvvvvvvvvvvvvvvvv')
+    if (msg.command === CRX_COMMAND.CMD_CRX_START_PROCESS || msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
+        browserControllerArray = [];
+        browserController = null;
+    }
     const responseMessage = await run(msg as RequestMessage);
+    console.log('^^^^^^^^^^^^^^^^Response^^^^^^^^^^^^^^^^')
     console.log(responseMessage)
+    console.log('vvvvvvvvvvvvvvvvResponsevvvvvvvvvvvvvvvv')
     port.postMessage(responseMessage);
 });
 port.onDisconnect.addListener(() => {
@@ -212,57 +220,51 @@ const reConnect = () => {
     })
 }
 
-const browserControllerArray : BrowserController[] = [];
+let browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
 
 const run = async (msg : RequestMessage) => {
-        console.log(msg.object.targetInstanceId)
-        if (msg.object.targetInstanceId) {
-            console.log('드렁왔음')
-            browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.object.targetInstanceId);
-            console.log('find?')
-            console.log(browserController);
-            if (!browserController) {
-                browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.object.targetInstanceId));
-            }
-        } else {
-            browserController = new BrowserController();
-            browserControllerArray.push(browserController);
+    if (msg.object.targetInstanceId) {
+        browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.object.targetInstanceId);
+        if (!browserController) {
+            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.object.targetInstanceId));
         }
+    } else {
+        browserController = new BrowserController();
+        browserControllerArray.push(browserController);
+    }
 
         
 
-        // if (!!!msg.object.parameter.browserType) {
-        //     console.log(browserController.getBrowserType);
-        //     if (browserController.getBrowserType !== msg.object.parameter.browserType) return;
-        // } else {
-        //     const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
-        //     if (browserType !== msg.object.parameter.browserType) return;
-        // }
+    // if (!!!msg.object.parameter.browserType) {
+    //     console.log(browserController.getBrowserType);
+    //     if (browserController.getBrowserType !== msg.object.parameter.browserType) return;
+    // } else {
+    //     const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
+    //     if (browserType !== msg.object.parameter.browserType) return;
+    // }
         
-        console.log(browserController)
-        let responseMessage : ResponseMessage;
+    let responseMessage : ResponseMessage;
 
-        try {
-            const result = await browserController.execute(msg);
-            
-            responseMessage = {
-                command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
-                object : {
-                    status : Status.SUCCESS,
-                    value : result
-                }
-            }
-        } catch (e : any) {
-            responseMessage = {
-                command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
-                object : {
-                    status : Status.ERROR,
-                    value : e.message
-                }
+    try {
+        const result = await browserController.execute(msg);
+        responseMessage = {
+            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
+            object : {
+                status : Status.SUCCESS,
+                value : result
             }
         }
-        return responseMessage;
+    } catch (e : any) {
+        responseMessage = {
+            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
+            object : {
+                status : Status.ERROR,
+                value : e.message
+            }
+        }
+    }
+    return responseMessage;
 }
 
 const sleep = (ms : number) => {

@@ -230,9 +230,11 @@ export class BrowserController {
             }
             case BrowserAction.SWITCH_FRAME : {
                 await this.switchFrame(msg);
+                break;
             }
             case BrowserAction.RESET_FRAME : {
                 await this.resetFrame();
+                break;
             }
             case BrowserAction.GO_TO : {
                 await this.goTo(value as string);
