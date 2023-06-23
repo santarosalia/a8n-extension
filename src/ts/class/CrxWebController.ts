@@ -28,15 +28,15 @@ export class BrowserController {
         return this.browserType;
     }
     /**
-     * Puppeteer 를 이용하여 class 의 tab id 를 가진 tab 에 연결,
+     * 1. Puppeteer 를 이용하여 BrowserController 의 tab id 를 가진 tab 에 연결,
      * 
-     * transport 생성,
+     * 2. transport 생성,
      * 
-     * transport로 Browser Instance 설정,
+     * 3. transport로 Browser Instance 설정,
      * 
-     * Browser Instance 에서 pages 가져와 Page Instance 설정,
+     * 4. Browser Instance 에서 pages 가져와 Page Instance 설정,
      * 
-     * Page Instance 에서 mainFrame 가져와 Frame Instance 설정
+     * 5. Page Instance 에서 mainFrame 가져와 Frame Instance 설정
      * 
      */
     private async connect() {
