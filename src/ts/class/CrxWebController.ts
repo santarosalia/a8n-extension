@@ -1,4 +1,4 @@
-import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow, sleep, detachDebugger } from "@CrxApi";
+import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow, sleep, detachDebugger, generateUUID } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, KeyInput, BoundingBox, BoxModel } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
@@ -8,7 +8,7 @@ export class BrowserController {
     private window : chrome.windows.Window
     private tab : chrome.tabs.Tab
     private instance : Browser
-    private instanceId : string
+    private instanceUUID : string
     private page : Page
     private elementControllerArray : ElementController[]
     private frame : Frame
@@ -16,10 +16,11 @@ export class BrowserController {
 
     constructor() {
         this.elementControllerArray = [];
+        this.instanceUUID = generateUUID();
     }
 
-    get getInstanceId() {
-        return this.instanceId;
+    get getInstanceUUID() {
+        return this.instanceUUID;
     }
     get getElementControllerArray() {
         return this.elementControllerArray;
@@ -179,26 +180,19 @@ export class BrowserController {
         const value = msg.object.parameter.value;
         const x = msg.object.parameter.x;
         const y = msg.object.parameter.y;
-        const returnInstanceId = msg.object.returnInstanceId;
-        const targetInstanceId = msg.object.targetInstanceId;
+        const targetInstanceUUID = msg.object.instanceUUID;
         const bool = msg.object.parameter.bool;
 
         let elementController : ElementController;
         const isElement = Object.values(ElementAction).includes(action as any);
 
         if (isElement) {
-            if (targetInstanceId) {
-                elementController = this.elementControllerArray.find(elementController => elementController.instanceId === targetInstanceId);
-            }
-    
-            if (!elementController) {
+            if (targetInstanceUUID) {
+                elementController = this.elementControllerArray.find(elementController => elementController.getInstanceUUID === targetInstanceUUID);
+            } else {
                 elementController = await this.waitFor(msg);
                 this.elementControllerArray.push(elementController);
             }
-        }
-
-        if (!isElement && returnInstanceId) {
-            this.instanceId = returnInstanceId;
         }
 
         switch(action) {
@@ -262,7 +256,7 @@ export class BrowserController {
                 break;
             }
             case ElementAction.WAIT : {
-                return elementController.instanceId;
+                return elementController.getInstanceUUID;
                 break;
             }
             case ElementAction.CLICK : {
@@ -329,7 +323,6 @@ export class BrowserController {
     private async waitFor(msg : RequestMessage) {
         const locator = msg.object.parameter.locator;
         const locatorType = msg.object.parameter.locatorType;
-        const returnInstanceId = msg.object.returnInstanceId;
         const timeout = msg.object.parameter.timeout;
         let elementHandle : ElementHandle;
 
@@ -347,7 +340,7 @@ export class BrowserController {
                 break;
             }
         }
-        return new ElementController(elementHandle, returnInstanceId);
+        return new ElementController(elementHandle);
     }
 
     /**
@@ -376,10 +369,9 @@ export class BrowserController {
 export interface RequestMessage {
     command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY | CRX_COMMAND.CMD_CRX_START_PROCESS | CRX_COMMAND.CMD_CRX_END_PROCESS
     object : {
-        targetInstanceId? : string
+        instanceUUID? : string
         action : Action
         parameter : Parameter
-        returnInstanceId? : string
     }
 }
 
@@ -388,6 +380,7 @@ export interface ResponseMessage {
     object : {
         status : Status,
         value : string | boolean | BoundingBox | BoxModel,
+        instanceUUID? : string
     }
     
 }
@@ -463,15 +456,18 @@ export interface Parameter {
 }
 
 export class ElementController {
-    elementHandle : ElementHandle
-    instanceId : string
+    private elementHandle : ElementHandle
+    private instanceUUID : string
 
-    constructor(elementHandle : ElementHandle, instanceId : string) {
+    constructor(elementHandle : ElementHandle) {
         this.elementHandle = elementHandle;
-        if (instanceId) {
-            this.instanceId = instanceId;
-        }
+        this.instanceUUID = generateUUID();
     }
+
+    get getInstanceUUID() {
+        return this.instanceUUID;
+    }
+
     /**
      * 엘리먼트 클릭
      * @peon click
@@ -480,6 +476,7 @@ export class ElementController {
     async click() {
         await this.elementHandle.click();
     }
+
     /**
      * 엘리먼트 마우스 오버
      * @peon hover
@@ -572,6 +569,7 @@ export class ElementController {
     async clear() {
         await this.elementHandle.evaluate(node => node.textContent = '');
     }
+
     /**
      * 체크박스 상태 변경
      * @peon setCheckBoxState

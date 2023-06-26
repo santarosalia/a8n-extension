@@ -235,11 +235,15 @@ let browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
 
 const execute = async (msg : RequestMessage) => {
-    if (msg.object.targetInstanceId) {
-        browserController = browserControllerArray.find(browserController => browserController.getInstanceId === msg.object.targetInstanceId);
-        if (!browserController) {
-            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.instanceId === msg.object.targetInstanceId));
+    const isElement = Object.values(ElementAction).includes(msg.object.action as any);
+
+    if (msg.object.instanceUUID) {
+        if (isElement) {
+            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.getInstanceUUID === msg.object.instanceUUID));
+        } else {
+            browserController = browserControllerArray.find(browserController => browserController.getInstanceUUID === msg.object.instanceUUID);
         }
+        if (!browserController) throw new Error('It is not browser instance');
     } else {
         browserController = new BrowserController();
         browserControllerArray.push(browserController);
@@ -254,14 +258,14 @@ const execute = async (msg : RequestMessage) => {
     // }
         
     let responseMessage : ResponseMessage;
-
     try {
         const result = await browserController.execute(msg);
         responseMessage = {
             command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
             object : {
                 status : Status.SUCCESS,
-                value : result
+                value : result,
+                instanceUUID : isElement ? browserController.getElementControllerArray[browserController.getElementControllerArray.length - 1].getInstanceUUID : browserController.getInstanceUUID
             }
         }
     } catch (e : any) {

@@ -542,3 +542,7 @@ export const detachDebugger = async () => {
         await chrome.debugger.detach({targetId : target.id}).catch(() => {});
     });
 }
+
+export const generateUUID = () => {
+    return self.crypto.randomUUID();
+}
