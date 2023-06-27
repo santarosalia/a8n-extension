@@ -188,7 +188,7 @@ export class BrowserController {
 
         if (isElement) {
             if (targetInstanceUUID) {
-                elementController = this._elementControllerArray.find(elementController => elementController.getInstanceUUID === targetInstanceUUID);
+                elementController = this._elementControllerArray.find(elementController => elementController.instanceUUID === targetInstanceUUID);
             } else {
                 elementController = await this.waitFor(msg);
                 this._elementControllerArray.push(elementController);
@@ -256,7 +256,7 @@ export class BrowserController {
                 break;
             }
             case ElementAction.WAIT : {
-                return elementController.getInstanceUUID;
+                return elementController.instanceUUID;
                 break;
             }
             case ElementAction.CLICK : {
