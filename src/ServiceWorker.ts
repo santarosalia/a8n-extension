@@ -209,6 +209,7 @@ port.onMessage.addListener(async (message : string) => {
         if (msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
             await detachDebugger();
         }
+        console.log(responseMessage)
         return port.postMessage(responseMessage);
     }
     const responseMessage = await execute(msg as RequestMessage);

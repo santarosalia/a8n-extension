@@ -509,7 +509,7 @@ export const findTabsByUrl = (url : string) => {
     });
 }
 /**
- * 
+ * Window 최대화
  * @category Controller
  * @param windowId 
  * @returns 
@@ -521,7 +521,7 @@ export const maximizeWindow = (windowId : number) => {
 }
 
 /**
- * 
+ * Window 최소화
  * @category Controller
  * @param windowId 
  * @returns 
@@ -532,17 +532,32 @@ export const minimizeWindow = (windowId : number) => {
     });
 }
 
+/**
+ * 주어진 밀리 세컨드 만큼 대기합니다.
+ * @category Controller
+ * @param ms 
+ * @returns 
+ */
 export const sleep = (ms : number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * 모든 디버거가 연결 되어 있는 대상에서 디버거를 분리합니다.
+ * @category Controller
+ * @returns 
+ */
 export const detachDebugger = async () => {
     const targets = (await chrome.debugger.getTargets()).filter(target => target.attached);
     return targets.forEach(async (target) => {    
         await chrome.debugger.detach({targetId : target.id}).catch(() => {});
     });
 }
-
+/**
+ * 랜덤 UUID 를 생성하여 반환합니다. 각각의 Browser Instance | Element Instance 구별에 사용
+ * @category Controller
+ * @returns 
+ */
 export const generateUUID = () => {
     return self.crypto.randomUUID();
 }
