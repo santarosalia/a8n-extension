@@ -456,16 +456,16 @@ export interface Parameter {
 }
 
 export class ElementController {
-    private elementHandle : ElementHandle
-    private instanceUUID : string
+    private _elementHandle : ElementHandle
+    private _instanceUUID : string
 
     constructor(elementHandle : ElementHandle) {
-        this.elementHandle = elementHandle;
-        this.instanceUUID = generateUUID();
+        this._elementHandle = elementHandle;
+        this._instanceUUID = generateUUID();
     }
 
-    get getInstanceUUID() {
-        return this.instanceUUID;
+    get instanceUUID() {
+        return this._instanceUUID;
     }
 
     /**
@@ -474,7 +474,7 @@ export class ElementController {
      * @activity 엘리먼트 클릭
      */
     async click() {
-        await this.elementHandle.click();
+        await this._elementHandle.click();
     }
 
     /**
@@ -483,7 +483,7 @@ export class ElementController {
      * @activity 엘리먼트 마우스오버
      */
     async hover() {
-        await this.elementHandle.hover();
+        await this._elementHandle.hover();
     }
 
     /**
@@ -493,7 +493,7 @@ export class ElementController {
      * @param text 
      */
     async type(text : string) {
-        await this.elementHandle.type(text);
+        await this._elementHandle.type(text);
     }
 
     /**
@@ -503,7 +503,7 @@ export class ElementController {
      * @returns 
      */
     async read() {
-        const result = await (await this.elementHandle.getProperty('textContent')).jsonValue() as string;
+        const result = await (await this._elementHandle.getProperty('textContent')).jsonValue() as string;
         return result;
     }
 
@@ -515,7 +515,7 @@ export class ElementController {
      * @returns 
      */
     async getProperty(propertyName : string) {
-        const property = await (await this.elementHandle.getProperty(propertyName)).jsonValue() as string;
+        const property = await (await this._elementHandle.getProperty(propertyName)).jsonValue() as string;
         return property;
     }
 
@@ -526,7 +526,7 @@ export class ElementController {
      * @param keyInput 
      */
     async press(keyInput : KeyInput) {
-        await this.elementHandle.press(keyInput);
+        await this._elementHandle.press(keyInput);
     }
 
     /**
@@ -536,7 +536,7 @@ export class ElementController {
      * @returns 
      */
     async boundingBox() {
-        const boundingBox = await this.elementHandle.boundingBox();
+        const boundingBox = await this._elementHandle.boundingBox();
         return boundingBox;
     }
 
@@ -547,7 +547,7 @@ export class ElementController {
      * @returns 
      */
     async readTag() {
-        const tag = await this.elementHandle.evaluate(node => node.tagName);
+        const tag = await this._elementHandle.evaluate(node => node.tagName);
         return tag;
     }
 
@@ -557,7 +557,7 @@ export class ElementController {
      * @returns 
      */
     async boxModel() {
-        const boxModel = await this.elementHandle.boxModel();
+        const boxModel = await this._elementHandle.boxModel();
         return boxModel;
     }
     
@@ -567,7 +567,7 @@ export class ElementController {
      * @activity 입력창 초기화
      */
     async clear() {
-        await this.elementHandle.evaluate(node => node.textContent = '');
+        await this._elementHandle.evaluate(node => node.textContent = '');
     }
 
     /**
@@ -577,7 +577,7 @@ export class ElementController {
      * @param value 
      */
     async setCheckBoxState(value : boolean) {
-        await this.elementHandle.evaluate(node => {
+        await this._elementHandle.evaluate(node => {
             const element = node as HTMLInputElement;
             element.checked = value;
         });
@@ -590,7 +590,7 @@ export class ElementController {
      * @param value 
      */
     async setSelectBoxValue(value : string) {
-        await this.elementHandle.select(value);
+        await this._elementHandle.select(value);
     }
 
     /**
@@ -599,6 +599,6 @@ export class ElementController {
      */
     async screenshot() {
         // 스크린샷 처리 어떻게할지 고민
-        await this.elementHandle.screenshot();
+        await this._elementHandle.screenshot();
     }
 }

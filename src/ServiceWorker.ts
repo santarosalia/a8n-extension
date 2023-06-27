@@ -239,7 +239,7 @@ const execute = async (msg : RequestMessage) => {
 
     if (msg.object.instanceUUID) {
         if (isElement) {
-            browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.getInstanceUUID === msg.object.instanceUUID));
+            browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.instanceUUID === msg.object.instanceUUID));
         } else {
             browserController = browserControllerArray.find(browserController => browserController.instanceUUID === msg.object.instanceUUID);
         }
@@ -265,7 +265,7 @@ const execute = async (msg : RequestMessage) => {
             object : {
                 status : Status.SUCCESS,
                 value : result,
-                instanceUUID : isElement ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].getInstanceUUID : browserController.instanceUUID
+                instanceUUID : isElement ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
             }
         }
     } catch (e : any) {
