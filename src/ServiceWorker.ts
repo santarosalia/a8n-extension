@@ -239,9 +239,9 @@ const execute = async (msg : RequestMessage) => {
 
     if (msg.object.instanceUUID) {
         if (isElement) {
-            browserController = browserControllerArray.find(browserController => browserController.getElementControllerArray.find(elementController => elementController.getInstanceUUID === msg.object.instanceUUID));
+            browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.getInstanceUUID === msg.object.instanceUUID));
         } else {
-            browserController = browserControllerArray.find(browserController => browserController.getInstanceUUID === msg.object.instanceUUID);
+            browserController = browserControllerArray.find(browserController => browserController.instanceUUID === msg.object.instanceUUID);
         }
         if (!browserController) throw new Error('It is not browser instance');
     } else {
@@ -265,7 +265,7 @@ const execute = async (msg : RequestMessage) => {
             object : {
                 status : Status.SUCCESS,
                 value : result,
-                instanceUUID : isElement ? browserController.getElementControllerArray[browserController.getElementControllerArray.length - 1].getInstanceUUID : browserController.getInstanceUUID
+                instanceUUID : isElement ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].getInstanceUUID : browserController.instanceUUID
             }
         }
     } catch (e : any) {

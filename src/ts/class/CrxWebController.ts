@@ -2,31 +2,31 @@ import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, find
 import { Browser, Page, ElementHandle, Frame, KeyInput, BoundingBox, BoxModel } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
-import { CRX_COMMAND } from "../interface/CrxInterface";
+import { CRX_COMMAND } from "@CrxInterface";
 
 export class BrowserController {
-    private window : chrome.windows.Window
-    private tab : chrome.tabs.Tab
-    private instance : Browser
-    private instanceUUID : string
-    private page : Page
-    private elementControllerArray : ElementController[]
-    private frame : Frame
-    private browserType : BrowserType
+    private _window : chrome.windows.Window
+    private _tab : chrome.tabs.Tab
+    private _instance : Browser
+    private _instanceUUID : string
+    private _page : Page
+    private _elementControllerArray : ElementController[]
+    private _frame : Frame
+    private _browserType : BrowserType
 
     constructor() {
-        this.elementControllerArray = [];
-        this.instanceUUID = generateUUID();
+        this._elementControllerArray = [];
+        this._instanceUUID = generateUUID();
     }
 
-    get getInstanceUUID() {
-        return this.instanceUUID;
+    get instanceUUID() {
+        return this._instanceUUID;
     }
-    get getElementControllerArray() {
-        return this.elementControllerArray;
+    get elementControllerArray() {
+        return this._elementControllerArray;
     }
-    get getBrowserType() {
-        return this.browserType;
+    get browserType() {
+        return this._browserType;
     }
     /**
      * 1. Puppeteer 를 이용하여 BrowserController 의 tab id 를 가진 tab 에 연결,
@@ -42,13 +42,13 @@ export class BrowserController {
      */
     private async connect() {
         await detachDebugger();
-        const transport = await ExtensionDebuggerTransport.create(this.tab.id);
-        this.instance = await puppeteer.connect({
+        const transport = await ExtensionDebuggerTransport.create(this._tab.id);
+        this._instance = await puppeteer.connect({
             transport : transport,
             defaultViewport : null
         });
-        [this.page] = await this.instance.pages();
-        this.frame = this.page.mainFrame();
+        [this._page] = await this._instance.pages();
+        this._frame = this._page.mainFrame();
     }
     /**
      * CrxApi 윈도우 생성하여 Window Instance 설정
@@ -58,8 +58,8 @@ export class BrowserController {
      * connect 실행
      */
     private async open() {
-        this.window = await createWindow();
-        [this.tab] = await currentWindowTabs(this.window.id);
+        this._window = await createWindow();
+        [this._tab] = await currentWindowTabs(this._window.id);
         await this.connect();
     }
 
@@ -70,7 +70,7 @@ export class BrowserController {
      * @param url 
      */
     private async goTo(url : string) {
-        await this.page.goto(url);
+        await this._page.goto(url);
     }
 
     /**
@@ -80,7 +80,7 @@ export class BrowserController {
      * @param title 
      */
     private async findTabByTitle(title : string) {
-        [this.tab] = await findTabsByTitle(title);
+        [this._tab] = await findTabsByTitle(title);
         await this.connect();
     }
 
@@ -92,7 +92,7 @@ export class BrowserController {
      * @deprecated 지원 검토 중
      */
     private async findTabByIndex(index : number) {
-        [this.tab] = await findTabsByIndex(this.window.id, index);
+        [this._tab] = await findTabsByIndex(this._window.id, index);
         await this.connect();
     }
 
@@ -103,7 +103,7 @@ export class BrowserController {
      * @param url 
      */
     private async findTabByUrl(url : string) {
-        [this.tab] = await findTabsByUrl(url);
+        [this._tab] = await findTabsByUrl(url);
         await this.connect();
     }
 
@@ -113,7 +113,7 @@ export class BrowserController {
      * @activity 창 최대화
      */
     private async maximize() {
-        await maximizeWindow(this.window.id);
+        await maximizeWindow(this._window.id);
     }
 
     /**
@@ -122,7 +122,7 @@ export class BrowserController {
      * @activity 창 최소화
      */
     private async minimize() {
-        await minimizeWindow(this.window.id);
+        await minimizeWindow(this._window.id);
     }
 
     /**
@@ -133,7 +133,7 @@ export class BrowserController {
      * @param y 
      */
     private async scrollTo(x : number, y : number) {
-        await this.page.mouse.wheel({
+        await this._page.mouse.wheel({
             deltaX : x,
             deltaY : y
         });
@@ -145,7 +145,7 @@ export class BrowserController {
      * @activity 이전페이지 이동
      */
     private async back() {
-        await this.page.goBack();
+        await this._page.goBack();
     }
 
     /**
@@ -155,7 +155,7 @@ export class BrowserController {
      * @activity 경고
      */
     private async handleAlert() {
-        this.page.on('dialog', dialog => {
+        this._page.on('dialog', dialog => {
             dialog.accept();
         });
     }
@@ -188,10 +188,10 @@ export class BrowserController {
 
         if (isElement) {
             if (targetInstanceUUID) {
-                elementController = this.elementControllerArray.find(elementController => elementController.getInstanceUUID === targetInstanceUUID);
+                elementController = this._elementControllerArray.find(elementController => elementController.getInstanceUUID === targetInstanceUUID);
             } else {
                 elementController = await this.waitFor(msg);
-                this.elementControllerArray.push(elementController);
+                this._elementControllerArray.push(elementController);
             }
         }
 
@@ -199,7 +199,7 @@ export class BrowserController {
             case BrowserAction.OPEN : {
                 await this.open();
                 await this.goTo(msg.object.parameter.url);
-                this.browserType = await this.page.evaluate(() => {
+                this._browserType = await this._page.evaluate(() => {
                     return window.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
                 });
                 break;
@@ -220,7 +220,7 @@ export class BrowserController {
                 break;
             }
             case BrowserAction.CLOSE : {
-                await closeWindow(this.window.id);
+                await closeWindow(this._window.id);
                 break;
             }
             case BrowserAction.SWITCH_FRAME : {
@@ -328,13 +328,13 @@ export class BrowserController {
 
         switch(locatorType) {
             case LocatorType.XPATH : {
-                elementHandle = await this.frame.waitForXPath(locator, {
+                elementHandle = await this._frame.waitForXPath(locator, {
                     timeout : timeout
                 });
                 break;
             }
             case LocatorType.CSS_SELECTOR : {
-                elementHandle = await this.frame.waitForSelector(locator, {
+                elementHandle = await this._frame.waitForSelector(locator, {
                     timeout : timeout
                 });
                 break;
@@ -351,8 +351,8 @@ export class BrowserController {
      */
     private async switchFrame(msg : RequestMessage) {
         const frameName = msg.object.parameter.frameName;
-        const frames = this.frame.childFrames();
-        this.frame = frames.find(frame => frame.name() === frameName);
+        const frames = this._frame.childFrames();
+        this._frame = frames.find(frame => frame.name() === frameName);
         await sleep(1000);
     }
     /**
@@ -361,7 +361,7 @@ export class BrowserController {
      * @activity 프레임 초기화
      */
     private async resetFrame() {
-        this.frame = this.page.mainFrame();
+        this._frame = this._page.mainFrame();
         await sleep(1000);
     }
 }
