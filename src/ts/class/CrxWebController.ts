@@ -394,7 +394,7 @@ export interface ResponseMessage {
     status : Status,
     errorMessage? : string,
     object? : {
-        value? : {
+        value : {
             textContent? : string,
             propertyName? : string
             boundingBox? : BoundingBox,
