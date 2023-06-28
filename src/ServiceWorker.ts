@@ -199,12 +199,8 @@ port.onMessage.addListener(async (message : string) => {
     if (msg.command === CRX_COMMAND.CMD_CRX_START_PROCESS || msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
         browserControllerArray = [];
         browserController = null;
-        const responseMessage = {
-            command : msg.command,
-            object : {
-                status : Status.SUCCESS,
-                value : null
-            }
+        const responseMessage : ResponseMessage = {
+            status : Status.SUCCESS
         }
         if (msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
             await detachDebugger();
@@ -262,20 +258,16 @@ const execute = async (msg : RequestMessage) => {
     try {
         const result = await browserController.execute(msg);
         responseMessage = {
-            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
+            status : Status.SUCCESS,
             object : {
-                status : Status.SUCCESS,
                 value : result,
                 instanceUUID : isElement ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
             }
         }
     } catch (e : any) {
         responseMessage = {
-            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
-            object : {
-                status : Status.ERROR,
-                value : e.message
-            }
+            status : Status.ERROR,
+            errorMessage : e.message
         }
     }
     return responseMessage;

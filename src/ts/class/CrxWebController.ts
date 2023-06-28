@@ -256,7 +256,9 @@ export class BrowserController {
                 break;
             }
             case ElementAction.WAIT : {
-                return elementController.instanceUUID;
+                return {
+                    instanceUUID : elementController.instanceUUID
+                };
                 break;
             }
             case ElementAction.CLICK : {
@@ -272,32 +274,45 @@ export class BrowserController {
                 break;
             }
             case ElementAction.READ : {
-                const result = await elementController.read();
-                return result;
+                const textContent = await elementController.read();
+                return {
+                    textContent : textContent
+                };
             }
             case ElementAction.EXISTS : {
                 const exists = elementController ? true : false;
-                return exists;
+                return {
+                    exists : exists
+                };
             }
             case ElementAction.GET_PROPERTY : {
-                const result = await elementController.getProperty(value as string);
-                return result;
+                const propertyName = await elementController.getProperty(value as string);
+                return {
+                    propertyName : propertyName
+                };
             }
             case ElementAction.PRESS : {
                 await elementController.press(value as KeyInput);
                 break;
             }
             case ElementAction.BOUNDING_BOX : {
-                const result = await elementController.boundingBox();
-                return result;
+                const boundingBox = await elementController.boundingBox();
+                return {
+                    boundingBox : boundingBox
+                };
             }
             case ElementAction.READ_TAG : {
-                const result = await elementController.readTag();
-                return result;
+                const tagName = await elementController.readTag();
+                return {
+                    tagName : tagName
+                };
             }
+            // deprecated
             case ElementAction.BOX_MODEL : {
-                const result = await elementController.boxModel();
-                return result;
+                const boxModel = await elementController.boxModel();
+                return {
+                    boxModel : boxModel
+                };
             }
             case ElementAction.CLEAR : {
                 await elementController.clear();
@@ -376,10 +391,16 @@ export interface RequestMessage {
 }
 
 export interface ResponseMessage {
-    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY
-    object : {
-        status : Status,
-        value : string | boolean | BoundingBox | BoxModel,
+    status : Status,
+    errorMessage? : string,
+    object? : {
+        value? : {
+            textContent? : string,
+            propertyName? : string
+            boundingBox? : BoundingBox,
+            exists? : boolean,
+            tagName? : string
+        }
         instanceUUID? : string
     }
     
@@ -503,8 +524,7 @@ export class ElementController {
      * @returns 
      */
     async read() {
-        const result = await (await this._elementHandle.getProperty('textContent')).jsonValue() as string;
-        return result;
+        return await (await this._elementHandle.getProperty('textContent')).jsonValue() as string;
     }
 
     /**
@@ -515,8 +535,7 @@ export class ElementController {
      * @returns 
      */
     async getProperty(propertyName : string) {
-        const property = await (await this._elementHandle.getProperty(propertyName)).jsonValue() as string;
-        return property;
+        return await (await this._elementHandle.getProperty(propertyName)).jsonValue() as string;
     }
 
     /**
@@ -536,8 +555,7 @@ export class ElementController {
      * @returns 
      */
     async boundingBox() {
-        const boundingBox = await this._elementHandle.boundingBox();
-        return boundingBox;
+        return await this._elementHandle.boundingBox();
     }
 
     /**
@@ -547,8 +565,7 @@ export class ElementController {
      * @returns 
      */
     async readTag() {
-        const tag = await this._elementHandle.evaluate(node => node.tagName);
-        return tag;
+        return await this._elementHandle.evaluate(node => node.tagName);
     }
 
     /**
@@ -557,8 +574,7 @@ export class ElementController {
      * @returns 
      */
     async boxModel() {
-        const boxModel = await this._elementHandle.boxModel();
-        return boxModel;
+        return await this._elementHandle.boxModel();
     }
     
     /**
