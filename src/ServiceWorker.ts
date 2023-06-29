@@ -189,10 +189,11 @@ chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 // Native Messaging
-var port = chrome.runtime.connectNative('crx');
+var port = chrome.runtime.connectNative('worktronics.browser_automation.chrome');
 
-port.onMessage.addListener(async (message : string) => {
-    const msg : RequestMessage = JSON.parse(message)
+port.onMessage.addListener(async (msg : RequestMessage) => {
+    //console.log(msg);
+    //const msg : RequestMessage = JSON.parse(message)
     console.log('^^^^^^^^^^^^^^^^Request^^^^^^^^^^^^^^^^')
     console.log(msg)
     console.log('vvvvvvvvvvvvvvvvRequestvvvvvvvvvvvvvvvv')
@@ -200,7 +201,9 @@ port.onMessage.addListener(async (message : string) => {
         browserControllerArray = [];
         browserController = null;
         const responseMessage : ResponseMessage = {
-            status : Status.SUCCESS
+            command: CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
+            tranId: msg.tranId,
+            result: Status.SUCCESS,
         }
         if (msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
             await detachDebugger();
@@ -258,7 +261,9 @@ const execute = async (msg : RequestMessage) => {
     try {
         const result = await browserController.execute(msg);
         responseMessage = {
-            status : Status.SUCCESS,
+            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
+            tranId : msg.tranId,
+            result : Status.SUCCESS,
             object : {
                 value : result,
                 instanceUUID : isElement ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
@@ -266,7 +271,9 @@ const execute = async (msg : RequestMessage) => {
         }
     } catch (e : any) {
         responseMessage = {
-            status : Status.ERROR,
+            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
+            tranId : msg.tranId,
+            result : Status.ERROR,
             errorMessage : e.message
         }
     }

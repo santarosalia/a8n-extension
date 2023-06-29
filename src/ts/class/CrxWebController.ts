@@ -194,7 +194,7 @@ export class BrowserController {
                 this._elementControllerArray.push(elementController);
             }
         }
-
+        
         switch(action) {
             case BrowserAction.OPEN : {
                 await this.open();
@@ -388,10 +388,13 @@ export interface RequestMessage {
         action : Action
         parameter : Parameter
     }
+    tranId :number
 }
 
 export interface ResponseMessage {
-    status : Status,
+    command : string,
+    tranId : number,
+    result : Status,
     errorMessage? : string,
     object? : {
         value : {
@@ -403,7 +406,6 @@ export interface ResponseMessage {
         }
         instanceUUID? : string
     }
-    
 }
 
 export enum Status {
