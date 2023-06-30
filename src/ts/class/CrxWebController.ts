@@ -48,7 +48,9 @@ export class BrowserController {
             defaultViewport : null
         });
         [this._page] = await this._instance.pages();
+        console.log(this._page);
         this._frame = this._page.mainFrame();
+        console.log(this._frame);
     }
     /**
      * CrxApi 윈도우 생성하여 Window Instance 설정
@@ -202,6 +204,7 @@ export class BrowserController {
                 break;
             }
             case BrowserAction.CONNECT : {
+                console.log('connect')
                 const connectOptionType = msg.object.parameter.connectOption.type;
                 const connectOptionValue = msg.object.parameter.connectOption.value;
                 switch (connectOptionType) {
@@ -403,13 +406,11 @@ export interface ResponseMessage {
     result : Status,
     errorMessage? : string,
     object? : {
-        value : {
-            textContent? : string,
-            propertyValue? : string
-            boundingBox? : BoundingBox,
-            exists? : boolean,
-            tagName? : string
-        }
+        textContent? : string,
+        propertyValue? : string
+        boundingBox? : BoundingBox,
+        exists? : boolean,
+        tagName? : string
         instanceUUID? : string
     }
 }
@@ -454,8 +455,8 @@ export enum ElementAction {
 export type Action = BrowserAction | ElementAction;
 
 export enum ConnectOptionType {
-    URL = 'url',
-    TITLE = 'title'
+    URL = 'URL',
+    TITLE = 'Title'
 }
 export enum LocatorType {
     XPATH = 'xpath',
@@ -595,6 +596,7 @@ export class ElementController {
      * @activity 입력창 초기화
      */
     async clear() {
+        console.log('clear')
         await this._elementHandle.evaluate(node => node.textContent = '');
     }
 

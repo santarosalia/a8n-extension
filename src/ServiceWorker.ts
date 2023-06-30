@@ -247,12 +247,17 @@ const execute = async (msg : RequestMessage) => {
     let responseMessage : ResponseMessage;
     try {
         const result = await browserController.execute(msg);
+        
         responseMessage = {
             command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
             tranId : msg.tranId,
             result : Status.SUCCESS,
             object : {
-                value : result,
+                textContent : result ? result.textContent : null,
+                propertyValue : result ? result.propertyValue : null,
+                boundingBox : result ? result.boundingBox : null,
+                exists : result ? result.exists : null,
+                tagName : result ? result.tagName : null,
                 instanceUUID : isElementInstance ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
             }
         }
