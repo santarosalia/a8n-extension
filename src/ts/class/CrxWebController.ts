@@ -177,11 +177,7 @@ export class BrowserController {
      */
     private async actionHandler(msg : RequestMessage) {
         const action = msg.object.action;
-        const value = msg.object.parameter.value;
-        const x = msg.object.parameter.x;
-        const y = msg.object.parameter.y;
         const targetInstanceUUID = msg.object.instanceUUID;
-        const bool = msg.object.parameter.bool;
 
         let elementController : ElementController;
         const isElement = Object.values(ElementAction).includes(action as any);
@@ -189,10 +185,11 @@ export class BrowserController {
         if (isElement) {
             if (targetInstanceUUID) {
                 elementController = this._elementControllerArray.find(elementController => elementController.instanceUUID === targetInstanceUUID);
-            } else {
-                elementController = await this.waitFor(msg);
-                this._elementControllerArray.push(elementController);
-            }
+            } 
+            // else {
+            //     elementController = await this.waitFor(msg);
+            //     this._elementControllerArray.push(elementController);
+            // }
         }
         
         switch(action) {
@@ -223,6 +220,12 @@ export class BrowserController {
                 await closeWindow(this._window.id);
                 break;
             }
+            case BrowserAction.WAIT : {
+                const elementController = await this.waitFor(msg);
+                this._elementControllerArray.push(elementController);
+                // return elementController.instanceUUID;
+                break;
+            }
             case BrowserAction.SWITCH_FRAME : {
                 await this.switchFrame(msg);
                 break;
@@ -232,7 +235,8 @@ export class BrowserController {
                 break;
             }
             case BrowserAction.GO_TO : {
-                await this.goTo(value as string);
+                const url = msg.object.parameter.url;
+                await this.goTo(url);
                 break;
             }
             case BrowserAction.BACK : {
@@ -248,17 +252,14 @@ export class BrowserController {
                 break;
             }
             case BrowserAction.SCROLL_TO : {
+                const x = msg.object.parameter.x;
+                const y = msg.object.parameter.y;
                 await this.scrollTo(x, y);
                 break;
             }
             case BrowserAction.SWITCH_TAB : {
-                await this.findTabByIndex(value as number);
-                break;
-            }
-            case ElementAction.WAIT : {
-                return {
-                    instanceUUID : elementController.instanceUUID
-                };
+                const tabIndex = msg.object.parameter.tabIndex;
+                await this.findTabByIndex(tabIndex);
                 break;
             }
             case ElementAction.CLICK : {
@@ -270,7 +271,8 @@ export class BrowserController {
                 break;
             }
             case ElementAction.TYPE : {
-                await elementController.type(value as string);
+                const text = msg.object.parameter.text;
+                await elementController.type(text);
                 break;
             }
             case ElementAction.READ : {
@@ -286,13 +288,15 @@ export class BrowserController {
                 };
             }
             case ElementAction.GET_PROPERTY : {
-                const propertyName = await elementController.getProperty(value as string);
+                const propertyName = msg.object.parameter.propertyName;
+                const propertyValue = await elementController.getProperty(propertyName);
                 return {
-                    propertyName : propertyName
+                    propertyValue : propertyValue
                 };
             }
             case ElementAction.PRESS : {
-                await elementController.press(value as KeyInput);
+                const key = msg.object.parameter.key;
+                await elementController.press(key);
                 break;
             }
             case ElementAction.BOUNDING_BOX : {
@@ -319,11 +323,13 @@ export class BrowserController {
                 break;
             }
             case ElementAction.SET_CHECK_BOX_STATE : {
-                await elementController.setCheckBoxState(bool);
+                const check = msg.object.parameter.check;
+                await elementController.setCheckBoxState(check);
                 break;
             }
             case ElementAction.SET_SELECT_BOX_VALUE : {
-                await elementController.setSelectBoxValue(value as string);
+                const selectValue = msg.object.parameter.selectValue;
+                await elementController.setSelectBoxValue(selectValue);
                 break;
             }
         }
@@ -399,7 +405,7 @@ export interface ResponseMessage {
     object? : {
         value : {
             textContent? : string,
-            propertyName? : string
+            propertyValue? : string
             boundingBox? : BoundingBox,
             exists? : boolean,
             tagName? : string
@@ -425,11 +431,11 @@ export enum BrowserAction {
     SCROLL_TO = 'scrollTo',
     GO_TO = 'goTo',
     BACK = 'back',
-    SWITCH_TAB = 'switchTab'
+    SWITCH_TAB = 'switchTab',
+    WAIT = 'wait',
 }
 
 export enum ElementAction {
-    WAIT = 'wait',
     CLICK = 'click',
     HOVER = 'hover',
     TYPE = 'type',
@@ -470,11 +476,15 @@ export interface Parameter {
     }
     locatorType? : LocatorType
     locator? : string
-    value? : string | number
+    text? : string
+    propertyName? : string
     frameName? : string
-    bool? : boolean
+    key? : KeyInput
+    check? : boolean
+    selectValue? : string
     x? : number
     y? : number
+    tabIndex? : number
     browserType? : BrowserType
 }
 

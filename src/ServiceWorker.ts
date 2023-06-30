@@ -197,20 +197,6 @@ port.onMessage.addListener(async (msg : RequestMessage) => {
     console.log('^^^^^^^^^^^^^^^^Request^^^^^^^^^^^^^^^^')
     console.log(msg)
     console.log('vvvvvvvvvvvvvvvvRequestvvvvvvvvvvvvvvvv')
-    if (msg.command === CRX_COMMAND.CMD_CRX_START_PROCESS || msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
-        browserControllerArray = [];
-        browserController = null;
-        const responseMessage : ResponseMessage = {
-            command: CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
-            tranId: msg.tranId,
-            result: Status.SUCCESS,
-        }
-        if (msg.command === CRX_COMMAND.CMD_CRX_END_PROCESS) {
-            await detachDebugger();
-        }
-        console.log(responseMessage)
-        return port.postMessage(responseMessage);
-    }
     const responseMessage = await execute(msg as RequestMessage);
     console.log('^^^^^^^^^^^^^^^^Response^^^^^^^^^^^^^^^^')
     console.log(responseMessage)
@@ -236,6 +222,7 @@ let browserController : BrowserController;
 
 const execute = async (msg : RequestMessage) => {
     const isElement = Object.values(ElementAction).includes(msg.object.action as any);
+    const isElementInstance = msg.object.action === BrowserAction.WAIT;
 
     if (msg.object.instanceUUID) {
         if (isElement) {
@@ -266,7 +253,7 @@ const execute = async (msg : RequestMessage) => {
             result : Status.SUCCESS,
             object : {
                 value : result,
-                instanceUUID : isElement ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
+                instanceUUID : isElementInstance ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
             }
         }
     } catch (e : any) {

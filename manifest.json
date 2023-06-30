@@ -10,7 +10,7 @@
     },
     "action": {
       "default_icon": "icons/recIcon_default64.png",
-      "default_title": "이든티앤에스 웹레코더"
+      "default_title": "Worktronics Browser Automation"
     },
     "background" : {
         "service_worker" : "src/ServiceWorker.ts",
@@ -44,9 +44,7 @@
       ],
     "externally_connectable": {
         "matches": [
-          "*://localhost/*",
-          "*://*.digitalworker.co.kr/*",
-          "*://10.0.1.112/*"
+          "*://*/*"
       ]
     }
 }
