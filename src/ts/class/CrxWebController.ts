@@ -28,6 +28,9 @@ export class BrowserController {
     get browserType() {
         return this._browserType;
     }
+    get tab() {
+        return this._tab
+    }
     /**
      * 1. Puppeteer 를 이용하여 BrowserController 의 tab id 를 가진 tab 에 연결,
      * 
@@ -48,9 +51,7 @@ export class BrowserController {
             defaultViewport : null
         });
         [this._page] = await this._instance.pages();
-        console.log(this._page);
         this._frame = this._page.mainFrame();
-        console.log(this._frame);
     }
     /**
      * CrxApi 윈도우 생성하여 Window Instance 설정
@@ -481,7 +482,7 @@ export interface Parameter {
     propertyName? : string
     frameName? : string
     key? : KeyInput
-    check? : boolean
+    check? : string
     selectValue? : string
     x? : number
     y? : number
@@ -597,7 +598,10 @@ export class ElementController {
      */
     async clear() {
         console.log('clear')
-        await this._elementHandle.evaluate(node => node.textContent = '');
+        await this._elementHandle.evaluate(node => {
+            const input = node as HTMLInputElement;
+            input.value = '';
+        });
     }
 
     /**
@@ -606,11 +610,19 @@ export class ElementController {
      * @activity 체크박스 선택
      * @param value 
      */
-    async setCheckBoxState(value : boolean) {
-        await this._elementHandle.evaluate(node => {
-            const element = node as HTMLInputElement;
-            element.checked = value;
-        });
+    async setCheckBoxState(value : string) {
+        const check = value === 'True' ? true : false;
+        if (check) {
+            await this._elementHandle.evaluate(async node => {
+                const element = node as HTMLInputElement;
+                element.checked = true;
+            });
+        } else {
+            await this._elementHandle.evaluate(async node => {
+                const element = node as HTMLInputElement;
+                element.checked = false;
+            });
+        }
     }
 
     /**

@@ -16,7 +16,8 @@ import { setItemFromLocalStorage,
     focusTab,
     allTabReload,
     sendMessageByWindowIdToFocusedTab,
-    detachDebugger
+    detachDebugger,
+    checkTab
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
@@ -223,7 +224,7 @@ let browserController : BrowserController;
 const execute = async (msg : RequestMessage) => {
     const isElement = Object.values(ElementAction).includes(msg.object.action as any);
     const isElementInstance = msg.object.action === BrowserAction.WAIT;
-
+    browserControllerArray = await pickBrowserControllerArray(browserControllerArray);
     if (msg.object.instanceUUID) {
         if (isElement) {
             browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.instanceUUID === msg.object.instanceUUID));
@@ -262,6 +263,7 @@ const execute = async (msg : RequestMessage) => {
             }
         }
     } catch (e : any) {
+        console.log(e)
         responseMessage = {
             command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
             tranId : msg.tranId,
@@ -270,4 +272,18 @@ const execute = async (msg : RequestMessage) => {
         }
     }
     return responseMessage;
+}
+
+/**
+ * 브라우저 살아있는거만 솎아내서 반환
+ * @param browserControllerArray 
+ * @returns 
+ */
+const pickBrowserControllerArray = async (browserControllerArray : BrowserController[]) => {
+    const pickedBrowserControllerArray : BrowserController[] = [];
+    for (let bc of browserControllerArray) {
+        const check = await checkTab(bc.tab);
+        if (check) pickedBrowserControllerArray.push(bc);
+    }
+    return pickedBrowserControllerArray;
 }

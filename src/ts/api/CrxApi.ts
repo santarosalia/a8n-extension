@@ -483,8 +483,8 @@ export const findTabsByTitle = async (title : string) => {
     }
   ```
  */
-export const findTabsByIndex = (windowId : number, index : number) => {
-    return chrome.tabs.query({
+export const findTabsByIndex = async (windowId : number, index : number) => {
+    return await chrome.tabs.query({
         windowId : windowId,
         index : index
     });
@@ -560,4 +560,13 @@ export const detachDebugger = async () => {
  */
 export const generateUUID = () => {
     return self.crypto.randomUUID();
+}
+
+/**
+ * 브라우저 살아있는지 체크
+ * @param checkTab 
+ * @returns 
+ */
+export const checkTab = async (checkTab : chrome.tabs.Tab) => {
+    return (await chrome.tabs.query({})).find(tab => tab.id === checkTab.id);
 }
