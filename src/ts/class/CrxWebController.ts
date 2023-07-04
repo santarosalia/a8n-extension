@@ -155,10 +155,11 @@ export class BrowserController {
         });
     }
 
-    private async goFoward() {
+    private async goForward() {
         await this._page.goForward({
             waitUntil : "domcontentloaded"
         });
+
     }
 
     /**
@@ -236,7 +237,6 @@ export class BrowserController {
             case BrowserAction.WAIT : {
                 const elementController = await this.waitFor(msg);
                 this._elementControllerArray.push(elementController);
-                // return elementController.instanceUUID;
                 break;
             }
             case BrowserAction.SWITCH_FRAME : {
@@ -256,8 +256,8 @@ export class BrowserController {
                 await this.goBack();
                 break;
             }
-            case BrowserAction.GO_FOWARD : {
-                await this.goFoward();
+            case BrowserAction.GO_FORWARD : {
+                await this.goForward();
                 break;
             }
             case BrowserAction.MAXIMIZE : {
@@ -457,7 +457,7 @@ export enum BrowserAction {
     SCROLL_TO = 'scrollTo',
     GO_TO = 'goTo',
     GO_BACK = 'goBack',
-    GO_FOWARD = 'goFoward',
+    GO_FORWARD = 'goForward',
     SWITCH_TAB = 'switchTab',
     WAIT = 'wait',
 }
@@ -558,7 +558,8 @@ export class ElementController {
     async doubleClick() {
         await this._elementHandle.click({
             button : "left",
-            clickCount : 2
+            clickCount : 2,
+            delay : 100
         });
     }
 

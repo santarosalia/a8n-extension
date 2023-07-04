@@ -191,7 +191,9 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 // Native Messaging
 var port = chrome.runtime.connectNative('worktronics.browser_automation.chrome');
-
+chrome.tabs.onCreated.addListener((tab)=>{
+    console.log(tab)
+})
 port.onMessage.addListener(async (msg : RequestMessage) => {
     //console.log(msg);
     //const msg : RequestMessage = JSON.parse(message)
