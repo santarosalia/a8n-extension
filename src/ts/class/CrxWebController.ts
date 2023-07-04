@@ -149,8 +149,16 @@ export class BrowserController {
      * @peon back
      * @activity 이전페이지 이동
      */
-    private async back() {
-        await this._page.goBack();
+    private async goBack() {
+        await this._page.goBack({
+            waitUntil : "domcontentloaded"
+        });
+    }
+
+    private async goFoward() {
+        await this._page.goForward({
+            waitUntil : "domcontentloaded"
+        });
     }
 
     /**
@@ -244,8 +252,12 @@ export class BrowserController {
                 await this.goTo(url);
                 break;
             }
-            case BrowserAction.BACK : {
-                await this.back();
+            case BrowserAction.GO_BACK : {
+                await this.goBack();
+                break;
+            }
+            case BrowserAction.GO_FOWARD : {
+                await this.goFoward();
                 break;
             }
             case BrowserAction.MAXIMIZE : {
@@ -267,8 +279,16 @@ export class BrowserController {
                 await this.findTabByIndex(tabIndex);
                 break;
             }
-            case ElementAction.CLICK : {
-                await elementController.click();
+            case ElementAction.LEFT_CLICK : {
+                await elementController.leftClick();
+                break;
+            }
+            case ElementAction.RIGHT_CLICK : {
+                await elementController.rightClick();
+                break;
+            }
+            case ElementAction.DOUBLE_CLICK : {
+                await elementController.doubleClick();
                 break;
             }
             case ElementAction.HOVER : {
@@ -276,6 +296,7 @@ export class BrowserController {
                 break;
             }
             case ElementAction.TYPE : {
+                await elementController.clear();
                 const text = msg.object.parameter.text;
                 await elementController.type(text);
                 break;
@@ -304,10 +325,13 @@ export class BrowserController {
                 await elementController.press(key);
                 break;
             }
-            case ElementAction.BOUNDING_BOX : {
-                const boundingBox = await elementController.boundingBox();
+            case ElementAction.GET_BOUNDING_BOX : {
+                const boundingBox = await elementController.getBoundingBox();
                 return {
-                    boundingBox : boundingBox
+                    x : Number(boundingBox.x.toFixed(0)),
+                    y : Number(boundingBox.y.toFixed(0)),
+                    width : Number(boundingBox.width.toFixed(0)),
+                    height : Number(boundingBox.height.toFixed(0))
                 };
             }
             case ElementAction.READ_TAG : {
@@ -322,10 +346,6 @@ export class BrowserController {
                 return {
                     boxModel : boxModel
                 };
-            }
-            case ElementAction.CLEAR : {
-                await elementController.clear();
-                break;
             }
             case ElementAction.SET_CHECK_BOX_STATE : {
                 const check = msg.object.parameter.check;
@@ -410,7 +430,10 @@ export interface ResponseMessage {
     object? : {
         textContent? : string,
         propertyValue? : string
-        boundingBox? : BoundingBox,
+        x? : number
+        y? : number
+        width? : number
+        height? : number
         exists? : boolean,
         tagName? : string
         instanceUUID? : string
@@ -433,23 +456,25 @@ export enum BrowserAction {
     MINIMIZE = 'minimize',
     SCROLL_TO = 'scrollTo',
     GO_TO = 'goTo',
-    BACK = 'back',
+    GO_BACK = 'goBack',
+    GO_FOWARD = 'goFoward',
     SWITCH_TAB = 'switchTab',
     WAIT = 'wait',
 }
 
 export enum ElementAction {
-    CLICK = 'click',
+    LEFT_CLICK = 'leftClick',
+    DOUBLE_CLICK = 'doubleClick',
+    RIGHT_CLICK = 'rightClick',
     HOVER = 'hover',
     TYPE = 'type',
     READ = 'read',
     EXISTS = 'exists',
     GET_PROPERTY = 'getProperty',
     PRESS = 'press',
-    BOUNDING_BOX = 'boundingBox',
+    GET_BOUNDING_BOX = 'getBoundingBox',
     READ_TAG = 'readTag',
     BOX_MODEL = 'boxModel',
-    CLEAR = 'clear',
     SET_CHECK_BOX_STATE = 'setCheckBoxState',
     SET_SELECT_BOX_VALUE = 'setSelectBoxValue'
 }
@@ -505,12 +530,36 @@ export class ElementController {
     }
 
     /**
-     * 엘리먼트 클릭
-     * @peon click
-     * @activity 엘리먼트 클릭
+     * 엘리먼트 좌클릭
+     * @peon leftClick
+     * @activity 엘리먼트 좌클릭
      */
-    async click() {
-        await this._elementHandle.click();
+    async leftClick() {
+        await this._elementHandle.click({
+            button : "left"
+        });
+    }
+    /**
+     * 엘리먼트 우클릭
+     * @peon rightClick
+     * @activity 엘리먼트 우클릭
+     */
+    async rightClick() {
+        await this._elementHandle.click({
+            button : "right"
+        });
+    }
+
+    /**
+     * 엘리먼트 더블 클릭
+     * @peon doubleClick
+     * @activity 엘리먼트 더블 클릭
+     */
+    async doubleClick() {
+        await this._elementHandle.click({
+            button : "left",
+            clickCount : 2
+        });
     }
 
     /**
@@ -564,12 +613,12 @@ export class ElementController {
     }
 
     /**
-     * 엘리먼트 height width x y 정보를 갖고 있는 객체 반환
+     * 엘리먼트 height width x y 정보를 갖고 있는 객체 반환 후 반올림
      * @peon boundingBox
      * @activity 엘리먼트 크기
      * @returns 
      */
-    async boundingBox() {
+    async getBoundingBox() {
         return await this._elementHandle.boundingBox();
     }
 

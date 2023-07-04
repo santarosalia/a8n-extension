@@ -258,7 +258,10 @@ const execute = async (msg : RequestMessage) => {
             object : {
                 textContent : result ? result.textContent : null,
                 propertyValue : result ? result.propertyValue : null,
-                boundingBox : result ? result.boundingBox : null,
+                x : result ? result.x : null,
+                y : result ? result.y : null,
+                width : result ? result.width : null,
+                height : result ? result.height : null,
                 exists : result ? result.exists : null,
                 tagName : result ? result.tagName : null,
                 instanceUUID : isElementInstance ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
