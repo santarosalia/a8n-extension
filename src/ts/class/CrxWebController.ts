@@ -73,7 +73,9 @@ export class BrowserController {
      * @param url 
      */
     private async goTo(url : string) {
-        await this._page.goto(url);
+        await this._page.goto(url, {
+            waitUntil : "domcontentloaded"
+        });
     }
 
     /**
@@ -205,7 +207,6 @@ export class BrowserController {
                 break;
             }
             case BrowserAction.CONNECT : {
-                console.log('connect')
                 const connectOptionType = msg.object.parameter.connectOption.type;
                 const connectOptionValue = msg.object.parameter.connectOption.value;
                 switch (connectOptionType) {

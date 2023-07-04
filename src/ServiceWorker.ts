@@ -222,31 +222,33 @@ let browserControllerArray : BrowserController[] = [];
 let browserController : BrowserController;
 
 const execute = async (msg : RequestMessage) => {
-    const isElement = Object.values(ElementAction).includes(msg.object.action as any);
-    const isElementInstance = msg.object.action === BrowserAction.WAIT;
-    browserControllerArray = await pickBrowserControllerArray(browserControllerArray);
-    if (msg.object.instanceUUID) {
-        if (isElement) {
-            browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.instanceUUID === msg.object.instanceUUID));
-        } else {
-            browserController = browserControllerArray.find(browserController => browserController.instanceUUID === msg.object.instanceUUID);
-        }
-        if (!browserController) throw new Error('It is not browser instance');
-    } else {
-        browserController = new BrowserController();
-        browserControllerArray.push(browserController);
-    }
-
-    // if (!!!msg.object.parameter.browserType) {
-    //     console.log(browserController.getBrowserType);
-    //     if (browserController.getBrowserType !== msg.object.parameter.browserType) return;
-    // } else {
-    //     const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
-    //     if (browserType !== msg.object.parameter.browserType) return;
-    // }
-        
     let responseMessage : ResponseMessage;
+
     try {
+        const isElement = Object.values(ElementAction).includes(msg.object.action as any);
+        const isElementInstance = msg.object.action === BrowserAction.WAIT;
+        browserControllerArray = await pickBrowserControllerArray(browserControllerArray);
+        if (msg.object.instanceUUID) {
+            if (isElement) {
+                browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.instanceUUID === msg.object.instanceUUID));
+            } else {
+                browserController = browserControllerArray.find(browserController => browserController.instanceUUID === msg.object.instanceUUID);
+            }
+            if (!browserController) throw new Error('Target Lost');
+        } else {
+            browserController = new BrowserController();
+            browserControllerArray.push(browserController);
+        }
+
+        // if (!!!msg.object.parameter.browserType) {
+        //     console.log(browserController.getBrowserType);
+        //     if (browserController.getBrowserType !== msg.object.parameter.browserType) return;
+        // } else {
+        //     const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
+        //     if (browserType !== msg.object.parameter.browserType) return;
+        // }
+            
+    
         const result = await browserController.execute(msg);
         
         responseMessage = {
@@ -263,7 +265,6 @@ const execute = async (msg : RequestMessage) => {
             }
         }
     } catch (e : any) {
-        console.log(e)
         responseMessage = {
             command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
             tranId : msg.tranId,
