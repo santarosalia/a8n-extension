@@ -266,6 +266,7 @@ const execute = async (msg : RequestMessage) => {
                 height : result ? result.height : null,
                 exists : result ? result.exists : null,
                 tagName : result ? result.tagName : null,
+                image : result ? result.image : null,
                 instanceUUID : isElementInstance ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
             }
         }

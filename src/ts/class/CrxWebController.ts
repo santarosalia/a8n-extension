@@ -64,6 +64,11 @@ export class BrowserController {
         this._window = await createWindow();
         [this._tab] = await currentWindowTabs(this._window.id);
         await this.connect();
+        this._page.on('dialog', async (d)=>{
+            d.accept();
+            d.message();
+        });
+        
     }
 
     /**
@@ -357,6 +362,12 @@ export class BrowserController {
                 await elementController.setSelectBoxValue(selectValue);
                 break;
             }
+            case ElementAction.SCREENSHOT : {
+                const image = await elementController.screenshot();
+                return {
+                    image : image
+                }
+            }
         }
 
     }
@@ -437,6 +448,7 @@ export interface ResponseMessage {
         exists? : boolean,
         tagName? : string
         instanceUUID? : string
+        image? : string
     }
 }
 
@@ -476,7 +488,8 @@ export enum ElementAction {
     READ_TAG = 'readTag',
     BOX_MODEL = 'boxModel',
     SET_CHECK_BOX_STATE = 'setCheckBoxState',
-    SET_SELECT_BOX_VALUE = 'setSelectBoxValue'
+    SET_SELECT_BOX_VALUE = 'setSelectBoxValue',
+    SCREENSHOT = 'screenshot'
 }
 
 export type Action = BrowserAction | ElementAction;
@@ -648,7 +661,6 @@ export class ElementController {
      * @activity 입력창 초기화
      */
     async clear() {
-        console.log('clear')
         await this._elementHandle.evaluate(node => {
             const input = node as HTMLInputElement;
             input.value = '';
@@ -688,10 +700,12 @@ export class ElementController {
 
     /**
      * 스크린샷
-     * @deprecated 스크린샷 처리 방법 고민중
+     * @peon screenshot
+     * @activity 엘리먼트 이미지 저장
      */
     async screenshot() {
-        // 스크린샷 처리 어떻게할지 고민
-        await this._elementHandle.screenshot();
+        return await this._elementHandle.screenshot({
+            encoding : 'base64'
+        }) as string;
     }
 }
