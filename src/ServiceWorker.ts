@@ -21,7 +21,7 @@ import { setItemFromLocalStorage,
 } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
 import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
-import {BrowserAction, BrowserController, BrowserType, ElementAction, LocatorType, RequestMessage, ResponseMessage, Status } from "@/ts/class/CrxWebController";
+import {BrowserAction, BrowserController, BrowserType, ElementAction, LocatorType, ExecuteRequestMessage, ExecuteResponseMessage, Status, BrowserCheckRequestMessage, BrowserCheckReponseMessage } from "@/ts/class/CrxWebController";
 
 
 const crxInfo = new CrxInfo();
@@ -189,22 +189,53 @@ chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
 chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
+let tranId = 0;
+const tranIdBrowserControllerMap = new Map<number, BrowserController>();
+
 // Native Messaging
 var port = chrome.runtime.connectNative('worktronics.browser_automation.chrome');
-chrome.tabs.onCreated.addListener((tab)=>{
-    console.log(tab)
-})
-port.onMessage.addListener(async (msg : RequestMessage) => {
-    //console.log(msg);
-    //const msg : RequestMessage = JSON.parse(message)
-    console.log('^^^^^^^^^^^^^^^^Request^^^^^^^^^^^^^^^^')
-    console.log(msg)
-    console.log('vvvvvvvvvvvvvvvvRequestvvvvvvvvvvvvvvvv')
-    const responseMessage = await execute(msg as RequestMessage);
-    console.log('^^^^^^^^^^^^^^^^Response^^^^^^^^^^^^^^^^')
-    console.log(responseMessage)
-    console.log('vvvvvvvvvvvvvvvvResponsevvvvvvvvvvvvvvvv')
-    port.postMessage(responseMessage);
+chrome.tabs.onCreated.addListener(async tab => {
+    const browserController = new BrowserController(tab);
+    tranId++;
+    tranIdBrowserControllerMap.set(tranId, browserController);
+    const msg : BrowserCheckRequestMessage = {
+        command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
+        tranId : tranId,
+        responseInfo : null,
+        object : {
+            browserType : self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME,
+            instanceUUID : browserController.instanceUUID
+        }
+    }
+    console.log(msg);
+    port.postMessage(msg);
+});
+port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckReponseMessage) => {
+    const command = msg.command;
+    switch (command) {
+        case CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY : {
+            console.log('-REQ-')
+            console.log(msg)
+            const responseMessage = await execute(msg as ExecuteRequestMessage);
+            console.log('-RES-')
+            console.log(responseMessage)
+            port.postMessage(responseMessage);
+            break;
+        }
+        case CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH : {
+            if (msg.tranId !== tranId) return;
+            msg = msg as BrowserCheckReponseMessage;
+            if (msg.object.isBrowserLaunch) {
+                const browserController = tranIdBrowserControllerMap.get(tranId);
+                await browserController.connect();
+                instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
+            } else {
+                tranIdBrowserControllerMap.delete(tranId);
+            }
+            break;
+        }
+    }
+    
 });
 port.onDisconnect.addListener(() => {
     console.log('Native Messaging Disconnected');
@@ -220,26 +251,31 @@ const reConnect = () => {
     })
 }
 
-let browserControllerArray : BrowserController[] = [];
+let instanceUUIDBrowserControllerMap = new Map<string, BrowserController>();
 let browserController : BrowserController;
 
-const execute = async (msg : RequestMessage) => {
-    let responseMessage : ResponseMessage;
+const execute = async (msg : ExecuteRequestMessage) => {
+    let responseMessage : ExecuteResponseMessage;
 
     try {
         const isElement = Object.values(ElementAction).includes(msg.object.action as any);
         const isElementInstance = msg.object.action === BrowserAction.WAIT;
-        browserControllerArray = await pickBrowserControllerArray(browserControllerArray);
+        // browserControllerArray = await pickBrowserControllerArray(browserControllerArray);
+        await pickBrowserControllerMap();
         if (msg.object.instanceUUID) {
             if (isElement) {
-                browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.instanceUUID === msg.object.instanceUUID));
+                // browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.instanceUUID === msg.object.instanceUUID));
+                browserController = Array.from(instanceUUIDBrowserControllerMap.values()).find(browserController => browserController.instanceUUIDElementControllerMap.has(msg.object.instanceUUID));
+                console.log(browserController)
             } else {
-                browserController = browserControllerArray.find(browserController => browserController.instanceUUID === msg.object.instanceUUID);
+                browserController = instanceUUIDBrowserControllerMap.get(msg.object.instanceUUID);
+                // browserController = browserControllerArray.find(browserController => browserController.instanceUUID === msg.object.instanceUUID);
             }
             if (!browserController) throw new Error('Target Lost');
         } else {
             browserController = new BrowserController();
-            browserControllerArray.push(browserController);
+            instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
+            // browserControllerArray.push(browserController);
         }
 
         // if (!!!msg.object.parameter.browserType) {
@@ -256,7 +292,9 @@ const execute = async (msg : RequestMessage) => {
         responseMessage = {
             command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
             tranId : msg.tranId,
-            result : Status.SUCCESS,
+            responseInfo : {
+                result : Status.SUCCESS,
+            },
             object : {
                 textContent : result ? result.textContent : null,
                 propertyValue : result ? result.propertyValue : null,
@@ -267,15 +305,18 @@ const execute = async (msg : RequestMessage) => {
                 exists : result ? result.exists : null,
                 tagName : result ? result.tagName : null,
                 image : result ? result.image : null,
-                instanceUUID : isElementInstance ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
+                // instanceUUID : isElementInstance ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
+                instanceUUID : isElementInstance ? result.instanceUUID : browserController.instanceUUID
             }
         }
     } catch (e : any) {
         responseMessage = {
             command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
             tranId : msg.tranId,
-            result : Status.ERROR,
-            errorMessage : e.message
+            responseInfo : {
+                result : Status.ERROR,
+                errorMessage : e.message
+            }
         }
     }
     return responseMessage;
@@ -293,4 +334,11 @@ const pickBrowserControllerArray = async (browserControllerArray : BrowserContro
         if (check) pickedBrowserControllerArray.push(bc);
     }
     return pickedBrowserControllerArray;
+}
+
+const pickBrowserControllerMap = async () => {
+    for (const [instanceUUID, browserController] of instanceUUIDBrowserControllerMap) {
+        const check = await checkTab(browserController.tab);
+        if (!check) instanceUUIDBrowserControllerMap.delete(instanceUUID);
+    }
 }

@@ -10,20 +10,27 @@ export class BrowserController {
     private _instance : Browser
     private _instanceUUID : string
     private _page : Page
-    private _elementControllerArray : ElementController[]
+    // private _elementControllerArray : ElementController[]
+    private _instanceUUIDElementControllerMap : Map<string, ElementController>
     private _frame : Frame
     private _browserType : BrowserType
 
-    constructor() {
-        this._elementControllerArray = [];
+    constructor(tab? : chrome.tabs.Tab) {
+        // this._elementControllerArray = [];
+        this._instanceUUIDElementControllerMap = new Map<string, ElementController>();
         this._instanceUUID = generateUUID();
+        if (tab) this._tab = tab;
     }
 
     get instanceUUID() {
         return this._instanceUUID;
     }
-    get elementControllerArray() {
-        return this._elementControllerArray;
+    // get elementControllerArray() {
+    //     // return this._elementControllerArray;
+    //     return this._instanceUUIDElementControllerMap;
+    // }
+    get instanceUUIDElementControllerMap() {
+        return this._instanceUUIDElementControllerMap;
     }
     get browserType() {
         return this._browserType;
@@ -43,7 +50,7 @@ export class BrowserController {
      * 5. Page Instance 에서 mainFrame 가져와 Frame Instance 설정
      * 
      */
-    private async connect() {
+    async connect() {
         await detachDebugger();
         const transport = await ExtensionDebuggerTransport.create(this._tab.id);
         this._instance = await puppeteer.connect({
@@ -184,7 +191,7 @@ export class BrowserController {
      * @param msg 
      * @returns 
      */
-    async execute(msg : RequestMessage) {
+    async execute(msg : ExecuteRequestMessage) {
         const result = await this.actionHandler(msg);
         return result;
     }
@@ -194,7 +201,7 @@ export class BrowserController {
      * @param msg 
      * @returns 
      */
-    private async actionHandler(msg : RequestMessage) {
+    private async actionHandler(msg : ExecuteRequestMessage) {
         const action = msg.object.action;
         const targetInstanceUUID = msg.object.instanceUUID;
 
@@ -203,7 +210,9 @@ export class BrowserController {
 
         if (isElement) {
             if (targetInstanceUUID) {
-                elementController = this._elementControllerArray.find(elementController => elementController.instanceUUID === targetInstanceUUID);
+                // elementController = this._elementControllerArray.find(elementController => elementController.instanceUUID === targetInstanceUUID);
+                elementController = this._instanceUUIDElementControllerMap.get(targetInstanceUUID);
+                console.log(elementController)
             } 
             // else {
             //     elementController = await this.waitFor(msg);
@@ -241,7 +250,11 @@ export class BrowserController {
             }
             case BrowserAction.WAIT : {
                 const elementController = await this.waitFor(msg);
-                this._elementControllerArray.push(elementController);
+                // this._elementControllerArray.push(elementController);
+                this._instanceUUIDElementControllerMap.set(elementController.instanceUUID, elementController);
+                return {
+                    instanceUUID : elementController.instanceUUID
+                };
                 break;
             }
             case BrowserAction.SWITCH_FRAME : {
@@ -377,7 +390,7 @@ export class BrowserController {
      * @param msg 
      * @returns 
      */
-    private async waitFor(msg : RequestMessage) {
+    private async waitFor(msg : ExecuteRequestMessage) {
         const locator = msg.object.parameter.locator;
         const locatorType = msg.object.parameter.locatorType;
         const timeout = msg.object.parameter.timeout;
@@ -406,7 +419,7 @@ export class BrowserController {
      * @activity 프레임 이동
      * @param msg 
      */
-    private async switchFrame(msg : RequestMessage) {
+    private async switchFrame(msg : ExecuteRequestMessage) {
         const frameName = msg.object.parameter.frameName;
         const frames = this._frame.childFrames();
         this._frame = frames.find(frame => frame.name() === frameName);
@@ -423,21 +436,23 @@ export class BrowserController {
     }
 }
 
-export interface RequestMessage {
-    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY | CRX_COMMAND.CMD_CRX_START_PROCESS | CRX_COMMAND.CMD_CRX_END_PROCESS
+export interface ExecuteRequestMessage {
+    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY | CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH
     object : {
         instanceUUID? : string
-        action : Action
-        parameter : Parameter
+        action? : Action
+        parameter? : Parameter
     }
     tranId :number
 }
 
-export interface ResponseMessage {
+export interface ExecuteResponseMessage {
     command : string,
     tranId : number,
-    result : Status,
-    errorMessage? : string,
+    responseInfo : {
+        result : Status,
+        errorMessage? : string,
+    }
     object? : {
         textContent? : string,
         propertyValue? : string
@@ -449,6 +464,28 @@ export interface ResponseMessage {
         tagName? : string
         instanceUUID? : string
         image? : string
+    }
+}
+
+export interface BrowserCheckRequestMessage {
+    command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
+    tranId : number,
+    responseInfo : null,
+    object : {
+        browserType : BrowserType,
+        instanceUUID : string
+    }
+}
+
+export interface BrowserCheckReponseMessage {
+    command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
+    tranId : number,
+    responseInfo : {
+        result : Status,
+        errorMessage : string
+    },
+    object : {
+        isBrowserLaunch : boolean
     }
 }
 
