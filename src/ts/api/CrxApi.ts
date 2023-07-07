@@ -570,3 +570,7 @@ export const generateUUID = () => {
 export const checkTab = async (checkTab : chrome.tabs.Tab) => {
     return (await chrome.tabs.query({})).find(tab => tab.id === checkTab.id);
 }
+
+export const getWindow = async (windowId : number) => {
+    return await chrome.windows.get(windowId);
+}

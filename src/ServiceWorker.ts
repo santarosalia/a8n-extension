@@ -207,6 +207,7 @@ chrome.tabs.onCreated.addListener(async tab => {
             instanceUUID : browserController.instanceUUID
         }
     }
+    console.log('Browser Check REQ')
     console.log(msg);
     port.postMessage(msg);
 });
@@ -223,15 +224,15 @@ port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckRepo
             break;
         }
         case CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH : {
-            if (msg.tranId !== tranId) return;
+            // if (msg.tranId !== tranId) return;
             msg = msg as BrowserCheckReponseMessage;
+            console.log('Browser Check RES')
+            console.log(msg)
             if (msg.object.isBrowserLaunch) {
                 const browserController = tranIdBrowserControllerMap.get(tranId);
-                await browserController.connect();
                 instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
-            } else {
-                tranIdBrowserControllerMap.delete(tranId);
             }
+            tranIdBrowserControllerMap.delete(tranId);
             break;
         }
     }
@@ -251,7 +252,7 @@ const reConnect = () => {
     })
 }
 
-let instanceUUIDBrowserControllerMap = new Map<string, BrowserController>();
+const instanceUUIDBrowserControllerMap = new Map<string, BrowserController>();
 let browserController : BrowserController;
 
 const execute = async (msg : ExecuteRequestMessage) => {
@@ -259,32 +260,18 @@ const execute = async (msg : ExecuteRequestMessage) => {
 
     try {
         const isElement = Object.values(ElementAction).includes(msg.object.action as any);
-        const isElementInstance = msg.object.action === BrowserAction.WAIT;
-        // browserControllerArray = await pickBrowserControllerArray(browserControllerArray);
+        const isWait = msg.object.action === BrowserAction.WAIT;
         await pickBrowserControllerMap();
+        // connect || else 나눠야할듯?
         if (msg.object.instanceUUID) {
+            console.log(isElement)
             if (isElement) {
-                // browserController = browserControllerArray.find(browserController => browserController.elementControllerArray.find(elementController => elementController.instanceUUID === msg.object.instanceUUID));
                 browserController = Array.from(instanceUUIDBrowserControllerMap.values()).find(browserController => browserController.instanceUUIDElementControllerMap.has(msg.object.instanceUUID));
-                console.log(browserController)
             } else {
                 browserController = instanceUUIDBrowserControllerMap.get(msg.object.instanceUUID);
-                // browserController = browserControllerArray.find(browserController => browserController.instanceUUID === msg.object.instanceUUID);
             }
             if (!browserController) throw new Error('Target Lost');
-        } else {
-            browserController = new BrowserController();
-            instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
-            // browserControllerArray.push(browserController);
-        }
-
-        // if (!!!msg.object.parameter.browserType) {
-        //     console.log(browserController.getBrowserType);
-        //     if (browserController.getBrowserType !== msg.object.parameter.browserType) return;
-        // } else {
-        //     const browserType = self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
-        //     if (browserType !== msg.object.parameter.browserType) return;
-        // }
+        } 
             
     
         const result = await browserController.execute(msg);
@@ -305,8 +292,7 @@ const execute = async (msg : ExecuteRequestMessage) => {
                 exists : result ? result.exists : null,
                 tagName : result ? result.tagName : null,
                 image : result ? result.image : null,
-                // instanceUUID : isElementInstance ? browserController.elementControllerArray[browserController.elementControllerArray.length - 1].instanceUUID : browserController.instanceUUID
-                instanceUUID : isElementInstance ? result.instanceUUID : browserController.instanceUUID
+                instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID
             }
         }
     } catch (e : any) {

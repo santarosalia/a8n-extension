@@ -1,4 +1,4 @@
-import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow, sleep, detachDebugger, generateUUID } from "@CrxApi";
+import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow, sleep, detachDebugger, generateUUID, getWindow } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, KeyInput, BoundingBox, BoxModel } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
@@ -10,25 +10,24 @@ export class BrowserController {
     private _instance : Browser
     private _instanceUUID : string
     private _page : Page
-    // private _elementControllerArray : ElementController[]
     private _instanceUUIDElementControllerMap : Map<string, ElementController>
     private _frame : Frame
     private _browserType : BrowserType
 
-    constructor(tab? : chrome.tabs.Tab) {
-        // this._elementControllerArray = [];
+    constructor (tab? : chrome.tabs.Tab) {
         this._instanceUUIDElementControllerMap = new Map<string, ElementController>();
         this._instanceUUID = generateUUID();
-        if (tab) this._tab = tab;
+        if (tab) {
+            this._tab = tab;
+            getWindow(tab.windowId).then(window => {
+                this._window = window;
+            });
+        }
     }
 
     get instanceUUID() {
         return this._instanceUUID;
     }
-    // get elementControllerArray() {
-    //     // return this._elementControllerArray;
-    //     return this._instanceUUIDElementControllerMap;
-    // }
     get instanceUUIDElementControllerMap() {
         return this._instanceUUIDElementControllerMap;
     }
@@ -210,9 +209,7 @@ export class BrowserController {
 
         if (isElement) {
             if (targetInstanceUUID) {
-                // elementController = this._elementControllerArray.find(elementController => elementController.instanceUUID === targetInstanceUUID);
                 elementController = this._instanceUUIDElementControllerMap.get(targetInstanceUUID);
-                console.log(elementController)
             } 
             // else {
             //     elementController = await this.waitFor(msg);
