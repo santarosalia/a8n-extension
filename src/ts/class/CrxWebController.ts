@@ -65,6 +65,7 @@ export class BrowserController {
      * Window ID 로 Tab 검색하여 Tab Instance 설정
      * 
      * connect 실행
+     * @deprecated
      */
     private async open() {
         this._window = await createWindow();
@@ -218,14 +219,14 @@ export class BrowserController {
         }
         
         switch(action) {
-            case BrowserAction.OPEN : {
-                await this.open();
-                await this.goTo(msg.object.parameter.url);
-                this._browserType = await this._page.evaluate(() => {
-                    return window.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
-                });
-                break;
-            }
+            // case BrowserAction.OPEN : {
+            //     await this.open();
+            //     await this.goTo(msg.object.parameter.url);
+            //     this._browserType = await this._page.evaluate(() => {
+            //         return window.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
+            //     });
+            //     break;
+            // }
             case BrowserAction.CONNECT : {
                 const connectOptionType = msg.object.parameter.connectOption.type;
                 const connectOptionValue = msg.object.parameter.connectOption.value;
@@ -238,6 +239,10 @@ export class BrowserController {
                         await this.findTabByTitle(connectOptionValue);
                         break;
                     }
+                    case ConnectOptionType.INSTANCE_UUID : {
+                        await this.connect();
+                        break;
+                    }
                 }
                 break;
             }
@@ -247,7 +252,6 @@ export class BrowserController {
             }
             case BrowserAction.WAIT : {
                 const elementController = await this.waitFor(msg);
-                // this._elementControllerArray.push(elementController);
                 this._instanceUUIDElementControllerMap.set(elementController.instanceUUID, elementController);
                 return {
                     instanceUUID : elementController.instanceUUID
@@ -530,7 +534,8 @@ export type Action = BrowserAction | ElementAction;
 
 export enum ConnectOptionType {
     URL = 'URL',
-    TITLE = 'Title'
+    TITLE = 'Title',
+    INSTANCE_UUID = 'InstanceUUID'
 }
 export enum LocatorType {
     XPATH = 'xpath',
