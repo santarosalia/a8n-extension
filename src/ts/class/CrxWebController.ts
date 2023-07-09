@@ -535,7 +535,7 @@ export type Action = BrowserAction | ElementAction;
 export enum ConnectOptionType {
     URL = 'URL',
     TITLE = 'Title',
-    INSTANCE_UUID = 'InstanceUUID'
+    INSTANCE_UUID = 'instanceUUID'
 }
 export enum LocatorType {
     XPATH = 'xpath',

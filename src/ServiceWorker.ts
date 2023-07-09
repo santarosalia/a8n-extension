@@ -264,7 +264,6 @@ const execute = async (msg : ExecuteRequestMessage) => {
         await pickBrowserControllerMap();
         // connect || else 나눠야할듯?
         if (msg.object.instanceUUID) {
-            console.log(isElement)
             if (isElement) {
                 browserController = Array.from(instanceUUIDBrowserControllerMap.values()).find(browserController => browserController.instanceUUIDElementControllerMap.has(msg.object.instanceUUID));
             } else {
@@ -272,9 +271,8 @@ const execute = async (msg : ExecuteRequestMessage) => {
             }
             if (!browserController) throw new Error('Target Lost');
         } 
-            
-    
         const result = await browserController.execute(msg);
+        instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
         
         responseMessage = {
             command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
@@ -313,15 +311,6 @@ const execute = async (msg : ExecuteRequestMessage) => {
  * @param browserControllerArray 
  * @returns 
  */
-const pickBrowserControllerArray = async (browserControllerArray : BrowserController[]) => {
-    const pickedBrowserControllerArray : BrowserController[] = [];
-    for (let bc of browserControllerArray) {
-        const check = await checkTab(bc.tab);
-        if (check) pickedBrowserControllerArray.push(bc);
-    }
-    return pickedBrowserControllerArray;
-}
-
 const pickBrowserControllerMap = async () => {
     for (const [instanceUUID, browserController] of instanceUUIDBrowserControllerMap) {
         const check = await checkTab(browserController.tab);
