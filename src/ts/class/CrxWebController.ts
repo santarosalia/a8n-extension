@@ -1,4 +1,4 @@
-import { createWindow, currentWindowTabs, findTabsByTitle, findTabsByIndex, findTabsByUrl, closeWindow, maximizeWindow, minimizeWindow, sleep, detachDebugger, generateUUID, getWindow } from "@CrxApi";
+import { createWindow, currentWindowTabs, findTabsByIndex, closeWindow, maximizeWindow, minimizeWindow, sleep, detachDebugger, generateUUID, getWindow, getAllTabs } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, KeyInput, BoundingBox, BoxModel } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
@@ -96,8 +96,12 @@ export class BrowserController {
      * @activity 브라우저 연결
      * @param title 
      */
-    private async findTabByTitle(title : string) {
-        [this._tab] = await findTabsByTitle(title);
+    private async findTabByTitle(title : string, isContains : boolean) {
+        if (isContains) {
+            this._tab = (await getAllTabs()).find(tab => tab.title.includes(title));
+        } else {
+            this._tab = (await getAllTabs()).find(tab => tab.title === title);
+        }
         await this.connect();
     }
 
@@ -119,8 +123,12 @@ export class BrowserController {
      * @activity 브라우저 연결
      * @param url 
      */
-    private async findTabByUrl(url : string) {
-        [this._tab] = await findTabsByUrl(url);
+    private async findTabByUrl(url : string, isContains : boolean) {
+        if (isContains) {
+            this._tab = (await getAllTabs()).find(tab => tab.url.includes(url));
+        } else {
+            this._tab = (await getAllTabs()).find(tab => tab.url === url);
+        }
         await this.connect();
     }
 
@@ -171,7 +179,6 @@ export class BrowserController {
         await this._page.goForward({
             waitUntil : "domcontentloaded"
         });
-
     }
 
     /**
@@ -230,13 +237,14 @@ export class BrowserController {
             case BrowserAction.CONNECT : {
                 const connectOptionType = msg.object.parameter.connectOption.type;
                 const connectOptionValue = msg.object.parameter.connectOption.value;
+                const isContains = msg.object.parameter.connectOption.isContains;
                 switch (connectOptionType) {
                     case ConnectOptionType.URL : {
-                        await this.findTabByUrl(connectOptionValue);
+                        await this.findTabByUrl(connectOptionValue, isContains);
                         break;
                     }
                     case ConnectOptionType.TITLE : {
-                        await this.findTabByTitle(connectOptionValue);
+                        await this.findTabByTitle(connectOptionValue, isContains);
                         break;
                     }
                     case ConnectOptionType.INSTANCE_UUID : {
@@ -552,7 +560,8 @@ export interface Parameter {
     url? : string
     connectOption? : {
         type : ConnectOptionType,
-        value : string
+        value : string,
+        isContains : boolean
     }
     locatorType? : LocatorType
     locator? : string

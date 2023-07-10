@@ -450,24 +450,6 @@ export const sendMessageByWindowIdToFocusedTab = async (windowId : number, comma
 
     });
 }
-/**
- * 모든 탭에서 주어진 title 에 해당하는 tab 배열을 반환합니다.
- *
- * @param title 찾을 title
- * @category Recorder
- * @category Controller
- * @example
-  ```
-    async () => {
-        const [tab] = await findTabsByTitle('네이버');
-    }
-  ```
- */
-export const findTabsByTitle = async (title : string) => {
-    return await chrome.tabs.query({}).then(tabs => {
-        return tabs.filter(tab => tab.title.includes(title));
-    });
-}
 
 /**
  * windowId에 해당하는 window의 index 에 해당하는 tab 배열을 반환합니다.
@@ -490,24 +472,6 @@ export const findTabsByIndex = async (windowId : number, index : number) => {
     });
 }
 
-/**
- * 모든 탭에서 주어진 url을 찾아 tab 배열을 반환합니다.
- *
- * @param url 찾을 url
- * @category Recorder
- * @categery Controller
- * @example
-  ```
-    async () => {
-        const [tab] = await findTabsByUrl('https://naver.com');   
-    }
-  ```
- */
-export const findTabsByUrl = (url : string) => {
-    return chrome.tabs.query({
-        url : url
-    });
-}
 /**
  * Window 최대화
  * @category Controller
@@ -573,4 +537,8 @@ export const checkTab = async (checkTab : chrome.tabs.Tab) => {
 
 export const getWindow = async (windowId : number) => {
     return await chrome.windows.get(windowId);
+}
+
+export const getAllTabs = async () => {
+    return await chrome.tabs.query({});
 }

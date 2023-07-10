@@ -7,8 +7,8 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "zip" : "npm-build-zip --source=dist/ --destination=./build",
-    "docs" : "npx typedoc --entryPointStrategy expand ./src"
+    "zip": "npm-build-zip --source=dist/ --destination=./build",
+    "docs": "npx typedoc --entryPointStrategy expand ./src"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -27,7 +27,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^1.0.14",
+    "@crxjs/vite-plugin": "^2.0.0-beta.18",
     "@vitejs/plugin-vue": "^4.1.0",
     "tslib": "^2.5.0",
     "typedoc": "^0.24.7",
@@ -36,8 +36,8 @@
     "vue-cli-plugin-vuetify": "~2.5.8"
   },
   "type": "module",
-  "volta" : {
-    "node" : "18.16.0",
-    "npm" : "9.5.1"
+  "volta": {
+    "node": "18.16.0",
+    "npm": "9.5.1"
   }
 }
