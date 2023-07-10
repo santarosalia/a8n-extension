@@ -25,7 +25,6 @@
           "runAt" : "document_start"
         }
     ],
-    "devtools_page" : "src/DevToolsPlugin.html",
     "permissions": [
         "activeTab",
         "tabs",

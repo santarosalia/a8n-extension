@@ -1,6 +1,6 @@
 import { setItemFromLocalStorage, switchFrame } from "@CrxApi";
 import { CRX_ADD_SCRAPING_DATA } from "@CrxConstants";
-import { CrxClickEvent } from "../class/CrxClass";
+import { CrxClickEvent } from "@CrxClass/CrxClickEvent";
 
 export const dataScraping = (ev : CrxClickEvent) => {
     const target = ev.target as Element;

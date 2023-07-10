@@ -4,8 +4,8 @@ import vuetify from '@/plugins/vuetify'
 import router from '@/router'
 import store from '@/store'
 import { setItemFromLocalStorage } from '@CrxApi'
-import { CRX_ADD_SCRAPING_DATA, CRX_ACTION, CRX_STATE, CRX_MSG_RECEIVER } from '@CrxConstants'
-import { CRX_COMMAND, CrxMessage } from '@CrxInterface'
+import { CRX_ADD_SCRAPING_DATA, CRX_ACTION, CRX_STATE, CRX_MSG_RECEIVER, CRX_COMMAND } from '@CrxConstants'
+import { CrxMessage } from '@CrxInterface'
 
 const storageChanged = (changes : any) => {
   if (changes.CRX_NEW_RECORD) {

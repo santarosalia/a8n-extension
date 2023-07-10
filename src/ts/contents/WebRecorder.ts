@@ -1,10 +1,13 @@
-import { CrxClickEvent, CrxInputEvent, CrxKeyEvent, CrxSelectEvent } from '@CrxClass';
-import { EVENT, CRX_NEW_RECORD, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
-import { getItemFromLocalStorage, sendMessageToServiceWorker, setItemFromLocalStorage} from '@CrxApi';
-import CrxContextMenu from '@/ts/class/CrxContextMenu';
-import { CRX_COMMAND, CRX_CONTEXT_MENU_TYPE, CrxMessage } from '@CrxInterface';
+import { EVENT, CRX_NEW_RECORD, CRX_MSG_RECEIVER, CRX_STATE, CRX_COMMAND } from "@CrxConstants";
+import { setItemFromLocalStorage} from '@CrxApi';
+import CrxContextMenu from '@CrxClass/CrxContextMenu';
+import { CRX_CONTEXT_MENU_TYPE, CrxMessage } from '@CrxInterface';
 import CrxHilightCSS from '@/css/CrxHighlight.css?raw'
 import CrxContexMenuCSS from '@/css/CrxContextMenu.css?raw'
+import { CrxClickEvent } from "@CrxClass/CrxClickEvent";
+import { CrxInputEvent } from "@CrxClass/CrxInputEvent";
+import { CrxSelectEvent } from "@CrxClass/CrxSelectEvent";
+import { CrxKeyEvent } from "@CrxClass/CrxKeyEvent";
 
 window.customElements.define('crx-contextmenu', CrxContextMenu);
 

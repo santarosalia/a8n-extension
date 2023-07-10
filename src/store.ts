@@ -1,10 +1,11 @@
 import { createStore } from "vuex";
-import { EVENT, CRX_STATE, CRX_NEW_RECORD } from '@CrxConstants'
+import { EVENT, CRX_STATE, CRX_NEW_RECORD, CRX_COMMAND } from '@CrxConstants'
 import { getItemFromLocalStorage, setItemFromLocalStorage, sendMessageToServiceWorker, switchFrame, editImage} from "@CrxApi";
 import { toRaw } from "vue";
-import { CapturedEvent, CrxDataScrapingEvent } from "@CrxClass";
-import { CRX_COMMAND, CRX_CONTEXT_MENU_TYPE, ScrapingDatas } from "@CrxInterface";
+import { CRX_CONTEXT_MENU_TYPE, ScrapingDatas } from "@CrxInterface";
 import router from "@/router";
+import { CrxCapturedEvent } from "@CrxClass/CrxCapturedEvent";
+import { CrxDataScrapingEvent } from "@CrxClass/CrxDataScrapingEvent";
 
 const getInitState = () => {
     const state = {
@@ -87,8 +88,8 @@ export default createStore({
         async ADD_NEW_RECORD({ getters }, payload) {
 
             const records = toRaw(getters[CRX_STATE.CRX_RECORDS]);
-            const newVal = payload.newValue as CapturedEvent;
-            const oldVal = payload.oldValue as CapturedEvent;   
+            const newVal = payload.newValue as CrxCapturedEvent;
+            const oldVal = payload.oldValue as CrxCapturedEvent;   
 
             if (oldVal && oldVal.type === EVENT.INPUT && newVal.type === EVENT.INPUT) {
                 records.pop();

@@ -1,10 +1,11 @@
 import CrxHilightCSS from '@/css/CrxHighlight.css?raw';
 import CrxSelectorDisplayCSS from '@/css/CrxSelectorDisplay.css?raw';
-import { CRX_COMMAND, CrxMessage } from '@CrxInterface';
-import { CRX_MSG_RECEIVER, EVENT } from '@CrxConstants';
-import { CrxClickEvent, CrxMousemoveEvent } from '@CrxClass';
-import { sendMessageToServiceWorker, showNotification } from '@CrxApi';
+import { CrxMessage } from '@CrxInterface';
+import { CRX_COMMAND, CRX_MSG_RECEIVER, EVENT } from '@CrxConstants';
+import { sendMessageToServiceWorker } from '@CrxApi';
 import CrxSelectorDisplay from '@/ts/class/CrxSelectorDisplay';
+import { CrxClickEvent } from '@CrxClass/CrxClickEvent';
+import { CrxMousemoveEvent } from '@CrxClass/CrxMouseMoveEvent';
 
 window.customElements.define('crx-selector-display', CrxSelectorDisplay);
 

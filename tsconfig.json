@@ -21,7 +21,7 @@
         "paths": {
             "@/*": ["src/*"],
             "tslib" : ["path/to/node_modules/tslib/tslib.d.ts"],
-            "@CrxClass" : ["src/ts/class/CrxClass.ts"],
+            "@CrxClass/*" : ["src/ts/class/*"],
             "@CrxApi" : ["src/ts/api/CrxApi.ts"],
             "@CrxConstants" : ["src/ts/constants/CrxConstants.ts"],
             "@CrxInterface" : ["src/ts/interface/CrxInterface.ts"],            

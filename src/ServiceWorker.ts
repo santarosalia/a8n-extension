@@ -1,5 +1,5 @@
-import { CrxInfo, CrxBrowserOpenEvent, CrxPopupEvent } from "@CrxClass";
-import { setItemFromLocalStorage,
+import { 
+    setItemFromLocalStorage,
     createViewTab,
     openViewWindow,
     createRecordingTargetTab,
@@ -15,13 +15,15 @@ import { setItemFromLocalStorage,
     showNotification,
     focusTab,
     allTabReload,
-    sendMessageByWindowIdToFocusedTab,
-    detachDebugger,
     checkTab
 } from "@CrxApi";
-import { CRX_ADD_SCRAPING_DATA, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE, EVENT} from "@CrxConstants";
-import { CrxMessage, CRX_COMMAND } from "@CrxInterface";
-import {BrowserAction, BrowserController, BrowserType, ElementAction, LocatorType, ExecuteRequestMessage, ExecuteResponseMessage, Status, BrowserCheckRequestMessage, BrowserCheckReponseMessage } from "@/ts/class/CrxWebController";
+import { BrowserType, CRX_ADD_SCRAPING_DATA, CRX_COMMAND, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE } from "@CrxConstants";
+import { BrowserCheckReponseMessage, BrowserCheckRequestMessage, CrxMessage, ExecuteRequestMessage, ExecuteResponseMessage } from "@CrxInterface";
+import { BrowserController } from "@/ts/class/CrxBrowserController";
+import { BrowserAction, ElementAction, Status } from "@CrxConstants";
+import { CrxInfo } from "@CrxClass/CrxInfo";
+import { CrxBrowserOpenEvent } from "@CrxClass/CrxBrowserOpenEvent";
+import { CrxPopupEvent } from "@CrxClass/CrxPopupEvent";
 
 
 const crxInfo = new CrxInfo();
@@ -214,7 +216,7 @@ chrome.tabs.onCreated.addListener(async tab => {
 port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckReponseMessage) => {
     const command = msg.command;
     switch (command) {
-        case CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY : {
+        case CRX_COMMAND.CMD_CRX_EXECUTE_ACTION : {
             console.log('-REQ-')
             console.log(msg)
             const responseMessage = await execute(msg as ExecuteRequestMessage);
@@ -275,7 +277,7 @@ const execute = async (msg : ExecuteRequestMessage) => {
         instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
         
         responseMessage = {
-            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
+            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
             tranId : msg.tranId,
             responseInfo : {
                 result : Status.SUCCESS,
@@ -295,7 +297,7 @@ const execute = async (msg : ExecuteRequestMessage) => {
         }
     } catch (e : any) {
         responseMessage = {
-            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTIVITY,
+            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
             tranId : msg.tranId,
             responseInfo : {
                 result : Status.ERROR,

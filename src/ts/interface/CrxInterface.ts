@@ -1,10 +1,14 @@
+import { KeyInput } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry"
+import { Action } from "@/ts/type/CrxType"
+import { BrowserType, CRX_COMMAND, ConnectOptionType, LocatorType, Status } from "@CrxConstants"
+
 export interface TopbarMenuDetails {
     title : string
     index : number
     path : string
 }
 
-export interface CapturedEventDetails extends EventDetails {
+export interface CrxCapturedEventDetails extends CrxEventDetails {
     localName : string
     textContent : string
     id : string
@@ -24,7 +28,7 @@ export interface CapturedEventDetails extends EventDetails {
     attribute : Locator
 }
 
-export interface EventDetails {
+export interface CrxEventDetails {
     AT_TARGET : number
     BUBBLING_PHASE : number
     CAPTURING_PHASE : number
@@ -113,44 +117,10 @@ export interface Locator {
     value : string
 }
 
-export enum LocatorType {
-    Xpath = 'xpath',
-    FullXpath = 'fullXpath',
-    LinkTextXpath = 'linkTextXpath',
-    CssSelector = 'cssSelector'
-}
-
 export interface CrxMessage {
     receiver : string
     command : CRX_COMMAND
     payload? : any
-}
-
-export enum CRX_COMMAND {
-    NONE = 'NONE',
-    CMD_RECORDING_START = 'CMD_RECORDING_START',
-    CMD_RECORDING_END = 'CMD_RECORDING_END',
-    CMD_STORE_CAPTURED_EVENT = 'CMD_STORE_CAPTURED_EVENT',
-    CMD_RECORDING_WINDOW_FOCUS = 'CMD_RECORDING_WINDOW_FOCUS',
-    CMD_CAPTURE_IMAGE = 'CMD_CAPTURE_IMAGE',
-    CMD_SEND_EVENT = 'CMD_SEND_EVENT',
-    CMD_OPEN_VIEW = 'CMD_OPEN_VIEW',
-    CMD_CONTEXT_MENU_CHANGE = 'CMD_CONTEXT_MENU_CHANGE',
-    CMD_SEND_NEXT_PAGE_BUTTON = 'CMD_SEND_NEXT_PAGE_BUTTON',
-    CMD_SEND_NEXT_PAGE_NUMBER = 'CMD_SEND_NEXT_PAGE_NUMBER',
-    CMD_WD_WINDOW_CHECK = 'CMD_WD_WINDOW_CHECK',
-    CMD_CREATE_ACTIVITY = 'CMD_CREATE_ACTIVITY',
-    CMD_LAUNCH_WEB_RECORDER = 'CMD_LAUNCH_WEB_RECORDER',
-    CMD_LAUNCH_WEB_SELECTOR = 'CMD_LAUNCH_WEB_SELECTOR',
-    CMD_KILL_WEB_SELECTOR = 'CMD_KILL_WEB_SELECTOR',
-    CMD_SELECTOR_START = 'CMD_SELECTOR_START',
-    CMD_SELECTOR_END = 'CMD_SELECTOR_END',
-    CMD_SEND_LOCATORS = 'CMD_SEND_LOCATORS',
-    CMD_SHOW_NOTIFICATION = 'CMD_SHOW_NOTIFICATION',
-    CMD_OPEN_BROWSER = 'CMD_OPEN_BROWSER',
-    CMD_WEB_CONTROL = 'CMD_WEB_CONTROL',
-    CMD_CRX_EXECUTE_ACTIVITY = 'Cmd_CRX_ExecuteActivity',
-    CMD_WB_CHECK_BROWSER_LAUNCH = 'Cmd_WB_CheckBrowserLaunch'
 }
 
 export enum CRX_CONTEXT_MENU_TYPE {
@@ -169,4 +139,79 @@ interface ScrapingData {
     pattern : string
     textData : string[][]
     exceptColumn : number[]
+}
+
+export interface ExecuteRequestMessage {
+    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION | CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH
+    object : {
+        instanceUUID? : string
+        action? : Action
+        parameter? : ExecuteActionParameter
+    }
+    tranId :number
+}
+
+export interface ExecuteResponseMessage {
+    command : string,
+    tranId : number,
+    responseInfo : {
+        result : Status,
+        errorMessage? : string,
+    }
+    object? : {
+        textContent? : string,
+        propertyValue? : string
+        x? : number
+        y? : number
+        width? : number
+        height? : number
+        exists? : boolean,
+        tagName? : string
+        instanceUUID? : string
+        image? : string
+    }
+}
+
+export interface BrowserCheckRequestMessage {
+    command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
+    tranId : number,
+    responseInfo : null,
+    object : {
+        browserType : BrowserType,
+        instanceUUID : string
+    }
+}
+
+export interface BrowserCheckReponseMessage {
+    command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
+    tranId : number,
+    responseInfo : {
+        result : Status,
+        errorMessage : string
+    },
+    object : {
+        isBrowserLaunch : boolean
+    }
+}
+
+export interface ExecuteActionParameter {
+    timeout? : number
+    url? : string
+    connectOption? : {
+        type : ConnectOptionType,
+        value : string,
+        isContains : boolean
+    }
+    locatorType? : LocatorType
+    locator? : string
+    text? : string
+    propertyName? : string
+    frameName? : string
+    key? : KeyInput
+    check? : string
+    selectValue? : string
+    x? : number
+    y? : number
+    tabIndex? : number
+    browserType? : BrowserType
 }

@@ -1,7 +1,7 @@
-import { CRX_MSG_RECEIVER, CRX_NEW_RECORD } from "@CrxConstants";
+import { CRX_COMMAND, CRX_MSG_RECEIVER, CRX_NEW_RECORD } from "@CrxConstants";
 import { EVENT } from "@CrxConstants";
-import { CapturedEvent, CrxMoveTabEvent } from "@CrxClass";
-import { CRX_COMMAND, CrxMessage } from '@CrxInterface'
+import { CrxMoveTabEvent } from "@CrxClass/CrxMoveTabEvent";
+import { CrxCapturedEvent } from "@CrxClass/CrxCapturedEvent";
 
 /**
  * Chrome Local Storage 에서 주어진 키들에 해당하는 값을 불러옵니다.
@@ -188,7 +188,7 @@ export const resetFrame = () => {
  * @param e CapturedEvent
  * @returns 
  */
-export const switchFrame = (e : CapturedEvent) => {
+export const switchFrame = (e : CrxCapturedEvent) => {
     return {
         type : EVENT.SWITCHFRAME,
         frameStack : e.frameStack.reverse()

@@ -1,8 +1,8 @@
 import { webRecorder } from "@/ts/contents/WebRecorder";
 import { webSelector } from "@/ts/contents/WebSelector";
-import { getItemFromLocalStorage, sendMessageToServiceWorker, showNotification } from "@CrxApi";
-import { CRX_COMMAND, CrxMessage } from "@CrxInterface";
-import { CRX_MSG_RECEIVER, CRX_STATE, EVENT } from "@CrxConstants";
+import { getItemFromLocalStorage } from "@CrxApi";
+import { CrxMessage } from "@CrxInterface";
+import { CRX_COMMAND, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
 
 const contentScript = async (message : CrxMessage) => {
     if (message.receiver !== CRX_MSG_RECEIVER.CONTENT_SCRIPT) return;

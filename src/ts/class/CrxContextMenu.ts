@@ -1,8 +1,10 @@
 import { getItemFromLocalStorage, sendMessageToServiceWorker, setItemFromLocalStorage } from "@CrxApi";
-import { CrxClickEvent, CrxContextMenuEvent, CrxReadAttributeEvent } from "@CrxClass";
-import { CRX_NEW_RECORD, CRX_STATE, EVENT } from "@CrxConstants";
+import { CRX_COMMAND, CRX_NEW_RECORD, CRX_STATE, EVENT } from "@CrxConstants";
 import { dataScraping } from "@/ts/contents/DataScraping";
-import { CRX_COMMAND, CRX_CONTEXT_MENU_TYPE } from "@CrxInterface";
+import { CRX_CONTEXT_MENU_TYPE } from "@CrxInterface";
+import { CrxClickEvent } from "@CrxClass/CrxClickEvent";
+import { CrxReadAttributeEvent } from "@CrxClass/CrxReadAttributeEvent";
+import { CrxContextMenuEvent } from "@CrxClass/CrxContextMenuEvent";
 const normalMenu = [
     {
         title : '텍스트 읽기',
