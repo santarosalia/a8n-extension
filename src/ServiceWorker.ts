@@ -209,8 +209,8 @@ chrome.tabs.onCreated.addListener(async tab => {
             instanceUUID : browserController.instanceUUID
         }
     }
-    console.log('Browser Check REQ')
-    console.log(msg);
+    // console.log('Browser Check REQ')
+    // console.log(msg);
     port.postMessage(msg);
 });
 port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckReponseMessage) => {
@@ -228,8 +228,8 @@ port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckRepo
         case CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH : {
             // if (msg.tranId !== tranId) return;
             msg = msg as BrowserCheckReponseMessage;
-            console.log('Browser Check RES')
-            console.log(msg)
+            // console.log('Browser Check RES')
+            // console.log(msg)
             if (msg.object.isBrowserLaunch) {
                 const browserController = tranIdBrowserControllerMap.get(tranId);
                 instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);

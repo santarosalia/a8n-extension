@@ -1,6 +1,4 @@
 import { 
-    createWindow,
-    currentWindowTabs,
     findTabsByIndex,
     maximizeWindow,
     minimizeWindow,
@@ -187,26 +185,31 @@ export class BrowserController {
      * @activity 경고
      */
     private async handleAlert(alertOption : AlertOption) {
-        let result : string | boolean;
+        const exists = this._dialog !== undefined;
+        const dialogMessage = this._dialog.message();
+        let result = {
+            textContent : dialogMessage,
+            exists : exists
+        };
+
         switch (alertOption) {
             case AlertOption.ACCEPT : {
                 await this._dialog.accept();
+                this._dialog = undefined;
                 break;
             }
             case AlertOption.DISMISS : {
                 await this._dialog.dismiss();
+                this._dialog = undefined;
                 break;
             }
             case AlertOption.EXISTS : {
-                result = this._dialog !== undefined;
                 break;
             }
             case AlertOption.READ : {
-                result = this._dialog.message();
                 break;
             }
         }
-        this._dialog = undefined;
         return result;
     }
 
@@ -256,7 +259,6 @@ export class BrowserController {
                     }
                 }
 
-                // await this.handleAlert(acceptAlert);
                 break;
             }
             case BrowserAction.CLOSE : {
@@ -323,24 +325,13 @@ export class BrowserController {
             case BrowserAction.HANDLE_ALERT : {
                 const alertOption = msg.object.parameter.alertOption;
                 const result = await this.handleAlert(alertOption);
-                switch (alertOption) {
-                    case AlertOption.EXISTS : {
-                        return {
-                            exists : result as boolean
-                        }
-                    }
-                    case AlertOption.READ : {
-                        return {
-                            textContent : result as string
-                        }
-                    }
-                    default : break;
-                }
+                return {
+                    textContent : result.textContent,
+                    exists : result.exists
+                };
             }
             case ElementAction.LEFT_CLICK : {
                 await elementController.leftClick();
-                
-                // await this.dialog.accept();
                 break;
             }
             case ElementAction.RIGHT_CLICK : {
