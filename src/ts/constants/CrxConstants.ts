@@ -132,7 +132,6 @@ export enum Status {
 
 
 export enum BrowserAction {
-    OPEN = 'open',
     CONNECT = 'connect',
     SWITCH_FRAME = 'switchFrame',
     RESET_FRAME = 'resetFrame',
@@ -145,6 +144,7 @@ export enum BrowserAction {
     GO_FORWARD = 'goForward',
     SWITCH_TAB = 'switchTab',
     WAIT = 'wait',
+    HANDLE_ALERT = 'handleAlert'
 }
 
 export enum ElementAction {
@@ -174,6 +174,11 @@ export enum ConnectOptionType {
 export enum BrowserType {
     CHROME = 'Chrome',
     EDGE = 'Edge'
+}
+
+export enum CloseTarget {
+    TAB = 'tab',
+    WINDOW = 'window'
 }
 
 export enum LocatorType {
@@ -208,4 +213,11 @@ export enum CRX_COMMAND {
     CMD_WEB_CONTROL = 'CMD_WEB_CONTROL',
     CMD_CRX_EXECUTE_ACTION = 'Cmd_CRX_ExecuteAction',
     CMD_WB_CHECK_BROWSER_LAUNCH = 'Cmd_WB_CheckBrowserLaunch'
+}
+
+export enum AlertOption {
+    ACCEPT = 'accept',
+    DISMISS = 'dismiss',
+    READ = 'read',
+    EXISTS = 'exists'
 }

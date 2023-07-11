@@ -1,6 +1,6 @@
 import { KeyInput } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry"
 import { Action } from "@/ts/type/CrxType"
-import { BrowserType, CRX_COMMAND, ConnectOptionType, LocatorType, Status } from "@CrxConstants"
+import { AlertOption, BrowserType, CRX_COMMAND, CloseTarget, ConnectOptionType, LocatorType, Status } from "@CrxConstants"
 
 export interface TopbarMenuDetails {
     title : string
@@ -214,4 +214,6 @@ export interface ExecuteActionParameter {
     y? : number
     tabIndex? : number
     browserType? : BrowserType
+    target? : CloseTarget
+    alertOption? : AlertOption
 }

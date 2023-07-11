@@ -313,7 +313,6 @@ export const sendMessageToView = async (windowId : number, command : CRX_COMMAND
  *
  * @param windowId Window ID
  * @category Recorder
- * @category Controller
  * @example
   ```
     async () => {
@@ -541,4 +540,8 @@ export const getWindow = async (windowId : number) => {
 
 export const getAllTabs = async () => {
     return await chrome.tabs.query({});
+}
+
+export const closeTab = async (tab : chrome.tabs.Tab) => {
+    return await chrome.tabs.remove(tab.id);
 }

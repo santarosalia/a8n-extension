@@ -292,7 +292,7 @@ const execute = async (msg : ExecuteRequestMessage) => {
                 exists : result ? result.exists : null,
                 tagName : result ? result.tagName : null,
                 image : result ? result.image : null,
-                instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID
+                instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID,
             }
         }
     } catch (e : any) {

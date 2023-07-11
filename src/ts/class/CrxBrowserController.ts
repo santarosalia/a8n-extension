@@ -2,21 +2,22 @@ import {
     createWindow,
     currentWindowTabs,
     findTabsByIndex,
-    closeWindow,
     maximizeWindow,
     minimizeWindow,
     sleep,
     detachDebugger,
     generateUUID,
     getWindow,
-    getAllTabs 
+    getAllTabs, 
+    closeWindow,
+    closeTab
 } from "@CrxApi";
-import { Browser, Page, ElementHandle, Frame } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
+import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
 import { ExecuteRequestMessage } from "@CrxInterface";
 import { ElementController } from "@CrxClass/CrxElementController";
-import { BrowserAction, BrowserType, ConnectOptionType, ElementAction, LocatorType } from "@CrxConstants";
+import { AlertOption, BrowserAction, BrowserType, CloseTarget, ConnectOptionType, ElementAction, LocatorType } from "@CrxConstants";
 
 export class BrowserController {
     private _window : chrome.windows.Window
@@ -27,6 +28,7 @@ export class BrowserController {
     private _instanceUUIDElementControllerMap : Map<string, ElementController>
     private _frame : Frame
     private _browserType : BrowserType
+    private _dialog : Dialog
 
     constructor (tab? : chrome.tabs.Tab) {
         this._instanceUUIDElementControllerMap = new Map<string, ElementController>();
@@ -72,24 +74,9 @@ export class BrowserController {
         });
         [this._page] = await this._instance.pages();
         this._frame = this._page.mainFrame();
-    }
-    /**
-     * CrxApi 윈도우 생성하여 Window Instance 설정
-     * 
-     * Window ID 로 Tab 검색하여 Tab Instance 설정
-     * 
-     * connect 실행
-     * @deprecated
-     */
-    private async open() {
-        this._window = await createWindow();
-        [this._tab] = await currentWindowTabs(this._window.id);
-        await this.connect();
-        this._page.on('dialog', async (d)=>{
-            d.accept();
-            d.message();
+        this._page.on('dialog', dialog => {
+            this._dialog = dialog;
         });
-        
     }
 
     /**
@@ -124,7 +111,6 @@ export class BrowserController {
      * @peon connect
      * @activity 브라우저 연결
      * @param index 
-     * @deprecated 지원 검토 중
      */
     private async findTabByIndex(index : number) {
         [this._tab] = await findTabsByIndex(this._window.id, index);
@@ -196,15 +182,32 @@ export class BrowserController {
     }
 
     /**
-     * window.alert 으로 띄워진 얼럿 처리 기능
-     * @deprecated 지원 예정
-     * @peon alert
+     * window.alert 으로 띄워진 얼럿 처리
+     * @peon handleAlert
      * @activity 경고
      */
-    private async handleAlert() {
-        this._page.on('dialog', dialog => {
-            dialog.accept();
-        });
+    private async handleAlert(alertOption : AlertOption) {
+        let result : string | boolean;
+        switch (alertOption) {
+            case AlertOption.ACCEPT : {
+                await this._dialog.accept();
+                break;
+            }
+            case AlertOption.DISMISS : {
+                await this._dialog.dismiss();
+                break;
+            }
+            case AlertOption.EXISTS : {
+                result = this._dialog !== undefined;
+                break;
+            }
+            case AlertOption.READ : {
+                result = this._dialog.message();
+                break;
+            }
+        }
+        this._dialog = undefined;
+        return result;
     }
 
     /**
@@ -230,24 +233,10 @@ export class BrowserController {
         const isElement = Object.values(ElementAction).includes(action as any);
 
         if (isElement) {
-            if (targetInstanceUUID) {
-                elementController = this._instanceUUIDElementControllerMap.get(targetInstanceUUID);
-            } 
-            // else {
-            //     elementController = await this.waitFor(msg);
-            //     this._elementControllerArray.push(elementController);
-            // }
+            elementController = this._instanceUUIDElementControllerMap.get(targetInstanceUUID);
         }
         
         switch(action) {
-            // case BrowserAction.OPEN : {
-            //     await this.open();
-            //     await this.goTo(msg.object.parameter.url);
-            //     this._browserType = await this._page.evaluate(() => {
-            //         return window.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME;
-            //     });
-            //     break;
-            // }
             case BrowserAction.CONNECT : {
                 const connectOptionType = msg.object.parameter.connectOption.type;
                 const connectOptionValue = msg.object.parameter.connectOption.value;
@@ -266,10 +255,22 @@ export class BrowserController {
                         break;
                     }
                 }
+
+                // await this.handleAlert(acceptAlert);
                 break;
             }
             case BrowserAction.CLOSE : {
-                await closeWindow(this._window.id);
+                const target = msg.object.parameter.target;
+                switch (target) {
+                    case CloseTarget.TAB : {
+                        await closeTab(this._tab);
+                        break;
+                    }
+                    case CloseTarget.WINDOW : {
+                        await closeWindow(this._window.id);
+                        break;
+                    }
+                }
                 break;
             }
             case BrowserAction.WAIT : {
@@ -278,7 +279,6 @@ export class BrowserController {
                 return {
                     instanceUUID : elementController.instanceUUID
                 };
-                break;
             }
             case BrowserAction.SWITCH_FRAME : {
                 await this.switchFrame(msg);
@@ -320,8 +320,27 @@ export class BrowserController {
                 await this.findTabByIndex(tabIndex);
                 break;
             }
+            case BrowserAction.HANDLE_ALERT : {
+                const alertOption = msg.object.parameter.alertOption;
+                const result = await this.handleAlert(alertOption);
+                switch (alertOption) {
+                    case AlertOption.EXISTS : {
+                        return {
+                            exists : result as boolean
+                        }
+                    }
+                    case AlertOption.READ : {
+                        return {
+                            textContent : result as string
+                        }
+                    }
+                    default : break;
+                }
+            }
             case ElementAction.LEFT_CLICK : {
                 await elementController.leftClick();
+                
+                // await this.dialog.accept();
                 break;
             }
             case ElementAction.RIGHT_CLICK : {
