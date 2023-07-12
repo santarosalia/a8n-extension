@@ -428,7 +428,7 @@ export class BrowserController {
         const locator = msg.object.parameter.locator;
         const locatorType = msg.object.parameter.locatorType;
         const timeout = msg.object.parameter.timeout;
-        const defaultTimeout = 2000;
+        const defaultTimeout = 1000;
         let elementHandle : ElementHandle | void;
         switch(locatorType) {
             case LocatorType.XPATH : {
