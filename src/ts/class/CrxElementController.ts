@@ -5,14 +5,23 @@ import { ElementHandle, KeyInput } from "puppeteer-core/lib/cjs/puppeteer/api-do
 export class ElementController {
     private _elementHandle : ElementHandle
     private _instanceUUID : string
+    private _exists : boolean
 
-    constructor(elementHandle : ElementHandle) {
-        this._elementHandle = elementHandle;
+    constructor(elementHandle : ElementHandle | void) {
+        if (typeof(elementHandle) === 'undefined') {
+            this._exists = false;
+        } else {
+            this._elementHandle = elementHandle;
+            this._exists = true;
+        }
         this._instanceUUID = generateUUID();
     }
 
     get instanceUUID() {
         return this._instanceUUID;
+    }
+    get exists() {
+        return this._exists;
     }
 
     /**

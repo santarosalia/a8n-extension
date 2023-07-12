@@ -359,9 +359,8 @@ export class BrowserController {
                 };
             }
             case ElementAction.EXISTS : {
-                const exists = elementController ? true : false;
                 return {
-                    exists : exists
+                    exists : elementController.exists
                 };
             }
             case ElementAction.GET_PROPERTY : {
@@ -427,22 +426,23 @@ export class BrowserController {
         const locator = msg.object.parameter.locator;
         const locatorType = msg.object.parameter.locatorType;
         const timeout = msg.object.parameter.timeout;
-        let elementHandle : ElementHandle;
-
+        const defaultTimeout = 2000;
+        let elementHandle : ElementHandle | void;
         switch(locatorType) {
             case LocatorType.XPATH : {
                 elementHandle = await this._frame.waitForXPath(locator, {
-                    timeout : timeout
-                });
+                    timeout : timeout === 0 ? defaultTimeout : timeout
+                }).catch(e => {});
                 break;
             }
             case LocatorType.CSS_SELECTOR : {
                 elementHandle = await this._frame.waitForSelector(locator, {
-                    timeout : timeout
-                });
+                    timeout : timeout === 0 ? defaultTimeout : timeout
+                }).catch(e => {});
                 break;
             }
         }
+        console.log(elementHandle)
         return new ElementController(elementHandle);
     }
 
