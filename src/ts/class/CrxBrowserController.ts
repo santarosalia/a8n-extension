@@ -101,6 +101,7 @@ export class BrowserController {
         } else {
             this._tab = (await getAllTabs()).find(tab => tab.title === title);
         }
+        if (typeof(this._tab) === 'undefined') throw new Error('Not Exists');
         await this.connect();
     }
 
@@ -127,6 +128,7 @@ export class BrowserController {
         } else {
             this._tab = (await getAllTabs()).find(tab => tab.url === url);
         }
+        if (typeof(this._tab) === 'undefined') throw new Error('Not Exists');
         await this.connect();
     }
 
@@ -442,7 +444,6 @@ export class BrowserController {
                 break;
             }
         }
-        console.log(elementHandle)
         return new ElementController(elementHandle);
     }
 

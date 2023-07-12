@@ -155,8 +155,7 @@ export class ElementController {
      * @activity 체크박스 선택
      * @param value 
      */
-    async setCheckBoxState(value : string) {
-        const check = value === 'True' ? true : false;
+    async setCheckBoxState(check : boolean) {
         if (check) {
             await this._elementHandle.evaluate(async node => {
                 const element = node as HTMLInputElement;

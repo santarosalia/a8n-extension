@@ -208,7 +208,7 @@ export interface ExecuteActionParameter {
     propertyName? : string
     frameName? : string
     key? : KeyInput
-    check? : string
+    check? : boolean
     selectValue? : string
     x? : number
     y? : number

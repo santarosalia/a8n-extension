@@ -272,7 +272,10 @@ const execute = async (msg : ExecuteRequestMessage) => {
                 browserController = instanceUUIDBrowserControllerMap.get(msg.object.instanceUUID);
             }
             if (!browserController) throw new Error('Target Lost');
-        } 
+        } else {
+            browserController = new BrowserController();
+            instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
+        }
         const result = await browserController.execute(msg);
         instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
         
