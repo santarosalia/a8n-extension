@@ -29,8 +29,8 @@
 
 ## Version
 
-- default `YY.MM.dd`
-- hotfix `YY.MM.dd.1` ...
+- default `YYMM.dd.0`
+- hotfix `YYMM.dd.1` ...
 
 ### NPM Version
 - 9.5.1

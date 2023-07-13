@@ -434,13 +434,17 @@ export class BrowserController {
             case LocatorType.XPATH : {
                 elementHandle = await this._frame.waitForXPath(locator, {
                     timeout : timeout === 0 ? defaultTimeout : timeout
-                }).catch(e => {});
+                }).catch(e => {
+                    console.log(e);
+                });
                 break;
             }
             case LocatorType.CSS_SELECTOR : {
                 elementHandle = await this._frame.waitForSelector(locator, {
                     timeout : timeout === 0 ? defaultTimeout : timeout
-                }).catch(e => {});
+                }).catch(e => {
+                    console.log(e);
+                });
                 break;
             }
         }
