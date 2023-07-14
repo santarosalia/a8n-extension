@@ -24,6 +24,7 @@ import { BrowserAction, ElementAction, Status } from "@CrxConstants";
 import { CrxInfo } from "@CrxClass/CrxInfo";
 import { CrxBrowserOpenEvent } from "@CrxClass/CrxBrowserOpenEvent";
 import { CrxPopupEvent } from "@CrxClass/CrxPopupEvent";
+import { test } from "./ts/api/CrxPuppeteerTest";
 
 
 const crxInfo = new CrxInfo();
@@ -196,7 +197,7 @@ const tranIdBrowserControllerMap = new Map<number, BrowserController>();
 
 // Native Messaging
 var port = chrome.runtime.connectNative('worktronics.browser_automation.chrome');
-chrome.tabs.onCreated.addListener(async tab => {
+chrome.tabs.onCreated.addListener(tab => {
     const browserController = new BrowserController(tab);
     tranId++;
     tranIdBrowserControllerMap.set(tranId, browserController);
@@ -209,12 +210,13 @@ chrome.tabs.onCreated.addListener(async tab => {
             instanceUUID : browserController.instanceUUID
         }
     }
-    // console.log('Browser Check REQ')
-    // console.log(msg);
+    console.log('Browser Check REQ')
+    console.log(msg);
     port.postMessage(msg);
 });
 port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckReponseMessage) => {
     const command = msg.command;
+    console.log(instanceUUIDBrowserControllerMap);
     switch (command) {
         case CRX_COMMAND.CMD_CRX_EXECUTE_ACTION : {
             console.log('-REQ-')
@@ -226,15 +228,15 @@ port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckRepo
             break;
         }
         case CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH : {
-            // if (msg.tranId !== tranId) return;
             msg = msg as BrowserCheckReponseMessage;
-            // console.log('Browser Check RES')
-            // console.log(msg)
+            console.log('Browser Check RES')
+            console.log(msg)
             if (msg.object.isBrowserLaunch) {
                 const browserController = tranIdBrowserControllerMap.get(tranId);
                 instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
             }
             tranIdBrowserControllerMap.delete(tranId);
+            console.log(instanceUUIDBrowserControllerMap)
             break;
         }
     }
@@ -322,3 +324,5 @@ const pickBrowserControllerMap = async () => {
         if (!check) instanceUUIDBrowserControllerMap.delete(instanceUUID);
     }
 }
+
+// chrome.action.onClicked.addListener(test);

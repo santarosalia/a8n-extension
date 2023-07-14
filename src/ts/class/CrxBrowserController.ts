@@ -432,7 +432,12 @@ export class BrowserController {
         let elementHandle : ElementHandle | void;
         switch(locatorType) {
             case LocatorType.XPATH : {
-                elementHandle = await this._frame.waitForXPath(locator, {
+                // elementHandle = await this._frame.waitForXPath(locator, {
+                //     timeout : timeout === 0 ? defaultTimeout : timeout
+                // }).catch(e => {
+                //     console.log(e);
+                // });
+                elementHandle = await this._frame.waitForSelector('xpath/'+locator, {
                     timeout : timeout === 0 ? defaultTimeout : timeout
                 }).catch(e => {
                     console.log(e);
