@@ -75,6 +75,7 @@ export class BrowserController {
         this._page.on('dialog', dialog => {
             this._dialog = dialog;
         });
+        await sleep(1000);
     }
 
     /**
@@ -435,7 +436,7 @@ export class BrowserController {
                 elementHandle = await this._frame.waitForXPath(locator, {
                     timeout : timeout === 0 ? defaultTimeout : timeout
                 }).catch(e => {
-                    console.log(e);
+                    console.error(e);
                 });
                 break;
             }
@@ -443,7 +444,7 @@ export class BrowserController {
                 elementHandle = await this._frame.waitForSelector(locator, {
                     timeout : timeout === 0 ? defaultTimeout : timeout
                 }).catch(e => {
-                    console.log(e);
+                    console.error(e);
                 });
                 break;
             }
@@ -460,8 +461,9 @@ export class BrowserController {
     private async switchFrame(msg : ExecuteRequestMessage) {
         const frameName = msg.object.parameter.frameName;
         const frames = this._frame.childFrames();
-        this._frame = frames.find(frame => frame.name() === frameName);
-        await sleep(1000);
+        this._frame = frames.find(frame => frame.name().includes(frameName));
+        if (this._frame === undefined) throw new Error('Not Found');
+        await sleep(2000);
     }
     /**
      * 프레임 초기화

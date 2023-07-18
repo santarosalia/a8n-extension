@@ -216,7 +216,6 @@ chrome.tabs.onCreated.addListener(tab => {
 });
 port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckReponseMessage) => {
     const command = msg.command;
-    console.log(instanceUUIDBrowserControllerMap);
     switch (command) {
         case CRX_COMMAND.CMD_CRX_EXECUTE_ACTION : {
             console.log('-REQ-')
@@ -236,7 +235,6 @@ port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckRepo
                 instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
             }
             tranIdBrowserControllerMap.delete(tranId);
-            console.log(instanceUUIDBrowserControllerMap)
             break;
         }
     }
