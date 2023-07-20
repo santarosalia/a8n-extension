@@ -13,7 +13,7 @@ window.customElements.define('crx-contextmenu', CrxContextMenu);
 
 let contextMenuType = CRX_CONTEXT_MENU_TYPE.NORMAL;
 let crxContextMenu = new CrxContextMenu(0, 0, null, contextMenuType);
-let webRecorderStatus : boolean = false;
+let browserRecorderStatus : boolean = false;
 
 const clickEventHandler = (ev : MouseEvent) => {
     const target = ev.target as Element;
@@ -65,7 +65,7 @@ const contextmenuEventHandler = (ev : Event) => {
 const isContextMenu = (target : Element) => {
     return target.closest('crx-contextmenu');
 }
-const WebRecorderEventHandler =  (ev : Event) => {
+const browserRecorderEventHandler =  (ev : Event) => {
     
     switch (ev.type) {
         case EVENT.INPUT : {
@@ -112,36 +112,36 @@ const WebRecorderEventHandler =  (ev : Event) => {
     }
 }
 
-const webRecorderStart = () => {
-    window.addEventListener(EVENT.CLICK, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.CONTEXTMENU, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.SCROLL, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.INPUT, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.WHEEL, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.MOUSEOVER, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.MOUSEOUT, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.KEYDOWN, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.MOUSEUP, WebRecorderEventHandler, true);
-    window.addEventListener(EVENT.MOUSEDOWN, WebRecorderEventHandler, true);
+const browserRecorderStart = () => {
+    window.addEventListener(EVENT.CLICK, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.CONTEXTMENU, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.SCROLL, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.INPUT, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.WHEEL, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.MOUSEOVER, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.MOUSEOUT, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.KEYDOWN, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.MOUSEUP, browserRecorderEventHandler, true);
+    window.addEventListener(EVENT.MOUSEDOWN, browserRecorderEventHandler, true);
 }
 
-const webRecorderEnd = () => {
-    window.removeEventListener(EVENT.CLICK, WebRecorderEventHandler);
-    window.removeEventListener(EVENT.SCROLL, WebRecorderEventHandler);
-    window.removeEventListener(EVENT.INPUT, WebRecorderEventHandler);
-    window.removeEventListener(EVENT.SELECT, WebRecorderEventHandler);
-    window.removeEventListener(EVENT.WHEEL, WebRecorderEventHandler);
-    window.removeEventListener(EVENT.MOUSEUP, WebRecorderEventHandler);
-    window.removeEventListener(EVENT.MOUSEDOWN, WebRecorderEventHandler);
+const browserRecorderEnd = () => {
+    window.removeEventListener(EVENT.CLICK, browserRecorderEventHandler);
+    window.removeEventListener(EVENT.SCROLL, browserRecorderEventHandler);
+    window.removeEventListener(EVENT.INPUT, browserRecorderEventHandler);
+    window.removeEventListener(EVENT.SELECT, browserRecorderEventHandler);
+    window.removeEventListener(EVENT.WHEEL, browserRecorderEventHandler);
+    window.removeEventListener(EVENT.MOUSEUP, browserRecorderEventHandler);
+    window.removeEventListener(EVENT.MOUSEDOWN, browserRecorderEventHandler);
 }
 
-export const webRecorder = (request : CrxMessage) => {
-    if (request.receiver !== CRX_MSG_RECEIVER.WEB_RECORDER) return;
+export const browserRecorder = (request : CrxMessage) => {
+    if (request.receiver !== CRX_MSG_RECEIVER.BROWSER_RECORDER) return;
     switch (request.command) {
         
         case CRX_COMMAND.CMD_RECORDING_START : {
-            if (webRecorderStatus) return;
-            webRecorderStart();
+            if (browserRecorderStatus) return;
+            browserRecorderStart();
             const crxHighlightStyle = document.createElement('style');
             crxHighlightStyle.innerHTML = CrxHilightCSS;
             document.head.appendChild(crxHighlightStyle);
@@ -150,11 +150,11 @@ export const webRecorder = (request : CrxMessage) => {
             crxContextMenuStyle.innerHTML = CrxContexMenuCSS;
             document.head.appendChild(crxContextMenuStyle);
 
-            webRecorderStatus = true;
+            browserRecorderStatus = true;
             break;
         }
         case CRX_COMMAND.CMD_RECORDING_END : {
-            webRecorderEnd();
+            browserRecorderEnd();
             break;
         }
         case CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE : {

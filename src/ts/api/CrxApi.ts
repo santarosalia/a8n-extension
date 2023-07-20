@@ -130,7 +130,7 @@ export const sendMessageByWindowId = async (windowId : number, command : CRX_COM
         
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
-                receiver : CRX_MSG_RECEIVER.WEB_RECORDER,
+                receiver : CRX_MSG_RECEIVER.BROWSER_RECORDER,
                 command : command,
                 payload : payload
             });
@@ -360,7 +360,7 @@ export const sendMessageToSelector = async (command : CRX_COMMAND, payload? : an
     return chrome.tabs.query({}).then(tabs => {
         tabs.filter(tab => tab.id !== launcherTabId).forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
-                receiver : CRX_MSG_RECEIVER.WEB_SELECTOR,
+                receiver : CRX_MSG_RECEIVER.BROWSER_SELECTOR,
                 command : command,
                 payload : payload
             });
@@ -442,7 +442,7 @@ export const sendMessageByWindowIdToFocusedTab = async (windowId : number, comma
         
         const activeTab = tabs.find(tab => tab.active);
         chrome.tabs.sendMessage(activeTab.id, {
-            receiver : CRX_MSG_RECEIVER.WEB_CONTROLLER,
+            receiver : CRX_MSG_RECEIVER.BROWSER_CONTROLLER,
             command : command,
             payload : payload
         });

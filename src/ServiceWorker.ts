@@ -35,7 +35,7 @@ console.log('%c  | |  | |'+'%c | |   | |'+'%c   |  ___/'+'%c    |  _| _  ','colo
 console.log("%c _| |_.' / "+"%c\\  `-'  /"+"%c  _| |_    "+"%c  _| |__/ | ",'color:red','color:orange','color:yellow','color:green')
 console.log("%c|______.' "+"%c  `.___.' "+"%c |_____|   "+"%c |________| ",'color:red','color:orange','color:yellow','color:green')
 
-const initWebRecorder = (url : string) => {
+const initBrowserRecorder = (url : string) => {
     const e = new CrxBrowserOpenEvent(url);
     setItemFromLocalStorage(CRX_NEW_RECORD, null);
     setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [e]);
@@ -118,11 +118,11 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
 const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageSender, sendResponse : any) => {
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     switch (message.command) {
-        case CRX_COMMAND.CMD_LAUNCH_WEB_RECORDER : {
+        case CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER : {
             crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
             crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
             
-            initWebRecorder(message.payload);
+            initBrowserRecorder(message.payload);
             const injectInterval = setInterval(() => {
                 // if(crxInfo.RECORDING_TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
                 sendMessageByWindowId(crxInfo.RECORDING_TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
@@ -132,7 +132,7 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
             },1000);
             break;
         }
-        case CRX_COMMAND.CMD_LAUNCH_WEB_SELECTOR : {
+        case CRX_COMMAND.CMD_LAUNCH_BROWSER_SELECTOR : {
             crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
             crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
             
@@ -144,13 +144,10 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
             sendResponse({started : true});
             break;
         }
-        case CRX_COMMAND.CMD_KILL_WEB_SELECTOR : {
+        case CRX_COMMAND.CMD_KILL_BROWSER_SELECTOR : {
             clearInterval(crxInfo.SELECTOR_INJECT_INTERVAL);
             sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_END);
             break;
-        }
-        case CRX_COMMAND.CMD_WEB_CONTROL : {
-            
         }
     }
     sendResponse({});
