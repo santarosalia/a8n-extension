@@ -528,20 +528,50 @@ export const generateUUID = () => {
 /**
  * 브라우저 살아있는지 체크
  * @param checkTab 
+ * @category Controller
  * @returns 
  */
 export const checkTab = async (checkTab : chrome.tabs.Tab) => {
     return (await chrome.tabs.query({})).find(tab => tab.id === checkTab.id);
 }
 
+/**
+ * 윈도우 아이디로 윈도우 가져오기
+ * @param windowId
+ * @category Controller
+ * @returns 
+ */
 export const getWindow = async (windowId : number) => {
     return await chrome.windows.get(windowId);
 }
 
+/**
+ * 모든 탭 가져오기
+ * @category Controller
+ * @returns 
+ */
 export const getAllTabs = async () => {
     return await chrome.tabs.query({});
 }
 
+/**
+ * 탭 닫기
+ * @category Controller
+ * @param tab 
+ * @returns 
+ */
 export const closeTab = async (tab : chrome.tabs.Tab) => {
     return await chrome.tabs.remove(tab.id);
+}
+
+/**
+ * 페이지 로딩 기다리기
+ * @category Controller
+ * @param tab 
+ */
+export const waitPageLoading = async (tab : chrome.tabs.Tab) => {
+    let getTab = await chrome.tabs.get(tab.id);
+    while (getTab.status === 'loading') {
+        getTab = await chrome.tabs.get(tab.id);
+    }
 }

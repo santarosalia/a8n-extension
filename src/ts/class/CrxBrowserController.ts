@@ -8,7 +8,8 @@ import {
     getWindow,
     getAllTabs, 
     closeWindow,
-    closeTab
+    closeTab,
+    waitPageLoading
 } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
@@ -65,6 +66,7 @@ export class BrowserController {
      */
     async connect() {
         await detachDebugger();
+        await waitPageLoading(this.tab);
         const transport = await ExtensionDebuggerTransport.create(this._tab.id);
         this._instance = await puppeteer.connect({
             transport : transport,
@@ -75,7 +77,7 @@ export class BrowserController {
         this._page.on('dialog', dialog => {
             this._dialog = dialog;
         });
-        await sleep(1000);
+        // await sleep(1000);
     }
 
     /**
@@ -279,6 +281,7 @@ export class BrowserController {
                 break;
             }
             case BrowserAction.WAIT : {
+                await waitPageLoading(this._tab);
                 const elementController = await this.waitFor(msg);
                 this._instanceUUIDElementControllerMap.set(elementController.instanceUUID, elementController);
                 return {
@@ -463,7 +466,7 @@ export class BrowserController {
         const frames = this._frame.childFrames();
         this._frame = frames.find(frame => frame.name().includes(frameName));
         if (this._frame === undefined) throw new Error('Not Found');
-        await sleep(2000);
+        await sleep(1000);
     }
     /**
      * 프레임 초기화
