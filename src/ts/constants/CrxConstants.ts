@@ -1,4 +1,4 @@
-import { CapturedEvent } from "@CrxClass";
+import { CrxCapturedEvent } from "@CrxClass/CrxCapturedEvent";
 
 export const topbarMenu = [
     {
@@ -18,10 +18,10 @@ export const CRX_ADD_SCRAPING_DATA = 'CRX_ADD_SCRAPING_DATA';
 
 export const CRX_MSG_RECEIVER = {
     SERVICE_WORKER : 'SERVICE_WORKER',
-    WEB_RECORDER : 'WEB_RECORDER',
-    WEB_SELECTOR : 'WEB_SELECTOR',
-    WEB_CONTROLLER : 'WEB_CONTROLLER',
-    VIEW : 'VIEW',
+    BROWSER_RECORDER : 'BROWSER_RECORDER',
+    BROWSER_SELECTOR : 'BROWSER_SELECTOR',
+    BROWSER_CONTROLLER : 'BROWSER_CONTROLLER',
+    VUE : 'VUE',
     CONTENT_SCRIPT : 'CONTENT_SCRIPT'
 }
 
@@ -71,7 +71,7 @@ export const EVENT_TYPE_TO_KOREAN = {
     popup : '팝업'
 }
 
-export const getLocatorInfo = (self : CapturedEvent) => {
+export const getLocatorInfo = (self : CrxCapturedEvent) => {
     return {
         xpath : {
             displayName : 'XPath',
@@ -116,7 +116,7 @@ export const EVENT = {
     DATASCRAPING : 'datascraping',
     READATTRIBUTE : 'readattribute',
     HOVER : 'hover',
-    OPENVIEW : 'openview',
+    OPENRECORDINGHISTORY : 'openrecordinghistory',
     NEXTPAGEBUTTON : 'nextpagebutton',
     NEXTPAGENUMBER : 'nextpagenumber',
     RESETFRAME : 'resetframe',
@@ -125,3 +125,98 @@ export const EVENT = {
     MOUSEUP : 'mouseup'
 }
 
+export enum Status {
+    SUCCESS = 'success',
+    ERROR = 'error',
+}
+
+
+export enum BrowserAction {
+    CONNECT = 'connect',
+    SWITCH_FRAME = 'switchFrame',
+    RESET_FRAME = 'resetFrame',
+    CLOSE = 'close',
+    MAXIMIZE = 'maximize',
+    MINIMIZE = 'minimize',
+    SCROLL_TO = 'scrollTo',
+    GO_TO = 'goTo',
+    GO_BACK = 'goBack',
+    GO_FORWARD = 'goForward',
+    SWITCH_TAB = 'switchTab',
+    WAIT = 'wait',
+    HANDLE_ALERT = 'handleAlert'
+}
+
+export enum ElementAction {
+    LEFT_CLICK = 'leftClick',
+    DOUBLE_CLICK = 'doubleClick',
+    RIGHT_CLICK = 'rightClick',
+    HOVER = 'hover',
+    TYPE = 'type',
+    READ = 'read',
+    EXISTS = 'exists',
+    GET_PROPERTY = 'getProperty',
+    PRESS = 'press',
+    GET_BOUNDING_BOX = 'getBoundingBox',
+    READ_TAG = 'readTag',
+    BOX_MODEL = 'boxModel',
+    SET_CHECK_BOX_STATE = 'setCheckBoxState',
+    SET_SELECT_BOX_VALUE = 'setSelectBoxValue',
+    SCREENSHOT = 'screenshot'
+}
+
+export enum ConnectOptionType {
+    URL = 'URL',
+    TITLE = 'Title',
+    INSTANCE_UUID = 'instanceUUID'
+}
+
+export enum BrowserType {
+    CHROME = 'Chrome',
+    EDGE = 'Edge'
+}
+
+export enum CloseTarget {
+    TAB = 'tab',
+    WINDOW = 'window'
+}
+
+export enum LocatorType {
+    XPATH = 'xpath',
+    FULL_XPATH = 'fullXpath',
+    LINK_TEXT_XPATH = 'linkTextXpath',
+    CSS_SELECTOR = 'cssSelector'
+}
+
+export enum CRX_COMMAND {
+    NONE = 'NONE',
+    CMD_RECORDING_START = 'CMD_RECORDING_START',
+    CMD_RECORDING_END = 'CMD_RECORDING_END',
+    CMD_STORE_CAPTURED_EVENT = 'CMD_STORE_CAPTURED_EVENT',
+    CMD_RECORDING_WINDOW_FOCUS = 'CMD_RECORDING_WINDOW_FOCUS',
+    CMD_CAPTURE_IMAGE = 'CMD_CAPTURE_IMAGE',
+    CMD_SEND_EVENT = 'CMD_SEND_EVENT',
+    CMD_RECORDING_HISTORY = 'CMD_RECORDING_HISTORY',
+    CMD_CONTEXT_MENU_CHANGE = 'CMD_CONTEXT_MENU_CHANGE',
+    CMD_SEND_NEXT_PAGE_BUTTON = 'CMD_SEND_NEXT_PAGE_BUTTON',
+    CMD_SEND_NEXT_PAGE_NUMBER = 'CMD_SEND_NEXT_PAGE_NUMBER',
+    CMD_WD_WINDOW_CHECK = 'CMD_WD_WINDOW_CHECK',
+    CMD_CREATE_ACTIVITY = 'CMD_CREATE_ACTIVITY',
+    CMD_LAUNCH_BROWSER_RECORDER = 'CMD_LAUNCH_BROWSER_RECORDER',
+    CMD_LAUNCH_BROWSER_SELECTOR = 'CMD_LAUNCH_BROWSER_SELECTOR',
+    CMD_KILL_BROWSER_SELECTOR = 'CMD_KILL_BROWSER_SELECTOR',
+    CMD_SELECTOR_START = 'CMD_SELECTOR_START',
+    CMD_SELECTOR_END = 'CMD_SELECTOR_END',
+    CMD_SEND_LOCATORS = 'CMD_SEND_LOCATORS',
+    CMD_SHOW_NOTIFICATION = 'CMD_SHOW_NOTIFICATION',
+    CMD_OPEN_BROWSER = 'CMD_OPEN_BROWSER',
+    CMD_CRX_EXECUTE_ACTION = 'Cmd_CRX_ExecuteAction',
+    CMD_WB_CHECK_BROWSER_LAUNCH = 'Cmd_WB_CheckBrowserLaunch'
+}
+
+export enum AlertOption {
+    ACCEPT = 'accept',
+    DISMISS = 'dismiss',
+    READ = 'read',
+    EXISTS = 'exists'
+}

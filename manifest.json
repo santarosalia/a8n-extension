@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Worktronics Web Recorder",
-    "version": "2305.31",
+    "name": "Worktronics Browser Automation",
+    "version": "2307.25.0",
     "icons": {
       "16": "icons/recIcon_default16.png",
       "64": "icons/recIcon_default64.png",
@@ -10,7 +10,7 @@
     },
     "action": {
       "default_icon": "icons/recIcon_default64.png",
-      "default_title": "이든티앤에스 웹레코더"
+      "default_title": "Worktronics Browser Automation"
     },
     "background" : {
         "service_worker" : "src/ServiceWorker.ts",
@@ -23,16 +23,8 @@
           "match_origin_as_fallback": true,
           "all_frames" : true,
           "runAt" : "document_start"
-        },
-        {
-          "matches": ["*://*/*"],
-          "js":["src/ts/contents/WebController.ts"],
-          "match_origin_as_fallback": true,
-          "all_frames" : false,
-          "runAt" : "document_start"
         }
     ],
-    "devtools_page" : "src/DevToolsPlugin.html",
     "permissions": [
         "activeTab",
         "tabs",
@@ -51,9 +43,7 @@
       ],
     "externally_connectable": {
         "matches": [
-          "*://localhost/*",
-          "*://*.digitalworker.co.kr/*",
-          "*://10.0.1.112/*"
+          "*://*/*"
       ]
     }
 }

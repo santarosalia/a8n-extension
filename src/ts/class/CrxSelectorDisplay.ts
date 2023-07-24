@@ -1,4 +1,4 @@
-import { CrxMousemoveEvent } from "@CrxClass";
+import { CrxMousemoveEvent } from "@CrxClass/CrxMouseMoveEvent";
 
 class CrxSelectorDisplay extends HTMLElement {
     x : number

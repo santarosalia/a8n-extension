@@ -1,14 +1,15 @@
 import CrxHilightCSS from '@/css/CrxHighlight.css?raw';
 import CrxSelectorDisplayCSS from '@/css/CrxSelectorDisplay.css?raw';
-import { CRX_COMMAND, CrxMessage } from '@CrxInterface';
-import { CRX_MSG_RECEIVER, EVENT } from '@CrxConstants';
-import { CrxClickEvent, CrxMousemoveEvent } from '@CrxClass';
-import { sendMessageToServiceWorker, showNotification } from '@CrxApi';
+import { CrxMessage } from '@CrxInterface';
+import { CRX_COMMAND, CRX_MSG_RECEIVER, EVENT } from '@CrxConstants';
+import { sendMessageToServiceWorker } from '@CrxApi';
 import CrxSelectorDisplay from '@/ts/class/CrxSelectorDisplay';
+import { CrxClickEvent } from '@CrxClass/CrxClickEvent';
+import { CrxMousemoveEvent } from '@CrxClass/CrxMouseMoveEvent';
 
 window.customElements.define('crx-selector-display', CrxSelectorDisplay);
 
-let webSelectorStatus : boolean;
+let browserSelectorStatus : boolean;
 let crxSelectorDisplay = new CrxSelectorDisplay(null);
 
 const clickEventHandler = (ev : MouseEvent) => {
@@ -35,7 +36,7 @@ const clickEventHandler = (ev : MouseEvent) => {
 
     target.classList.remove('crx-highlight');
 
-    webSelectorEnd();
+    browserSelectorEnd();
     sendMessageToServiceWorker(CRX_COMMAND.CMD_SELECTOR_END, {
         locatorType : 'all',
         locators : locators
@@ -59,7 +60,7 @@ const mouseoutEventHandler = (ev : Event) => {
     target.classList.remove('crx-highlight');
 }
 
-const WebSelectorEventHandler = (ev : Event) => {
+const browserSelectorEventHandler = (ev : Event) => {
     switch (ev.type) {
         case EVENT.CLICK : {
             clickEventHandler(ev as MouseEvent);
@@ -76,24 +77,24 @@ const WebSelectorEventHandler = (ev : Event) => {
     }
 }
 
-const webSelectorStart = () => {
-    window.addEventListener(EVENT.CLICK, WebSelectorEventHandler, true);
-    window.addEventListener(EVENT.MOUSEMOVE, WebSelectorEventHandler, true);
-    window.addEventListener(EVENT.MOUSEOUT, WebSelectorEventHandler, true);
+const browserSelectorStart = () => {
+    window.addEventListener(EVENT.CLICK, browserSelectorEventHandler, true);
+    window.addEventListener(EVENT.MOUSEMOVE, browserSelectorEventHandler, true);
+    window.addEventListener(EVENT.MOUSEOUT, browserSelectorEventHandler, true);
 }
-const webSelectorEnd = () => {
+const browserSelectorEnd = () => {
     crxSelectorDisplay.remove();
-    window.removeEventListener(EVENT.CLICK, WebSelectorEventHandler, true);
-    window.removeEventListener(EVENT.MOUSEMOVE, WebSelectorEventHandler, true);
-    window.removeEventListener(EVENT.MOUSEOUT, WebSelectorEventHandler, true);
+    window.removeEventListener(EVENT.CLICK, browserSelectorEventHandler, true);
+    window.removeEventListener(EVENT.MOUSEMOVE, browserSelectorEventHandler, true);
+    window.removeEventListener(EVENT.MOUSEOUT, browserSelectorEventHandler, true);
 }
-export const webSelector = (message : CrxMessage) => {
-    if (message.receiver !== CRX_MSG_RECEIVER.WEB_SELECTOR) return;
+export const browserSelector = (message : CrxMessage) => {
+    if (message.receiver !== CRX_MSG_RECEIVER.BROWSER_SELECTOR) return;
     switch (message.command) {  
 
         case CRX_COMMAND.CMD_SELECTOR_START : {
-            if (webSelectorStatus) return;
-            webSelectorStart();
+            if (browserSelectorStatus) return;
+            browserSelectorStart();
             const crxHighlightStyle = document.createElement('style');
             crxHighlightStyle.innerHTML = CrxHilightCSS;
             document.head.appendChild(crxHighlightStyle);
@@ -102,13 +103,13 @@ export const webSelector = (message : CrxMessage) => {
             crxSelectorDisplayStyle.innerHTML = CrxSelectorDisplayCSS;
             document.head.appendChild(crxSelectorDisplayStyle);
 
-            webSelectorStatus = true;
+            browserSelectorStatus = true;
             break;
         }
         case CRX_COMMAND.CMD_SELECTOR_END : {
-            webSelectorEnd();
+            browserSelectorEnd();
 
-            webSelectorStatus = false;
+            browserSelectorStatus = false;
             break;
         }
        

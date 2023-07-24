@@ -30,7 +30,7 @@ import { useRouter } from 'vue-router';
 import { computed } from 'vue';
 import { CRX_STATE, CRX_ACTION } from '@CrxConstants';
 import { ScrapingDatas } from '@/ts/interface/CrxInterface';
-import { CrxDataScrapingEvent } from '@CrxClass';
+import { CrxDataScrapingEvent } from '@/ts/class/CrxDataScrapingEvent';
 
 const store = useStore();
 const router = useRouter();
@@ -96,4 +96,4 @@ const saveData = () => {
     store.dispatch(CRX_ACTION.SAVE_DATA);
 }
 </script>
-  
+  @/ts/class/CrxCapturedEventDetails.ts@/ts/class/CrxCapturedEventDetails

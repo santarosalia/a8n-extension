@@ -1,8 +1,8 @@
-import { webRecorder } from "@/ts/contents/WebRecorder";
-import { webSelector } from "@/ts/contents/WebSelector";
-import { getItemFromLocalStorage, sendMessageToServiceWorker, showNotification } from "@CrxApi";
-import { CRX_COMMAND, CrxMessage } from "@CrxInterface";
-import { CRX_MSG_RECEIVER, CRX_STATE, EVENT } from "@CrxConstants";
+import { browserRecorder } from "@/ts/contents/BrowserRecorder";
+import { browserSelector } from "@/ts/contents/BrowserSelector";
+import { getItemFromLocalStorage } from "@CrxApi";
+import { CrxMessage } from "@CrxInterface";
+import { CRX_COMMAND, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
 
 const contentScript = async (message : CrxMessage) => {
     if (message.receiver !== CRX_MSG_RECEIVER.CONTENT_SCRIPT) return;
@@ -16,11 +16,11 @@ const contentScript = async (message : CrxMessage) => {
             break;
         }
         case CRX_COMMAND.CMD_SEND_LOCATORS : {
-            const webSelectorModalButton = document.querySelector('#webSelectorModalButton') as HTMLElement;
+            const browserSelectorModalButton = document.querySelector('#browserSelectorModalButton') as HTMLElement;
             const locators = message.payload;
-            if (webSelectorModalButton) {
+            if (browserSelectorModalButton) {
                 sessionStorage.setItem('ws-locators',JSON.stringify(locators));
-                webSelectorModalButton.click();
+                browserSelectorModalButton.click();
             }
             break;
         }
@@ -28,5 +28,5 @@ const contentScript = async (message : CrxMessage) => {
 }
 
 chrome.runtime.onMessage.addListener(contentScript);
-chrome.runtime.onMessage.addListener(webRecorder);
-chrome.runtime.onMessage.addListener(webSelector);
+chrome.runtime.onMessage.addListener(browserRecorder);
+chrome.runtime.onMessage.addListener(browserSelector);

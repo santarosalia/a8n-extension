@@ -10,13 +10,13 @@
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 import RecordingHistoryItem from '@/components/recordinghistory/RecordingHistoryItem.vue';
-import { CapturedEventDetails } from '@CrxInterface';
+import { CrxCapturedEventDetails } from '@CrxInterface';
 import { CRX_STATE } from '@CrxConstants';
 
 
 const store = useStore();
 const listHeight = ref(window.innerHeight - (48 + 56));
-const records = computed(():CapturedEventDetails[]=> store.getters[CRX_STATE.CRX_RECORDS]);
+const records = computed(():CrxCapturedEventDetails[]=> store.getters[CRX_STATE.CRX_RECORDS]);
 const onResize = () => {
   listHeight.value = window.innerHeight - (48 + 56);
 }

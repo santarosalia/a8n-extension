@@ -1,8 +1,10 @@
 import { getItemFromLocalStorage, sendMessageToServiceWorker, setItemFromLocalStorage } from "@CrxApi";
-import { CrxClickEvent, CrxContextMenuEvent, CrxReadAttributeEvent } from "@CrxClass";
-import { CRX_NEW_RECORD, CRX_STATE, EVENT } from "@CrxConstants";
+import { CRX_COMMAND, CRX_NEW_RECORD, CRX_STATE, EVENT } from "@CrxConstants";
 import { dataScraping } from "@/ts/contents/DataScraping";
-import { CRX_COMMAND, CRX_CONTEXT_MENU_TYPE } from "@CrxInterface";
+import { CRX_CONTEXT_MENU_TYPE } from "@CrxInterface";
+import { CrxClickEvent } from "@CrxClass/CrxClickEvent";
+import { CrxReadAttributeEvent } from "@CrxClass/CrxReadAttributeEvent";
+import { CrxContextMenuEvent } from "@CrxClass/CrxContextMenuEvent";
 const normalMenu = [
     {
         title : '텍스트 읽기',
@@ -22,7 +24,7 @@ const normalMenu = [
     },
     {
         title : '레코딩 내역창 열기',
-        value : EVENT.OPENVIEW
+        value : EVENT.OPENRECORDINGHISTORY
     }
 ]
 const multiPageMenu = [
@@ -100,8 +102,8 @@ class CrxContextMenu extends HTMLElement {
                 dataScraping(this.e);
                 return;
             }
-            case EVENT.OPENVIEW : {
-                sendMessageToServiceWorker(CRX_COMMAND.CMD_OPEN_VIEW);
+            case EVENT.OPENRECORDINGHISTORY : {
+                sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_HISTORY);
                 return;
             }
             case EVENT.NEXTPAGEBUTTON : {
