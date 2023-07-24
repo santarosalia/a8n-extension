@@ -23,7 +23,7 @@ const storageChanged = (changes : any) => {
 }
 
 const msg = (message : CrxMessage) => {
-  if (message.receiver !== CRX_MSG_RECEIVER.VIEW) return;
+  if (message.receiver !== CRX_MSG_RECEIVER.VUE) return;
   switch (message.command) {
     case CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON : {
       store.commit(CRX_STATE.CRX_NEXT_PAGE_BUTTON, message.payload);

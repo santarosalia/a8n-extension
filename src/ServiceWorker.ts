@@ -1,7 +1,7 @@
 import { 
     setItemFromLocalStorage,
-    createViewTab,
-    openViewWindow,
+    createRecordingHistoryTab,
+    openRecordingHistoryWindow,
     createRecordingTargetTab,
     openRecordingTargetWindow,
     sendMessageByWindowId,
@@ -47,12 +47,12 @@ const initBrowserRecorder = (url : string) => {
     
     createRecordingTargetTab(url).then(result => {
         openRecordingTargetWindow(result).then(result => {
-            crxInfo.TARGET_TAB = result.tabs[0];
-            crxInfo.RECORDING_TARGET_WINDOW_ID = result.tabs[0].windowId;
+            [crxInfo.TARGET_TAB] = result.tabs;
+            crxInfo.RECORDING_TARGET_WINDOW_ID = crxInfo.TARGET_TAB.windowId;
         });
     });
 
-    openView();
+    openRecordingHistory();
 }
 
 export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageSender , sendResponse : any) => {
@@ -72,11 +72,11 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
             });
             return true;
         }
-        case CRX_COMMAND.CMD_OPEN_VIEW : {
-            sendMessageByWindowId(crxInfo.VIEW_WINDOW_ID, CRX_COMMAND.NONE).then(() => {
-                windowFocus(crxInfo.VIEW_WINDOW_ID);
+        case CRX_COMMAND.CMD_RECORDING_HISTORY : {
+            sendMessageByWindowId(crxInfo.RECORDING_HISTORY_WINDOW_ID, CRX_COMMAND.NONE).then(() => {
+                windowFocus(crxInfo.RECORDING_HISTORY_WINDOW_ID);
             }).catch(() => {
-                openView();
+                openRecordingHistory();
             });
             
             break;
@@ -86,17 +86,17 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
             break;
         }
         case CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON : {
-            sendMessageToView(crxInfo.VIEW_WINDOW_ID,CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON, message.payload);
+            sendMessageToView(crxInfo.RECORDING_HISTORY_WINDOW_ID, CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON, message.payload);
             break;
         }
         case CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER : {
-            sendMessageToView(crxInfo.VIEW_WINDOW_ID,CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER, message.payload);
+            sendMessageToView(crxInfo.RECORDING_HISTORY_WINDOW_ID, CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER, message.payload);
             break;
         }
         case CRX_COMMAND.CMD_RECORDING_END : {
             sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID, CRX_COMMAND.CMD_CREATE_ACTIVITY);
             closeWindow(crxInfo.RECORDING_TARGET_WINDOW_ID);
-            closeWindow(crxInfo.VIEW_WINDOW_ID);
+            closeWindow(crxInfo.RECORDING_HISTORY_WINDOW_ID);
             break;
         }
         case CRX_COMMAND.CMD_SELECTOR_END : {
@@ -153,12 +153,10 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
     sendResponse({});
     return;
 }
-const openView = () => {
-    createViewTab().then(result => {
-        openViewWindow(result).then(result => {
-            crxInfo.VIEW_WINDOW_ID = result.id;
-        });
-    });
+const openRecordingHistory = async () => {
+    const tab = await createRecordingHistoryTab();
+    const window = await openRecordingHistoryWindow(tab);
+    crxInfo.RECORDING_HISTORY_WINDOW_ID = window.id;
 }
 const storageChange = (d) => {
     // console.log(d)
@@ -167,15 +165,6 @@ const storageChange = (d) => {
 const onHighlightedTabHandler = (highlightInfo : chrome.tabs.TabHighlightInfo) => {
     if (highlightInfo.windowId !== crxInfo.RECORDING_TARGET_WINDOW_ID) return;
     onHighlightedTab(highlightInfo.windowId);
-}
-
-const onCreated = (window : chrome.windows.Window)=> {
-    if (window.id === crxInfo.VIEW_WINDOW_ID || window.type !== 'popup') return;
-    const e = new CrxPopupEvent();
-    setTimeout(() => {
-        setItemFromLocalStorage(CRX_NEW_RECORD, e);
-        sendMessageByWindowId(window.id, CRX_COMMAND.CMD_RECORDING_START)
-    }, 500);
 }
 
 const onInstalled = () => {
@@ -315,6 +304,10 @@ const execute = async (msg : ExecuteRequestMessage) => {
  */
 const pickBrowserControllerMap = async () => {
     for (const [instanceUUID, browserController] of instanceUUIDBrowserControllerMap) {
+        if (browserController.tab === undefined) {
+            instanceUUIDBrowserControllerMap.delete(instanceUUID);
+            continue;
+        }
         const check = await checkTab(browserController.tab);
         if (!check) instanceUUIDBrowserControllerMap.delete(instanceUUID);
     }

@@ -104,7 +104,7 @@ export class BrowserController {
         } else {
             this._tab = (await getAllTabs()).find(tab => tab.title === title);
         }
-        if (typeof(this._tab) === 'undefined') throw new Error('Not Exists');
+        if (this._tab === undefined) throw new Error('Not Exists');
         await this.connect();
     }
 

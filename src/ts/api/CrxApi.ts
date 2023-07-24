@@ -43,7 +43,7 @@ export const setItemFromLocalStorage = (key : string , value : any) => {
  *
  * @category Recorder
  */
-export const createViewTab = () => {
+export const createRecordingHistoryTab = () => {
     return chrome.tabs.create({
         url: chrome.runtime.getURL('index.html'),
         active : true
@@ -58,11 +58,11 @@ export const createViewTab = () => {
  * @example
   ```
     async () => {
-        const window = await openViewWindow(tab);
+        const window = await openRecordingHistoryWindow(tab);
     }
   ```
  */
-export const openViewWindow = (tab : chrome.tabs.Tab) => {
+export const openRecordingHistoryWindow = (tab : chrome.tabs.Tab) => {
     return chrome.windows.create({
         tabId : tab.id,
         type : "popup",

@@ -24,7 +24,7 @@ const normalMenu = [
     },
     {
         title : '레코딩 내역창 열기',
-        value : EVENT.OPENVIEW
+        value : EVENT.OPENRECORDINGHISTORY
     }
 ]
 const multiPageMenu = [
@@ -102,8 +102,8 @@ class CrxContextMenu extends HTMLElement {
                 dataScraping(this.e);
                 return;
             }
-            case EVENT.OPENVIEW : {
-                sendMessageToServiceWorker(CRX_COMMAND.CMD_OPEN_VIEW);
+            case EVENT.OPENRECORDINGHISTORY : {
+                sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_HISTORY);
                 return;
             }
             case EVENT.NEXTPAGEBUTTON : {

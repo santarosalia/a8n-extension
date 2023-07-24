@@ -1,5 +1,5 @@
 export class CrxInfo {
-    VIEW_WINDOW_ID : number;
+    RECORDING_HISTORY_WINDOW_ID : number;
     TARGET_TAB : chrome.tabs.Tab;
     RECORDING_TARGET_WINDOW_ID : number;
     TARGET_TABS : chrome.tabs.Tab[];
