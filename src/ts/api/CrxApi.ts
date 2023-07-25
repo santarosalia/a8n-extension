@@ -300,7 +300,7 @@ export const sendMessageToView = async (windowId : number, command : CRX_COMMAND
         
         tabs.forEach(tab => {
             chrome.tabs.sendMessage(tab.id, {
-                receiver : CRX_MSG_RECEIVER.VIEW,
+                receiver : CRX_MSG_RECEIVER.VUE,
                 command : command,
                 payload : payload
             });
