@@ -216,4 +216,13 @@ export interface ExecuteActionParameter {
     browserType? : BrowserType
     target? : CloseTarget
     alertOption? : AlertOption
+    dataScrapingOption? : {
+        columnSizeArray : number[]
+        patternArray : string[]
+        exceptColumnArray : number[][]
+        exceptRowArray : number[]
+        pageCount : number | string
+        nextPageButtonXpath : string
+        nextPageNumberXpath : string
+    }
 }

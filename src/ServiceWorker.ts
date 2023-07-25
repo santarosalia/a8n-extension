@@ -313,4 +313,4 @@ const pickBrowserControllerMap = async () => {
     }
 }
 
-// chrome.action.onClicked.addListener(test);
+chrome.action.onClicked.addListener(test);

@@ -14,7 +14,7 @@ import {
 import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
-import { ExecuteRequestMessage } from "@CrxInterface";
+import { ExecuteActionParameter, ExecuteRequestMessage } from "@CrxInterface";
 import { ElementController } from "@CrxClass/CrxElementController";
 import { AlertOption, BrowserAction, BrowserType, CloseTarget, ConnectOptionType, ElementAction, LocatorType } from "@CrxConstants";
 
@@ -336,6 +336,13 @@ export class BrowserController {
                     exists : result.exists
                 };
             }
+            case BrowserAction.DATA_SCRAPING : {
+                
+
+                this.dataScraping(msg);
+                
+                break;
+            }
             case ElementAction.LEFT_CLICK : {
                 await elementController.leftClick();
                 break;
@@ -477,8 +484,36 @@ export class BrowserController {
         this._frame = this._page.mainFrame();
         await sleep(1000);
     }
-}
 
+    private async dataScraping(msg : ExecuteRequestMessage) {
+        const dataScrapingOption = msg.object.parameter.dataScrapingOption;
+        const columnSizeArray = dataScrapingOption.columnSizeArray;
+        const patternArray = dataScrapingOption.patternArray;
+        const exceptColumnArray = dataScrapingOption.exceptColumnArray;
+        const exceptRowArray = dataScrapingOption.exceptRowArray;
+        const pageCount = dataScrapingOption.pageCount;
+        const nextPageButtonXpath = dataScrapingOption.nextPageButtonXpath;
+        const nextPageNumberXpath = dataScrapingOption.nextPageNumberXpath;
+        
+        
+        const allElements = (await this._page.$$(patternArray[0]));
+        
+        if ((pageCount as number > 1 || pageCount === '*') && (nextPageButtonXpath || nextPageNumberXpath)) {
+            // 다중페이지 처리
+        }
+        
+        for (const [i, element] of allElements.entries()) {
+            const text = await (await element.getProperty('textContent')).jsonValue();
+            const url = await (await element.getProperty('href')).jsonValue();
+            const src = await (await element.getProperty('src')).jsonValue();
+
+            
+            console.log(text)
+            console.log(url);
+            console.log(src);
+        }
+    }
+}
 
 
 

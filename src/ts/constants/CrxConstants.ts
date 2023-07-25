@@ -144,7 +144,8 @@ export enum BrowserAction {
     GO_FORWARD = 'goForward',
     SWITCH_TAB = 'switchTab',
     WAIT = 'wait',
-    HANDLE_ALERT = 'handleAlert'
+    HANDLE_ALERT = 'handleAlert',
+    DATA_SCRAPING = 'dataScraping'
 }
 
 export enum ElementAction {
