@@ -65,8 +65,8 @@ export class BrowserController {
      * 
      */
     async connect() {
-        await detachDebugger();
-        await waitPageLoading(this.tab);
+        await detachDebugger(this._tab);
+        await waitPageLoading(this._tab);
         const transport = await ExtensionDebuggerTransport.create(this._tab.id);
         this._instance = await puppeteer.connect({
             transport : transport,
