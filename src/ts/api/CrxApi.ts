@@ -506,15 +506,14 @@ export const sleep = (ms : number) => {
 }
 
 /**
- * 모든 디버거가 연결 되어 있는 대상에서 디버거를 분리합니다.
+ * 주어진 탭의 디버거를 분리합니다.
+ * @cause 디버거 기 연결 시 오류
  * @category Controller
  * @returns 
  */
-export const detachDebugger = async () => {
-    const targets = (await chrome.debugger.getTargets()).filter(target => target.attached);
-    return targets.forEach(async (target) => {    
-        await chrome.debugger.detach({targetId : target.id}).catch(() => {});
-    });
+export const detachDebugger = async (tab: chrome.tabs.Tab) => {
+    const [target] = (await chrome.debugger.getTargets()).filter(target => target.tabId === tab.id);
+    return await chrome.debugger.detach({targetId : target.id}).catch(() => {});
 }
 /**
  * 랜덤 UUID 를 생성하여 반환합니다. 각각의 Browser Instance | Element Instance 구별에 사용

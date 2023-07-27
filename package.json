@@ -1,6 +1,6 @@
 {
   "name": "wd-extension",
-  "version": "2307.25.0",
+  "version": "2307.25.2",
   "private": true,
   "scripts": {
     "serve": "vite preview",
