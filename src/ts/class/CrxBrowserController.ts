@@ -494,24 +494,140 @@ export class BrowserController {
         const pageCount = dataScrapingOption.pageCount;
         const nextPageButtonXpath = dataScrapingOption.nextPageButtonXpath;
         const nextPageNumberXpath = dataScrapingOption.nextPageNumberXpath;
+
+        let scrapingData: string[][] = [];
+        let pageData: string[][] = [];
+        let tempData: string[][][] = [];
+        let pageIndex = 1;
+        while(true) {
+            await waitPageLoading(this._tab);
+            for (const [patternIndex, pattern] of patternArray.entries()) {
+                const allElements = (await this._page.$$(pattern));
+                const patternData: string[][] = [];
+                for (const element of allElements) {
+                    const row: string[] = [];
+                    
+                    // textContent
+                    const textContent = await element.evaluate(node => node.textContent);
+                    
+                    row.push(textContent);
+
+                    if (columnSizeArray[patternIndex] === 1) {
+                        patternData.push(row);
+                        continue;
+                    }
+                    
+                    // url
+                    const url = await element.evaluate(node => {
+                        if (node.closest('a')) {
+                            return node.closest('a').href;
+                        }else if (node.querySelector('a')) {
+                            return node.querySelector('a').href;
+                        }
+                    });
+
+                    row.push(url);
+
+                    if (columnSizeArray[patternIndex] === 2) {
+                        patternData.push(row);
+                        continue;
+                    }
+                    
+                    // src
+                    const src = await element.evaluate(node => {
+                        if (node.closest('img')) {
+                            return node.closest('img').alt;
+                        } else if (node.querySelector('img')) {
+                            return node.querySelector('img').alt;
+                        }
+                    });
+
+                    row.push(src);
+
+                    if (columnSizeArray[patternIndex] === 3) {
+                        patternData.push(row);
+                        continue;
+                    }
+                    
+                    // alt
         
-        
-        const allElements = (await this._page.$$(patternArray[0]));
-        
-        if ((pageCount as number > 1 || pageCount === '*') && (nextPageButtonXpath || nextPageNumberXpath)) {
-            // 다중페이지 처리
-        }
-        
-        for (const [i, element] of allElements.entries()) {
-            const text = await (await element.getProperty('textContent')).jsonValue();
-            const url = await (await element.getProperty('href')).jsonValue();
-            const src = await (await element.getProperty('src')).jsonValue();
+                    const alt = await element.evaluate(node => {
+                        if (node.closest('img')) {
+                            return node.closest('img').alt;
+                        } else if (node.querySelector('img')) {
+                            return node.querySelector('img').alt;
+                        }
+                    });
+                    
+                    row.push(alt);
+
+                    if (columnSizeArray[patternIndex] === 4) {
+                        patternData.push(row);
+                        continue;
+                    }
+                }
+
+                // exceptColumn Processing
+                patternData.forEach(row => {
+                    exceptColumnArray[patternIndex].forEach(exceptColumn => {
+                        row.splice(exceptColumn, 1);
+                    });
+                });
+
+                // exceptRow Processing
+                exceptRowArray.reverse().forEach(exceptRow => {
+                    patternData.splice(exceptRow, 1);
+                });
+
+                tempData.push(patternData);
+            }
 
             
-            console.log(text)
-            console.log(url);
-            console.log(src);
+            tempData.forEach(item => {
+                pageData = item.map((arr,idx) => {
+                    pageData.push([]);
+                return pageData[idx].concat(arr);
+                });
+            });
+            
+            scrapingData = [...scrapingData, ...pageData];
+            pageData = [];
+            tempData = [];
+
+            // 페이지 수 1인 경우 || 다음페이지버튼 / 다음페이지숫자 미 설정 시
+            if (pageCount as number < 2 || pageCount !== '*' && (!nextPageButtonXpath && !nextPageNumberXpath)) break;
+            if (pageCount === pageIndex) break;
+            // if (nextPageButtonXpath) {
+            //     // await (await this._page.waitForXPath(nextPageButtonXpath)).click();
+            // } else
+             if (nextPageNumberXpath) {
+                const nextPageNumber = await this._page.waitForXPath(nextPageNumberXpath);
+                const parentElement = (await nextPageNumber.getProperty('parentNode')).asElement();
+                const allChildren = await parentElement.$$('a');
+
+                for (const el of allChildren) {
+                    const num = await (await el.getProperty('textContent')).jsonValue();
+                    console.log(num)
+                    console.log(pageIndex)
+                    if (num === (pageIndex + 1).toString()) {
+                        await el.click();
+                        break;
+                    }
+                }
+            }
+            pageIndex++;
+            console.log(123123123);
+
+
+
         }
+        
+        
+        
+        
+        
+        
+        console.log(scrapingData);
     }
 }
 
