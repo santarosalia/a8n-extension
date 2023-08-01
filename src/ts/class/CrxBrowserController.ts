@@ -216,12 +216,21 @@ export class BrowserController {
         return result;
     }
 
+    async connectCheck() {
+        if (this._instance) {
+            if (!this._instance.isConnected()) {
+                await this.connect();
+            }
+        }
+    }
+
     /**
      * 주어진 JSON 메시지로 브라우저 자동화
      * @param msg 
      * @returns 
      */
     async execute(msg : ExecuteRequestMessage) {
+        await this.connectCheck();
         const result = await this.actionHandler(msg);
         return result;
     }
