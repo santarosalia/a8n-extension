@@ -34,9 +34,6 @@ export class BrowserController {
         this._instanceUUID = generateUUID();
         if (tab) {
             this._tab = tab;
-            getWindow(tab.windowId).then(window => {
-                this._window = window;
-            });
         }
     }
 
@@ -67,6 +64,7 @@ export class BrowserController {
     async connect() {
         await detachDebugger(this._tab);
         await waitPageLoading(this._tab);
+        this._window = await getWindow(this._tab.windowId);
         const transport = await ExtensionDebuggerTransport.create(this._tab.id);
         this._instance = await puppeteer.connect({
             transport : transport,
