@@ -34,9 +34,6 @@ export class BrowserController {
         this._instanceUUID = generateUUID();
         if (tab) {
             this._tab = tab;
-            getWindow(tab.windowId).then(window => {
-                this._window = window;
-            });
         }
     }
 
@@ -67,6 +64,7 @@ export class BrowserController {
     async connect() {
         await detachDebugger(this._tab);
         await waitPageLoading(this._tab);
+        this._window = await getWindow(this._tab.windowId);
         const transport = await ExtensionDebuggerTransport.create(this._tab.id);
         this._instance = await puppeteer.connect({
             transport : transport,
@@ -596,30 +594,31 @@ export class BrowserController {
 
             // 페이지 수 1인 경우 || 다음페이지버튼 / 다음페이지숫자 미 설정 시
             if (pageCount as number < 2 || pageCount !== '*' && (!nextPageButtonXpath && !nextPageNumberXpath)) break;
+            // 다중페이지 종료 시
             if (pageCount === pageIndex) break;
-            // if (nextPageButtonXpath) {
-            //     // await (await this._page.waitForXPath(nextPageButtonXpath)).click();
-            // } else
-             if (nextPageNumberXpath) {
+
+            // 숫자페이지 버튼으로 먼저 클릭
+            if (nextPageNumberXpath) {
                 const nextPageNumber = await this._page.waitForXPath(nextPageNumberXpath);
                 const parentElement = (await nextPageNumber.getProperty('parentNode')).asElement();
-                const allChildren = await parentElement.$$('a');
-
-                for (const el of allChildren) {
-                    const num = await (await el.getProperty('textContent')).jsonValue();
-                    console.log(num)
-                    console.log(pageIndex)
+                const children = await parentElement.$$('a');
+                let element: ElementHandle;
+                for (const child of children) {
+                    const num = await (await child.getProperty('textContent')).jsonValue();
                     if (num === (pageIndex + 1).toString()) {
-                        await el.click();
+                        element = child;
                         break;
                     }
                 }
+                if (element) {
+                    await element.click();
+                } else {
+                    
+                }
+            } else if (nextPageButtonXpath) {
+                await (await this._page.waitForXPath(nextPageButtonXpath)).click();
             }
             pageIndex++;
-            console.log(123123123);
-
-
-
         }
         
         
