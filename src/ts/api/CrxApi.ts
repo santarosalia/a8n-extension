@@ -401,7 +401,7 @@ export const showNotification = (title :string, message : string) => {
  * @param tabId 
  */
 export const focusTab = (tabId : number) => {
-    chrome.tabs.update(tabId, {active : true});
+    return chrome.tabs.update(tabId, {active : true});
 }
 
 /**
