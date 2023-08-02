@@ -9,7 +9,9 @@ import {
     getAllTabs, 
     closeWindow,
     closeTab,
-    waitPageLoading
+    waitPageLoading,
+    focusTab,
+    windowFocus
 } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
@@ -428,6 +430,8 @@ export class BrowserController {
                 break;
             }
             case ElementAction.SCREENSHOT : {
+                await windowFocus(this._window.id);
+                await focusTab(this._tab.id);
                 const image = await elementController.screenshot();
                 return {
                     image : image
