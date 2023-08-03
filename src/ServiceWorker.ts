@@ -25,6 +25,7 @@ import { CrxInfo } from "@CrxClass/CrxInfo";
 import { CrxBrowserOpenEvent } from "@CrxClass/CrxBrowserOpenEvent";
 import { CrxPopupEvent } from "@CrxClass/CrxPopupEvent";
 import { test } from "./ts/api/CrxPuppeteerTest";
+import { instanceUUIDBrowserControllerMap } from "@/ts/store/CrxStore";
 
 
 const crxInfo = new CrxInfo();
@@ -240,7 +241,6 @@ const reConnect = () => {
     })
 }
 
-export const instanceUUIDBrowserControllerMap = new Map<string, BrowserController>();
 let browserController : BrowserController;
 
 const execute = async (msg : ExecuteRequestMessage) => {
