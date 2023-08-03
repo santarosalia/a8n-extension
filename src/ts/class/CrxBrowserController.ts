@@ -11,7 +11,8 @@ import {
     closeTab,
     waitPageLoading,
     focusTab,
-    windowFocus
+    windowFocus,
+    checkDebugger
 } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
@@ -19,6 +20,7 @@ import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
 import { ExecuteRequestMessage } from "@CrxInterface";
 import { ElementController } from "@CrxClass/CrxElementController";
 import { AlertOption, BrowserAction, BrowserType, CloseTarget, ConnectOptionType, ElementAction, LocatorType } from "@CrxConstants";
+import { instanceUUIDBrowserControllerMap } from "@/ServiceWorker";
 
 export class BrowserController {
     private _window : chrome.windows.Window
@@ -51,6 +53,10 @@ export class BrowserController {
     get tab() {
         return this._tab
     }
+    
+    get instance() {
+        return this._instance;
+    }
     /**
      * 1. Puppeteer 를 이용하여 BrowserController 의 tab id 를 가진 tab 에 연결,
      * 
@@ -64,14 +70,17 @@ export class BrowserController {
      * 
      */
     async connect() {
-        // await detachDebugger(this._tab);
         await waitPageLoading(this._tab);
         this._window = await getWindow(this._tab.windowId);
-        const transport = await ExtensionDebuggerTransport.create(this._tab.id);
-        this._instance = await puppeteer.connect({
-            transport : transport,
-            defaultViewport : null
-        });
+        const instance = await checkDebugger(this._tab);
+        this._instance = instance;
+        if (this._instance === undefined) {
+            const transport = await ExtensionDebuggerTransport.create(this._tab.id);
+            this._instance = await puppeteer.connect({
+                transport : transport,
+                defaultViewport : null
+            });
+        }
         [this._page] = await this._instance.pages();
         this._frame = this._page.mainFrame();
         this._page.on('dialog', dialog => {
@@ -116,6 +125,7 @@ export class BrowserController {
      */
     private async findTabByIndex(index : number) {
         [this._tab] = await findTabsByIndex(this._window.id, index);
+        await focusTab(this._tab.id);
         await this.connect();
     }
 
@@ -131,7 +141,7 @@ export class BrowserController {
         } else {
             this._tab = (await getAllTabs()).find(tab => tab.url === url);
         }
-        if (typeof(this._tab) === 'undefined') throw new Error('Not Exists');
+        if (this._tab === undefined) throw new Error('Not Exists');
         await this.connect();
     }
 

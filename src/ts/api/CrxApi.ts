@@ -2,6 +2,7 @@ import { CRX_COMMAND, CRX_MSG_RECEIVER, CRX_NEW_RECORD } from "@CrxConstants";
 import { EVENT } from "@CrxConstants";
 import { CrxMoveTabEvent } from "@CrxClass/CrxMoveTabEvent";
 import { CrxCapturedEvent } from "@CrxClass/CrxCapturedEvent";
+import { instanceUUIDBrowserControllerMap } from "@/ServiceWorker";
 
 /**
  * Chrome Local Storage 에서 주어진 키들에 해당하는 값을 불러옵니다.
@@ -503,6 +504,23 @@ export const minimizeWindow = (windowId : number) => {
  */
 export const sleep = (ms : number) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * 주어진 탭에 디버거가 연결 된 브라우저 인스턴스가 있는지 확인 후 인스턴스를 반환합니다.
+ * @param tab 
+ * @returns 
+ */
+export const checkDebugger = async (tab: chrome.tabs.Tab) => {
+    const [target] = (await chrome.debugger.getTargets()).filter(target => target.tabId === tab.id);
+
+    if (target.attached) {
+        for (const [instanceUUID, browserController] of instanceUUIDBrowserControllerMap) {
+            if (browserController.tab.id === tab.id) {
+                return browserController.instance;
+            }
+        }
+    }
 }
 
 /**
