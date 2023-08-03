@@ -240,7 +240,7 @@ const reConnect = () => {
     })
 }
 
-const instanceUUIDBrowserControllerMap = new Map<string, BrowserController>();
+export const instanceUUIDBrowserControllerMap = new Map<string, BrowserController>();
 let browserController : BrowserController;
 
 const execute = async (msg : ExecuteRequestMessage) => {
@@ -264,7 +264,7 @@ const execute = async (msg : ExecuteRequestMessage) => {
         }
         const result = await browserController.execute(msg);
         instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
-        
+
         responseMessage = {
             command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
             tranId : msg.tranId,
