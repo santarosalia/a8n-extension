@@ -20,7 +20,7 @@ import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
 import { ExecuteRequestMessage } from "@CrxInterface";
 import { ElementController } from "@CrxClass/CrxElementController";
 import { AlertOption, BrowserAction, BrowserType, CloseTarget, ConnectOptionType, ElementAction, LocatorType } from "@CrxConstants";
-import { instanceUUIDBrowserControllerMap } from "@/ServiceWorker";
+import { instanceUUIDBrowserControllerMap } from "@/ts/store/CrxStore";
 
 export class BrowserController {
     private _window : chrome.windows.Window
