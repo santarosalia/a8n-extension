@@ -145,7 +145,7 @@ export enum BrowserAction {
     SWITCH_TAB = 'switchTab',
     WAIT = 'wait',
     HANDLE_ALERT = 'handleAlert',
-    DATA_SCRAPING = 'dataScraping'
+    BROWSER_RECORDER_SCRAPING = 'browserRecorderScraping'
 }
 
 export enum ElementAction {

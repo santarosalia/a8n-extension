@@ -27,7 +27,7 @@ export const test = async () => {
     await browserController.execute({
         command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
         object : {
-            action : BrowserAction.DATA_SCRAPING,
+            action : BrowserAction.BROWSER_RECORDER_SCRAPING,
             parameter : {
                 dataScrapingOption : {
                     patternArray : ['li > div.news_wrap.api_ani_send:nth-of-type(1)>div.news_area:nth-of-type(1)>a.news_tit:nth-of-type(1)',

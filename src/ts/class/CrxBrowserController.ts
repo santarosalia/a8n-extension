@@ -355,11 +355,11 @@ export class BrowserController {
                     exists : result.exists
                 };
             }
-            case BrowserAction.DATA_SCRAPING : {
-                
-
-                this.dataScraping(msg);
-                
+            case BrowserAction.BROWSER_RECORDER_SCRAPING : {
+                const scrapedData = await this.browserRecorderScraping(msg);
+                return {
+                    scrapedData : scrapedData
+                }
                 break;
             }
             case ElementAction.LEFT_CLICK : {
@@ -506,8 +506,17 @@ export class BrowserController {
         await sleep(1000);
     }
 
-    private async dataScraping(msg : ExecuteRequestMessage) {
-        const dataScrapingOption = msg.object.parameter.dataScrapingOption;
+    private async browserRecorderScraping(msg : ExecuteRequestMessage) {
+        const dataScrapingOption : {
+            columnSizeArray : number[]
+            patternArray : string[]
+            exceptColumnArray : number[][]
+            exceptRowArray : number[]
+            pageCount : number | string
+            nextPageButtonXpath : string
+            nextPageNumberXpath : string
+        } = JSON.parse(msg.object.parameter.dataScrapingJson);
+        console.log(dataScrapingOption)
         const columnSizeArray = dataScrapingOption.columnSizeArray;
         const patternArray = dataScrapingOption.patternArray;
         const exceptColumnArray = dataScrapingOption.exceptColumnArray;
@@ -516,7 +525,7 @@ export class BrowserController {
         const nextPageButtonXpath = dataScrapingOption.nextPageButtonXpath;
         const nextPageNumberXpath = dataScrapingOption.nextPageNumberXpath;
 
-        let scrapingData: string[][] = [];
+        let scrapedData: string[][] = [];
         let pageData: string[][] = [];
         let tempData: string[][][] = [];
         let pageIndex = 1;
@@ -611,7 +620,7 @@ export class BrowserController {
                 });
             });
             
-            scrapingData = [...scrapingData, ...pageData];
+            scrapedData = [...scrapedData, ...pageData];
             pageData = [];
             tempData = [];
 
@@ -649,7 +658,7 @@ export class BrowserController {
         
         
         
-        console.log(scrapingData);
+        return scrapedData;
     }
 }
 

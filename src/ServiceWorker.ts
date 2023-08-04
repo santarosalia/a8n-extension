@@ -15,7 +15,8 @@ import {
     showNotification,
     focusTab,
     allTabReload,
-    checkTab
+    checkTab,
+    getItemFromLocalStorage
 } from "@CrxApi";
 import { BrowserType, CRX_ADD_SCRAPING_DATA, CRX_COMMAND, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE } from "@CrxConstants";
 import { BrowserCheckReponseMessage, BrowserCheckRequestMessage, CrxMessage, ExecuteRequestMessage, ExecuteResponseMessage } from "@CrxInterface";
@@ -102,7 +103,19 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
         }
         case CRX_COMMAND.CMD_SELECTOR_END : {
             clearInterval(crxInfo.SELECTOR_INJECT_INTERVAL);
-            sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID,CRX_COMMAND.CMD_SEND_LOCATORS, message.payload.locators);
+            const allLocators = message.payload.locators;
+            const browserV1Locators = allLocators.filter(locator => locator.type !== 'CSSSELECTOR');
+            switch (crxInfo.BROWSER_VERSION) {
+                case 1 : {
+                    sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID,CRX_COMMAND.CMD_SEND_LOCATORS, browserV1Locators);
+                    break;
+                }
+                case 2 : {
+                    sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID,CRX_COMMAND.CMD_SEND_LOCATORS, allLocators);
+                    break;
+                }
+            }
+            
             sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_END);
             focusTab(crxInfo.LAUNCHER_TAB_ID)
             break;
@@ -123,7 +136,7 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
             crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
             crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
             
-            initBrowserRecorder(message.payload);
+            initBrowserRecorder(message.payload.url);
             const injectInterval = setInterval(() => {
                 // if(crxInfo.RECORDING_TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
                 sendMessageByWindowId(crxInfo.RECORDING_TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
@@ -136,7 +149,7 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
         case CRX_COMMAND.CMD_LAUNCH_BROWSER_SELECTOR : {
             crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
             crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
-            
+            crxInfo.BROWSER_VERSION = message.payload.browserVersion;
             const injectInterval = setInterval(() => {
                 sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_START, null, crxInfo.LAUNCHER_TAB_ID);
             },1000);
@@ -281,6 +294,7 @@ const execute = async (msg : ExecuteRequestMessage) => {
                 exists : result ? result.exists : null,
                 tagName : result ? result.tagName : null,
                 image : result ? result.image : null,
+                scrapedData : result ? result.scrapedData : null,
                 instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID,
             }
         }
