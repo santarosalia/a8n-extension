@@ -178,7 +178,8 @@ export interface ExecuteResponseMessage {
         tagName? : string
         instanceUUID? : string
         image? : string
-        scrapedData? : string[][]
+        scrapedData? : string[][],
+        elements? : string[]
     }
 }
 

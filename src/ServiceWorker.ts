@@ -295,6 +295,7 @@ const execute = async (msg : ExecuteRequestMessage) => {
                 tagName : result ? result.tagName : null,
                 image : result ? result.image : null,
                 scrapedData : result ? result.scrapedData : null,
+                elements : result ? result.elements : null,
                 instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID,
             }
         }

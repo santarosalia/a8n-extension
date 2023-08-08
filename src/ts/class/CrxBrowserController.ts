@@ -447,6 +447,35 @@ export class BrowserController {
                     image : image
                 }
             }
+            case ElementAction.FIND_CHILDREN : {
+                const locator = msg.object.parameter.locator;
+                const locatorType = msg.object.parameter.locatorType;
+
+                switch (locatorType) {
+                    case LocatorType.CSS_SELECTOR : {
+                        const elements = await elementController.findChildrenBySelector(locator);
+                        const elementControllers = elements.map(el => {
+                            const elementController = new ElementController(el);
+                            this.instanceUUIDElementControllerMap.set(elementController.instanceUUID, elementController);
+                            return elementController.instanceUUID;
+                        });
+                        return {
+                            elements : elementControllers
+                        };
+                    }
+                    case LocatorType.XPATH : {
+                        const elements = await elementController.findChildrenByXpath(locator);
+                        const elementControllers = elements.map(el => {
+                            const elementController = new ElementController(el);
+                            this.instanceUUIDElementControllerMap.set(elementController.instanceUUID, elementController);
+                            return elementController.instanceUUID;
+                        });
+                        return {
+                            elements : elementControllers
+                        };
+                    }
+                }
+            }
         }
 
     }

@@ -163,7 +163,8 @@ export enum ElementAction {
     BOX_MODEL = 'boxModel',
     SET_CHECK_BOX_STATE = 'setCheckBoxState',
     SET_SELECT_BOX_VALUE = 'setSelectBoxValue',
-    SCREENSHOT = 'screenshot'
+    SCREENSHOT = 'screenshot',
+    FIND_CHILDREN = 'findChildren'
 }
 
 export enum ConnectOptionType {
