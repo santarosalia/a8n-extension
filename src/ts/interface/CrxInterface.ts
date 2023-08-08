@@ -226,5 +226,5 @@ export interface ExecuteActionParameter {
     browserType? : BrowserType
     target? : CloseTarget
     alertOption? : AlertOption
-    dataScrapingJson? : string
+    dataScrapingOptionString? : string
 }

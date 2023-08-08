@@ -29,17 +29,7 @@ export const test = async () => {
         object : {
             action : BrowserAction.BROWSER_RECORDER_SCRAPING,
             parameter : {
-                dataScrapingOption : {
-                    patternArray : ['li > div.news_wrap.api_ani_send:nth-of-type(1)>div.news_area:nth-of-type(1)>a.news_tit:nth-of-type(1)',
-                                    'li > div.news_wrap.api_ani_send:nth-of-type(1)>div.news_area:nth-of-type(1)>div.news_dsc:nth-of-type(2)>div.dsc_wrap:nth-of-type(1)>a.api_txt_lines.dsc_txt_wrap:nth-of-type(1)'
-                                ],
-                    columnSizeArray : [2,2],
-                    exceptColumnArray : [[0],[1]],
-                    exceptRowArray : [],
-                    pageCount : 5,
-                    nextPageButtonXpath : '//*[@id="main_pack"]/div[2]/div/a[2]',
-                    nextPageNumberXpath : '//*[@id="main_pack"]/div[2]/div/div/a[2]'
-                }
+                dataScrapingOptionString : '{"patternArray": ["li > div.news_wrap.api_ani_send:nth-of-type(1)>div.news_area:nth-of-type(1)>a.news_tit:nth-of-type(1)", "li > div.news_wrap.api_ani_send:nth-of-type(1)>div.news_area:nth-of-type(1)>div.news_dsc:nth-of-type(2)>div.dsc_wrap:nth-of-type(1)>a.api_txt_lines.dsc_txt_wrap:nth-of-type(1)"], "columnSizeArray": [2, 2], "exceptColumnArray": [[0], [1]], "exceptRowArray":[], "pageCount": 5, "nextPageButtonXpath": "//*[@id=\"main_pack\"]/div[2]/div/a[2]", "nextPageNumberXpath": "//*[@id=\"main_pack\"]/div[2]/div/div/a[2]"}'
             }
         },
         tranId : 0

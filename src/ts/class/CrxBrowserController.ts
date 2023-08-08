@@ -515,7 +515,7 @@ export class BrowserController {
             pageCount : number | string
             nextPageButtonXpath : string
             nextPageNumberXpath : string
-        } = JSON.parse(msg.object.parameter.dataScrapingJson);
+        } = JSON.parse(msg.object.parameter.dataScrapingOptionString);
         console.log(dataScrapingOption)
         const columnSizeArray = dataScrapingOption.columnSizeArray;
         const patternArray = dataScrapingOption.patternArray;
