@@ -114,6 +114,7 @@ export class BrowserController {
             this._tab = (await getAllTabs()).find(tab => tab.title === title);
         }
         if (this._tab === undefined) throw new Error('Not Exists');
+        await focusTab(this._tab.id);
         await this.connect();
     }
 
@@ -142,6 +143,7 @@ export class BrowserController {
             this._tab = (await getAllTabs()).find(tab => tab.url === url);
         }
         if (this._tab === undefined) throw new Error('Not Exists');
+        await focusTab(this._tab.id);
         await this.connect();
     }
 
