@@ -592,3 +592,8 @@ export const waitPageLoading = async (tab : chrome.tabs.Tab) => {
         getTab = await chrome.tabs.get(tab.id);
     }
 }
+
+export const tabFocusCheck = async (windowId: number, tabId: number) => {
+    const [tab] = await chrome.tabs.query({windowId : windowId, active : true});
+    if (tab.id !== tabId) chrome.tabs.update(tabId, {active : true});
+}
