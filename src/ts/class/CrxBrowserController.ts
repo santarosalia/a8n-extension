@@ -12,7 +12,8 @@ import {
     waitPageLoading,
     focusTab,
     windowFocus,
-    checkDebugger
+    checkDebugger,
+    tabFocusCheck
 } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
@@ -114,6 +115,7 @@ export class BrowserController {
             this._tab = (await getAllTabs()).find(tab => tab.title === title);
         }
         if (this._tab === undefined) throw new Error('Not Exists');
+        await focusTab(this._tab.id);
         await this.connect();
     }
 
@@ -142,6 +144,7 @@ export class BrowserController {
             this._tab = (await getAllTabs()).find(tab => tab.url === url);
         }
         if (this._tab === undefined) throw new Error('Not Exists');
+        await focusTab(this._tab.id);
         await this.connect();
     }
 
@@ -233,6 +236,10 @@ export class BrowserController {
             if (!this._instance.isConnected()) {
                 await this.connect();
             }
+            if (!this._window.focused) {
+                await windowFocus(this._window.id);
+            }
+            await tabFocusCheck(this._window.id, this._tab.id);
         }
     }
 
