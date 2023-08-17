@@ -14,6 +14,7 @@ let crxSelectorDisplay = new CrxSelectorDisplay(null);
 
 const clickEventHandler = (ev : MouseEvent) => {
     const target = ev.target as Element;
+    target.classList.remove('crx-highlight');
     ev.preventDefault();
     ev.stopPropagation();
     const e = new CrxClickEvent(ev);
@@ -21,7 +22,7 @@ const clickEventHandler = (ev : MouseEvent) => {
     const fullXpath = e.fullXpath;
     const linkTextXpath = e.linkTextXpath;
     const cssSelector = e.cssSelector;
-
+    
     const locators = [{
         type : 'XPATH',
         value : xpath === fullXpath ? null : xpath
@@ -38,8 +39,6 @@ const clickEventHandler = (ev : MouseEvent) => {
         type : 'CSSSELECTOR',
         value : cssSelector ? cssSelector : null
     }];
-
-    target.classList.remove('crx-highlight');
 
     browserSelectorEnd();
     sendMessageToServiceWorker(CRX_COMMAND.CMD_SELECTOR_END, {

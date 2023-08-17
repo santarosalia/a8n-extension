@@ -210,7 +210,7 @@ chrome.tabs.onCreated.addListener(tab => {
             instanceUUID : browserController.instanceUUID
         }
     }
-    console.log('Browser Check REQ')
+    console.log('Browser Check REQ');
     console.log(msg);
     port.postMessage(msg);
 });
@@ -218,18 +218,18 @@ port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckRepo
     const command = msg.command;
     switch (command) {
         case CRX_COMMAND.CMD_CRX_EXECUTE_ACTION : {
-            console.log('-REQ-')
-            console.log(msg)
+            console.log('-REQ-');
+            console.log(msg);
             const responseMessage = await execute(msg as ExecuteRequestMessage);
-            console.log('-RES-')
-            console.log(responseMessage)
+            console.log('-RES-');
+            console.log(responseMessage);
             port.postMessage(responseMessage);
             break;
         }
         case CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH : {
             msg = msg as BrowserCheckReponseMessage;
-            console.log('Browser Check RES')
-            console.log(msg)
+            console.log('Browser Check RES');
+            console.log(msg);
             if (msg.object.isBrowserLaunch) {
                 const browserController = tranIdBrowserControllerMap.get(tranId);
                 instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
@@ -245,14 +245,14 @@ port.onDisconnect.addListener(() => {
     // reConnect();
 });
 
-const reConnect = () => {
-    port = chrome.runtime.connectNative('crx');
-    console.log('Native Messaging Connected');
-    port.onDisconnect.addListener(() => {
-        console.log('Native Messaging Disconnected');
-        reConnect();
-    })
-}
+// const reConnect = () => {
+//     port = chrome.runtime.connectNative('crx');
+//     console.log('Native Messaging Connected');
+//     port.onDisconnect.addListener(() => {
+//         console.log('Native Messaging Disconnected');
+//         reConnect();
+//     })
+// }
 
 let browserController : BrowserController;
 
@@ -328,4 +328,4 @@ const pickBrowserControllerMap = async () => {
     }
 }
 
-chrome.action.onClicked.addListener(test);
+// chrome.action.onClicked.addListener(test);
