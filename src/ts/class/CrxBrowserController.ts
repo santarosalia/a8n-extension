@@ -688,13 +688,11 @@ export class BrowserController {
             }
             pageIndex++;
         }
-        
-        
-        
-        
-        
-        
         return scrapedData;
+    }
+    
+    async evaluate(script: string) {
+        return await this._page.evaluate(script);
     }
 }
 
