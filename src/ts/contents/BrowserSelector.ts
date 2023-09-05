@@ -1,8 +1,8 @@
 import CrxHilightCSS from '@/css/CrxHighlight.css?raw';
 import CrxSelectorDisplayCSS from '@/css/CrxSelectorDisplay.css?raw';
 import { CrxMessage } from '@CrxInterface';
-import { CRX_COMMAND, CRX_MSG_RECEIVER, EVENT } from '@CrxConstants';
-import { sendMessageToServiceWorker } from '@CrxApi';
+import { CRX_COMMAND, CRX_MSG_RECEIVER, CRX_STATE, EVENT } from '@CrxConstants';
+import { getItemFromLocalStorage, sendMessageToServiceWorker } from '@CrxApi';
 import CrxSelectorDisplay from '@/ts/class/CrxSelectorDisplay';
 import { CrxClickEvent } from '@CrxClass/CrxClickEvent';
 import { CrxMousemoveEvent } from '@CrxClass/CrxMouseMoveEvent';
@@ -14,13 +14,15 @@ let crxSelectorDisplay = new CrxSelectorDisplay(null);
 
 const clickEventHandler = (ev : MouseEvent) => {
     const target = ev.target as Element;
+    target.classList.remove('crx-highlight');
     ev.preventDefault();
     ev.stopPropagation();
     const e = new CrxClickEvent(ev);
     const xpath = e.xpath;
     const fullXpath = e.fullXpath;
     const linkTextXpath = e.linkTextXpath;
-
+    const cssSelector = e.cssSelector;
+    
     const locators = [{
         type : 'XPATH',
         value : xpath === fullXpath ? null : xpath
@@ -32,9 +34,11 @@ const clickEventHandler = (ev : MouseEvent) => {
     {
         type : 'LINKTEXTXPATH',
         value : linkTextXpath ? linkTextXpath : null
+    },
+    {
+        type : 'CSSSELECTOR',
+        value : cssSelector ? cssSelector : null
     }];
-
-    target.classList.remove('crx-highlight');
 
     browserSelectorEnd();
     sendMessageToServiceWorker(CRX_COMMAND.CMD_SELECTOR_END, {

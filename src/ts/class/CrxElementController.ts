@@ -189,4 +189,11 @@ export class ElementController {
             encoding : 'base64'
         }) as string;
     }
+
+    async findChildrenBySelector(locator: string) {
+        return await this._elementHandle.$$(locator);
+    }
+    async findChildrenByXpath(locator: string) {
+        return await this._elementHandle.$x(locator);
+    }
 }

@@ -25,7 +25,8 @@ export class CrxReadAttributeEvent extends CrxCapturedEvent {
                 values : [
                     getLocatorInfo(this).xpath,
                     getLocatorInfo(this).fullxpath,
-                    getLocatorInfo(this).linktextxpath
+                    getLocatorInfo(this).linktextxpath,
+                    getLocatorInfo(this).cssselector
                 ]
             },
             {

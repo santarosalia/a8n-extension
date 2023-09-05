@@ -6,7 +6,8 @@ export class CrxInfo {
     LAUNCHER_TAB_ID : number;
     LAUNCHER_WINDOW_ID : number;
     SELECTOR_INJECT_INTERVAL : NodeJS.Timer;
-    CONTROLLER_WINDOW_ID : number
+    CONTROLLER_WINDOW_ID : number;
+    BROWSER_VERSION: number;
     constructor () {
         
     }

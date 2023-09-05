@@ -18,7 +18,7 @@ import {
 import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
 import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
-import { ExecuteRequestMessage } from "@CrxInterface";
+import { ExecuteActionParameter, ExecuteRequestMessage } from "@CrxInterface";
 import { ElementController } from "@CrxClass/CrxElementController";
 import { AlertOption, BrowserAction, BrowserType, CloseTarget, ConnectOptionType, ElementAction, LocatorType } from "@CrxConstants";
 import { instanceUUIDBrowserControllerMap } from "@/ts/store/CrxStore";
@@ -362,6 +362,13 @@ export class BrowserController {
                     exists : result.exists
                 };
             }
+            case BrowserAction.BROWSER_RECORDER_SCRAPING : {
+                const scrapedData = await this.browserRecorderScraping(msg);
+                return {
+                    scrapedData : scrapedData
+                }
+                break;
+            }
             case ElementAction.LEFT_CLICK : {
                 await elementController.leftClick();
                 break;
@@ -447,6 +454,35 @@ export class BrowserController {
                     image : image
                 }
             }
+            case ElementAction.FIND_CHILDREN : {
+                const locator = msg.object.parameter.locator;
+                const locatorType = msg.object.parameter.locatorType;
+
+                switch (locatorType) {
+                    case LocatorType.CSS_SELECTOR : {
+                        const elements = await elementController.findChildrenBySelector(locator);
+                        const elementControllers = elements.map(el => {
+                            const elementController = new ElementController(el);
+                            this.instanceUUIDElementControllerMap.set(elementController.instanceUUID, elementController);
+                            return elementController.instanceUUID;
+                        });
+                        return {
+                            elements : elementControllers
+                        };
+                    }
+                    case LocatorType.XPATH : {
+                        const elements = await elementController.findChildrenByXpath(locator);
+                        const elementControllers = elements.map(el => {
+                            const elementController = new ElementController(el);
+                            this.instanceUUIDElementControllerMap.set(elementController.instanceUUID, elementController);
+                            return elementController.instanceUUID;
+                        });
+                        return {
+                            elements : elementControllers
+                        };
+                    }
+                }
+            }
         }
 
     }
@@ -505,8 +541,162 @@ export class BrowserController {
         this._frame = this._page.mainFrame();
         await sleep(1000);
     }
-}
 
+    private async browserRecorderScraping(msg : ExecuteRequestMessage) {
+        const dataScrapingOption : {
+            columnSizeArray : number[]
+            patternArray : string[]
+            exceptColumnArray : number[][]
+            exceptRowArray : number[]
+            pageCount : number | string
+            nextPageButtonXpath : string
+            nextPageNumberXpath : string
+        } = JSON.parse(msg.object.parameter.dataScrapingOptionString);
+        
+        const columnSizeArray = dataScrapingOption.columnSizeArray;
+        const patternArray = dataScrapingOption.patternArray;
+        const exceptColumnArray = dataScrapingOption.exceptColumnArray;
+        const exceptRowArray = dataScrapingOption.exceptRowArray;
+        const pageCount = dataScrapingOption.pageCount;
+        const nextPageButtonXpath = dataScrapingOption.nextPageButtonXpath;
+        const nextPageNumberXpath = dataScrapingOption.nextPageNumberXpath;
+
+        let scrapedData: string[][] = [];
+        let pageData: string[][] = [];
+        let tempData: string[][][] = [];
+        let pageIndex = 1;
+        while(true) {
+            await waitPageLoading(this._tab);
+            for (const [patternIndex, pattern] of patternArray.entries()) {
+                const allElements = (await this._page.$$(pattern));
+                const patternData: string[][] = [];
+                for (const element of allElements) {
+                    const row: string[] = [];
+                    
+                    // textContent
+                    const textContent = await element.evaluate(node => node.textContent);
+                    
+                    row.push(textContent);
+
+                    if (columnSizeArray[patternIndex] === 1) {
+                        patternData.push(row);
+                        continue;
+                    }
+                    
+                    // url
+                    const url = await element.evaluate(node => {
+                        if (node.closest('a')) {
+                            return node.closest('a').href;
+                        }else if (node.querySelector('a')) {
+                            return node.querySelector('a').href;
+                        }
+                    });
+
+                    row.push(url);
+
+                    if (columnSizeArray[patternIndex] === 2) {
+                        patternData.push(row);
+                        continue;
+                    }
+                    
+                    // src
+                    const src = await element.evaluate(node => {
+                        if (node.closest('img')) {
+                            return node.closest('img').alt;
+                        } else if (node.querySelector('img')) {
+                            return node.querySelector('img').alt;
+                        }
+                    });
+
+                    row.push(src);
+
+                    if (columnSizeArray[patternIndex] === 3) {
+                        patternData.push(row);
+                        continue;
+                    }
+                    
+                    // alt
+        
+                    const alt = await element.evaluate(node => {
+                        if (node.closest('img')) {
+                            return node.closest('img').alt;
+                        } else if (node.querySelector('img')) {
+                            return node.querySelector('img').alt;
+                        }
+                    });
+                    
+                    row.push(alt);
+
+                    if (columnSizeArray[patternIndex] === 4) {
+                        patternData.push(row);
+                        continue;
+                    }
+                }
+
+                // exceptColumn Processing
+                patternData.forEach(row => {
+                    exceptColumnArray[patternIndex].forEach(exceptColumn => {
+                        row.splice(exceptColumn, 1);
+                    });
+                });
+
+                // exceptRow Processing
+                exceptRowArray.reverse().forEach(exceptRow => {
+                    patternData.splice(exceptRow, 1);
+                });
+
+                tempData.push(patternData);
+            }
+
+            
+            tempData.forEach(item => {
+                pageData = item.map((arr,idx) => {
+                    pageData.push([]);
+                return pageData[idx].concat(arr);
+                });
+            });
+            
+            scrapedData = [...scrapedData, ...pageData];
+            pageData = [];
+            tempData = [];
+
+            // 페이지 수 1인 경우 || 다음페이지버튼 / 다음페이지숫자 미 설정 시
+            if (pageCount as number < 2 || pageCount !== '*' && (!nextPageButtonXpath && !nextPageNumberXpath)) break;
+            // 다중페이지 종료 시
+            if (pageCount === pageIndex) break;
+
+            // 숫자페이지 버튼으로 먼저 클릭
+            if (nextPageNumberXpath) {
+                const nextPageNumber = await this._page.waitForXPath(nextPageNumberXpath);
+                const parentElement = (await nextPageNumber.getProperty('parentNode')).asElement();
+                const children = await parentElement.$$('a');
+                let element: ElementHandle;
+                for (const child of children) {
+                    const num = await (await child.getProperty('textContent')).jsonValue();
+                    if (num === (pageIndex + 1).toString()) {
+                        element = child;
+                        break;
+                    }
+                }
+                if (element) {
+                    await element.click();
+                } else {
+                    
+                }
+            } else if (nextPageButtonXpath) {
+                await (await this._page.waitForXPath(nextPageButtonXpath)).click();
+            }
+            pageIndex++;
+        }
+        
+        
+        
+        
+        
+        
+        return scrapedData;
+    }
+}
 
 
 

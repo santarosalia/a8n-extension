@@ -120,7 +120,16 @@ export interface Locator {
 export interface CrxMessage {
     receiver : string
     command : CRX_COMMAND
-    payload? : any
+    payload? : {
+        browserVersion?: number
+        title?: string
+        message?: string
+        locators?: {
+            type: string,
+            value: string
+        }[]
+        url?: string
+    }
 }
 
 export enum CRX_CONTEXT_MENU_TYPE {
@@ -169,6 +178,8 @@ export interface ExecuteResponseMessage {
         tagName? : string
         instanceUUID? : string
         image? : string
+        scrapedData? : string[][],
+        elements? : string[]
     }
 }
 
@@ -216,4 +227,5 @@ export interface ExecuteActionParameter {
     browserType? : BrowserType
     target? : CloseTarget
     alertOption? : AlertOption
+    dataScrapingOptionString? : string
 }
