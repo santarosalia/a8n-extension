@@ -369,6 +369,33 @@ export class BrowserController {
                 }
                 break;
             }
+            case BrowserAction.EVALUATE : {
+                const script = `(() => {${msg.object.parameter.script}})();`;
+                
+                const result = await this.evaluate(script);
+                let type: string;
+                switch (typeof result) {
+                    case "object" : {
+                        if (Array.isArray(result)) {
+                            type = 'array';
+                        } else {
+                            type = 'object';
+                        }
+                        break;
+                    }
+                    default : {
+                        type = typeof result;
+                        break;
+                    }
+                }
+                
+                return {
+                    evaluateResult : {
+                        type : type,
+                        value : result
+                    }
+                }
+            }
             case ElementAction.LEFT_CLICK : {
                 await elementController.leftClick();
                 break;
@@ -453,6 +480,10 @@ export class BrowserController {
                 return {
                     image : image
                 }
+            }
+            case ElementAction.CLIPBOARD_WRITE : {
+                await elementController.clipboardWrite();
+                break;
             }
             case ElementAction.FIND_CHILDREN : {
                 const locator = msg.object.parameter.locator;

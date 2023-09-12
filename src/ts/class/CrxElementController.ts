@@ -189,6 +189,24 @@ export class ElementController {
             encoding : 'base64'
         }) as string;
     }
+    async clipboardWrite() {
+        await this._elementHandle.evaluate(async el => {
+            const isImageElement = el.querySelector('img') || el.closest('img');
+            
+            if (isImageElement) {
+                const blob = new Blob([el.outerHTML], {type : 'text/html'});
+                const clipboardItem = new ClipboardItem({[blob.type] : blob});
+                await navigator.clipboard.write([clipboardItem]);
+            } else {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                const range = document.createRange();
+                range.selectNode(el);
+                selection.addRange(range);
+                document.execCommand('copy');
+            }
+        });
+    }
 
     async findChildrenBySelector(locator: string) {
         return await this._elementHandle.$$(locator);

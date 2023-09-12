@@ -145,7 +145,8 @@ export enum BrowserAction {
     SWITCH_TAB = 'switchTab',
     WAIT = 'wait',
     HANDLE_ALERT = 'handleAlert',
-    BROWSER_RECORDER_SCRAPING = 'browserRecorderScraping'
+    BROWSER_RECORDER_SCRAPING = 'browserRecorderScraping',
+    EVALUATE = 'evaluate'
 }
 
 export enum ElementAction {
@@ -164,7 +165,8 @@ export enum ElementAction {
     SET_CHECK_BOX_STATE = 'setCheckBoxState',
     SET_SELECT_BOX_VALUE = 'setSelectBoxValue',
     SCREENSHOT = 'screenshot',
-    FIND_CHILDREN = 'findChildren'
+    FIND_CHILDREN = 'findChildren',
+    CLIPBOARD_WRITE = 'clipboardWrite'
 }
 
 export enum ConnectOptionType {

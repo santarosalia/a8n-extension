@@ -179,7 +179,11 @@ export interface ExecuteResponseMessage {
         instanceUUID? : string
         image? : string
         scrapedData? : string[][],
-        elements? : string[]
+        elements? : string[],
+        evaluateResult?: {
+            type: string,
+            value: string | number | boolean | object
+        }
     }
 }
 
@@ -228,4 +232,5 @@ export interface ExecuteActionParameter {
     target? : CloseTarget
     alertOption? : AlertOption
     dataScrapingOptionString? : string
+    script?: string
 }
