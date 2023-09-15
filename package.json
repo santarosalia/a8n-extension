@@ -1,5 +1,5 @@
 {
-  "name": "wd-extension",
+  "name": "a8n-extension",
   "version": "2308.29.1",
   "private": true,
   "scripts": {
@@ -11,15 +11,26 @@
     "docs": "npx typedoc --entryPointStrategy expand ./src"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@mdi/font": "5.9.55",
+    "@mui/icons-material": "^5.14.9",
+    "@mui/material": "^5.14.9",
+    "@mui/styled-engine-sc": "^5.14.9",
     "@types/chrome": "^0.0.228",
     "@types/puppeteer-core": "^7.0.4",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
     "@types/vue-router": "^2.0.0",
+    "@vitejs/plugin-react": "^4.0.4",
     "@webcomponents/custom-elements": "^1.6.0",
     "npm-build-zip": "^1.0.3",
     "puppeteer-core": "^13.0.0",
     "puppeteer-extension-transport": "^0.0.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "roboto-fontface": "*",
+    "styled-components": "^6.0.8",
     "vue": "^3.2.47",
     "vue-router": "^4.0.13",
     "vuetify": "^3.0.0-beta.0",

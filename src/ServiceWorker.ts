@@ -61,6 +61,20 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     const COMMAND = message.command;
     switch (COMMAND) {
+        case CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER : {
+            // crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
+            // crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
+            
+            initBrowserRecorder(message.payload.url);
+            const injectInterval = setInterval(() => {
+                // if(crxInfo.RECORDING_TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
+                sendMessageByWindowId(crxInfo.RECORDING_TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
+                    //레코딩 창 닫힌 경우!
+                    clearInterval(injectInterval);
+                });
+            },1000);
+            break;
+        }
         case CRX_COMMAND.CMD_RECORDING_WINDOW_FOCUS : {
             windowFocus(crxInfo.RECORDING_TARGET_WINDOW_ID);
             break;
@@ -196,54 +210,54 @@ let tranId = 0;
 const tranIdBrowserControllerMap = new Map<number, BrowserController>();
 
 // Native Messaging
-var port = chrome.runtime.connectNative('worktronics.browser_automation.chrome');
-chrome.tabs.onCreated.addListener(tab => {
-    const browserController = new BrowserController(tab);
-    tranId++;
-    tranIdBrowserControllerMap.set(tranId, browserController);
-    const msg : BrowserCheckRequestMessage = {
-        command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
-        tranId : tranId,
-        responseInfo : null,
-        object : {
-            browserType : self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME,
-            instanceUUID : browserController.instanceUUID
-        }
-    }
-    console.log('Browser Check REQ');
-    console.log(msg);
-    port.postMessage(msg);
-});
-port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckReponseMessage) => {
-    const command = msg.command;
-    switch (command) {
-        case CRX_COMMAND.CMD_CRX_EXECUTE_ACTION : {
-            console.log('-REQ-');
-            console.log(msg);
-            const responseMessage = await execute(msg as ExecuteRequestMessage);
-            console.log('-RES-');
-            console.log(responseMessage);
-            port.postMessage(responseMessage);
-            break;
-        }
-        case CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH : {
-            msg = msg as BrowserCheckReponseMessage;
-            console.log('Browser Check RES');
-            console.log(msg);
-            if (msg.object.isBrowserLaunch) {
-                const browserController = tranIdBrowserControllerMap.get(tranId);
-                instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
-            }
-            tranIdBrowserControllerMap.delete(tranId);
-            break;
-        }
-    }
+// var port = chrome.runtime.connectNative('worktronics.browser_automation.chrome');
+// chrome.tabs.onCreated.addListener(tab => {
+//     const browserController = new BrowserController(tab);
+//     tranId++;
+//     tranIdBrowserControllerMap.set(tranId, browserController);
+//     const msg : BrowserCheckRequestMessage = {
+//         command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
+//         tranId : tranId,
+//         responseInfo : null,
+//         object : {
+//             browserType : self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME,
+//             instanceUUID : browserController.instanceUUID
+//         }
+//     }
+//     console.log('Browser Check REQ');
+//     console.log(msg);
+//     port.postMessage(msg);
+// });
+// port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckReponseMessage) => {
+//     const command = msg.command;
+//     switch (command) {
+//         case CRX_COMMAND.CMD_CRX_EXECUTE_ACTION : {
+//             console.log('-REQ-');
+//             console.log(msg);
+//             const responseMessage = await execute(msg as ExecuteRequestMessage);
+//             console.log('-RES-');
+//             console.log(responseMessage);
+//             port.postMessage(responseMessage);
+//             break;
+//         }
+//         case CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH : {
+//             msg = msg as BrowserCheckReponseMessage;
+//             console.log('Browser Check RES');
+//             console.log(msg);
+//             if (msg.object.isBrowserLaunch) {
+//                 const browserController = tranIdBrowserControllerMap.get(tranId);
+//                 instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
+//             }
+//             tranIdBrowserControllerMap.delete(tranId);
+//             break;
+//         }
+//     }
     
-});
-port.onDisconnect.addListener(() => {
-    console.log('Native Messaging Disconnected');
-    // reConnect();
-});
+// });
+// port.onDisconnect.addListener(() => {
+//     console.log('Native Messaging Disconnected');
+//     // reConnect();
+// });
 
 // const reConnect = () => {
 //     port = chrome.runtime.connectNative('crx');
