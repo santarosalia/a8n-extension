@@ -370,15 +370,15 @@ export class BrowserController {
                 break;
             }
             case ElementAction.LEFT_CLICK : {
-                await elementController.leftClick();
+                elementController.leftClick();
                 break;
             }
             case ElementAction.RIGHT_CLICK : {
-                await elementController.rightClick();
+                elementController.rightClick();
                 break;
             }
             case ElementAction.DOUBLE_CLICK : {
-                await elementController.doubleClick();
+                elementController.doubleClick();
                 break;
             }
             case ElementAction.HOVER : {

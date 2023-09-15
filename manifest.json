@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Worktronics Browser Automation",
-    "version": "2308.29.0",
+    "version": "2308.29.1",
     "icons": {
       "16": "icons/recIcon_default16.png",
       "64": "icons/recIcon_default64.png",
