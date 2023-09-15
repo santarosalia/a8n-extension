@@ -1,36 +1,32 @@
-import { EVENT, CRX_CMD } from "@CrxConstants";
-import HilightCSS from '@/css/Highlight.css?raw'
-import { WebRecorderEventHandler } from "@/ts/contents/WebRecorder";
-let WebRecorderStarted : boolean;
+import { browserRecorder } from "@/ts/contents/BrowserRecorder";
+import { browserSelector } from "@/ts/contents/BrowserSelector";
+import { getItemFromLocalStorage } from "@CrxApi";
+import { CrxMessage } from "@CrxInterface";
+import { CRX_COMMAND, CRX_MSG_RECEIVER, CRX_STATE } from "@CrxConstants";
 
-chrome.runtime.onMessage.addListener(request => {
-    switch (request.command) {
-        case CRX_CMD.CMD_RECORDING_START : {
-            if (WebRecorderStarted) return;
-
-            window.addEventListener(EVENT.CLICK, WebRecorderEventHandler, true);
-            window.addEventListener(EVENT.CONTEXTMENU, WebRecorderEventHandler, true);
-            window.addEventListener(EVENT.SCROLL, WebRecorderEventHandler, true);
-            window.addEventListener(EVENT.INPUT, WebRecorderEventHandler, true);
-            window.addEventListener(EVENT.WHEEL, WebRecorderEventHandler, true);
-            window.addEventListener(EVENT.MOUSEOVER, WebRecorderEventHandler, true);
-            window.addEventListener(EVENT.MOUSEOUT, WebRecorderEventHandler, true);
-            window.addEventListener(EVENT.KEYDOWN, WebRecorderEventHandler, true);
-            
-            const style = window.document.createElement('style');
-            style.innerHTML = HilightCSS;
-            window.document.head.appendChild(style);
-
-            WebRecorderStarted = true;
+const contentScript = async (message : CrxMessage) => {
+    if (message.receiver !== CRX_MSG_RECEIVER.CONTENT_SCRIPT) return;
+    switch (message.command) {
+        case CRX_COMMAND.CMD_CREATE_ACTIVITY : {
+            await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]).then(result => {
+                localStorage.setItem(CRX_STATE.CRX_RECORDS,JSON.stringify(result[CRX_STATE.CRX_RECORDS]));
+            });
+            const createWebRecAct2 = document.querySelector('#createWebRecAct2') as HTMLElement;
+            if (createWebRecAct2) createWebRecAct2.click();
             break;
         }
-        case CRX_CMD.CMD_RECORDING_END : {
-            window.removeEventListener(EVENT.CLICK, WebRecorderEventHandler);
-            window.removeEventListener(EVENT.SCROLL, WebRecorderEventHandler);
-            window.removeEventListener(EVENT.INPUT, WebRecorderEventHandler);
-            window.removeEventListener(EVENT.SELECT, WebRecorderEventHandler);
-            window.removeEventListener(EVENT.WHEEL, WebRecorderEventHandler);
+        case CRX_COMMAND.CMD_SEND_LOCATORS : {
+            const browserSelectorModalButton = document.querySelector('#browserSelectorModalButton') as HTMLElement;
+            const locators = message.payload;
+            if (browserSelectorModalButton) {
+                sessionStorage.setItem('ws-locators',JSON.stringify(locators));
+                browserSelectorModalButton.click();
+            }
             break;
         }
     }
-});
+}
+
+chrome.runtime.onMessage.addListener(contentScript);
+chrome.runtime.onMessage.addListener(browserRecorder);
+chrome.runtime.onMessage.addListener(browserSelector);

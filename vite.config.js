@@ -24,7 +24,7 @@ export default defineConfig({
       },
       {
         find : '@CrxClass',
-        replacement : resolve(__dirname, 'src/ts/class/CrxClass.ts')
+        replacement : resolve(__dirname, 'src/ts/class')
       },
       {
         find : '@CrxConstants',

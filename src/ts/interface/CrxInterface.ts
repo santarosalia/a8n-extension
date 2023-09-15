@@ -1,10 +1,14 @@
+import { KeyInput } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry"
+import { Action } from "@/ts/type/CrxType"
+import { AlertOption, BrowserAction, BrowserType, CRX_COMMAND, CloseTarget, ConnectOptionType, LocatorType, Status } from "@CrxConstants"
+
 export interface TopbarMenuDetails {
     title : string
     index : number
     path : string
 }
 
-export interface CapturedEventDetails extends EventDetails {
+export interface CrxCapturedEventDetails extends CrxEventDetails {
     localName : string
     textContent : string
     id : string
@@ -21,9 +25,10 @@ export interface CapturedEventDetails extends EventDetails {
     image : string
     clientWidth : number
     clientHeight : number
+    attribute : Locator
 }
 
-export interface EventDetails {
+export interface CrxEventDetails {
     AT_TARGET : number
     BUBBLING_PHASE : number
     CAPTURING_PHASE : number
@@ -92,6 +97,7 @@ export interface FrameStack {
     frameIndex : number
     id : string
     name : string
+    element : Element
 }
 export interface EventInfo {
     type : string
@@ -106,14 +112,140 @@ export interface LocatorInfo {
     val : string
 }
 
-interface Locator {
+export interface Locator {
     type : LocatorType
     value : string
 }
 
-export enum LocatorType {
-    Xpath = 'xpath',
-    FullXpath = 'fullXpath',
-    LinkTextXpath = 'linkTextXpath',
-    CssSelector = 'cssSelector'
+export interface CrxMessage {
+    receiver : string
+    command : CRX_COMMAND
+    payload? : {
+        browserVersion?: number
+        title?: string
+        message?: string
+        locators?: {
+            type: string,
+            value: string
+        }[]
+        url?: string
+    }
+}
+
+export enum CRX_CONTEXT_MENU_TYPE {
+    NORMAL,
+    MULTIPAGE
+}
+
+export interface ScrapingDatas {
+    exceptRow : number[]
+    data : ScrapingData[]
+    frameStack : FrameStack[]
+}
+
+interface ScrapingData {
+    columnSize : number
+    pattern : string
+    textData : string[][]
+    exceptColumn : number[]
+}
+
+export interface ExecuteRequestMessage {
+    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION | CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH
+    object : {
+        instanceUUID? : string
+        action? : Action
+        parameter? : ExecuteActionParameter
+    }
+    tranId :number
+}
+
+export interface ExecuteResponseMessage {
+    command : string,
+    tranId : number,
+    responseInfo : {
+        result : Status,
+        errorMessage? : string,
+    }
+    object? : {
+        textContent? : string,
+        propertyValue? : string
+        x? : number
+        y? : number
+        width? : number
+        height? : number
+        exists? : boolean,
+        tagName? : string
+        instanceUUID? : string
+        image? : string
+        scrapedData? : string[][],
+        elements? : string[],
+        evaluateResult?: {
+            type: string,
+            value: string | number | boolean | object
+        },
+        outerHTML?: string
+    }
+}
+
+export interface ExecuteReadTextResponseMessage extends ExecuteResponseMessage{
+    object : {
+        textContent: string
+    }
+}
+
+export interface ExcuteWaitRequestMessage extends ExecuteRequestMessage {
+    object: {
+        action: BrowserAction.WAIT,
+        
+
+    }
+}
+
+export interface BrowserCheckRequestMessage {
+    command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
+    tranId : number,
+    responseInfo : null,
+    object : {
+        browserType : BrowserType,
+        instanceUUID : string
+    }
+}
+
+export interface BrowserCheckReponseMessage {
+    command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
+    tranId : number,
+    responseInfo : {
+        result : Status,
+        errorMessage : string
+    },
+    object : {
+        isBrowserLaunch : boolean
+    }
+}
+
+export interface ExecuteActionParameter {
+    timeout? : number
+    url? : string
+    connectOption? : {
+        type : ConnectOptionType,
+        value : string,
+        isContains : boolean
+    }
+    locatorType? : LocatorType
+    locator? : string
+    text? : string
+    propertyName? : string
+    frameName? : string
+    key? : KeyInput
+    check? : boolean
+    selectValue? : string
+    x? : number
+    y? : number
+    tabIndex? : number
+    browserType? : BrowserType
+    target? : CloseTarget
+    alertOption? : AlertOption
+    dataScrapingOptionString? : string
+    script?: string
 }

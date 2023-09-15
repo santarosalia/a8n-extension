@@ -27,8 +27,10 @@
               {{ frame.id ?? frame.name }}
             </span>
           </span>
+          
         </template>
         <template #append>
+          <img v-if="record.image" :src="record.image" width="50"/>
           <v-btn v-if="record.type !== EVENT.OPENBROWSER" variant="text" icon @click.stop="removeRecord(index)">
             <v-icon>mdi-minus</v-icon>
           </v-btn>
@@ -46,11 +48,11 @@
                 </v-btn>
             </v-toolbar>
 <!-- Dialog Contents-->
-            <v-container align="center" class="pa-1">
+            <v-container class="pa-1" align="center">
                 <v-card max-width="400" variant="text" class="pt-2">
                   <v-row v-if="record.type === EVENT.CLICK || record.type === EVENT.INPUT || record.type === EVENT.SELECT" align="center">
                       <v-col>
-                        <v-list-group value >
+                        <v-list-group value align="center">
                         <template #activator="{ props }">
                           <v-list-item v-bind="props" title="엘리먼트 정보" prepend-icon="mdi-info"></v-list-item>
                         </template>
@@ -105,6 +107,10 @@
                           <v-select v-model="locatorDisplayName" variant="solo" density="compact" :items="info.values" item-title="displayName" item-value="type" hide-details @update:model-value="changeLocator"></v-select>
                           <v-text-field v-model="locatorValue" variant="outlined" density="compact" hide-details readonly></v-text-field>
                       </v-col>
+                      <v-col cols="8" v-else-if="info.type === 'selectAttribute'">
+                          <v-select v-model="attributeDisplayName" variant="solo" density="compact" :items="info.values" item-title="displayName" item-value="type" hide-details @update:model-value="changeAttribute"></v-select>
+                          <v-text-field v-model="attributeValue" variant="outlined" density="compact" hide-details readonly></v-text-field>
+                      </v-col>
                       <v-col cols="8" v-else-if="info.type === 'image'">
                         <v-img v-if="record.image" :src="record.image"/>
                         <span v-else>이미지가 없습니다.</span>
@@ -119,26 +125,29 @@
 
 <script setup lang="ts">
 
-import { CapturedEventDetails, LocatorType } from '@CrxInterface';
-import { EVENT, EVENT_TYPE_TO_KOREAN } from '@CrxConstants';
+import { CrxCapturedEventDetails } from '@CrxInterface';
+import { EVENT, EVENT_TYPE_TO_KOREAN, CRX_ACTION, LocatorType } from '@CrxConstants';
 import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
 const showDialog = ref(false);
 const props = defineProps<{
-  record : CapturedEventDetails,
+  record : CrxCapturedEventDetails,
   index : number
 }>();
 const locatorDisplayName = ref('XPath');
 const locatorValue = ref(props.record.xpath);
 
+const attributeDisplayName = ref('속성을 선택 해 주세요');
+const attributeValue = ref('');
+
 const removeRecord = (index : number) => {
-  store.dispatch('removeRecord', index);
+  store.dispatch(CRX_ACTION.REMOVE_RECORD, index);
 }
 
-const editRecord = (index : number, record : CapturedEventDetails) => {
-    store.dispatch('editRecord', {
+const editRecord = (index : number, record : CrxCapturedEventDetails) => {
+    store.dispatch(CRX_ACTION.EDIT_RECORD, {
         index : index,
         record : record
     });
@@ -150,6 +159,14 @@ const changeLocator = (locatorType : LocatorType) => {
     value : props.record[locatorType]
   };
   locatorValue.value = props.record.locator.value;
+}
+
+const changeAttribute = (attributeType : LocatorType) => {
+  props.record.attribute = {
+    type : attributeType,
+    value : props.record.info.find(item => item.type === 'selectAttribute').values.find(item => item.type === attributeType).val
+  };
+  attributeValue.value = props.record.attribute.value;
 }
 
 watch(showDialog, (newVal) => {

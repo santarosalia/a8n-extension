@@ -17,10 +17,16 @@
 
     const router = useRouter();
     const topbarMenus = topbarMenu;
-    const tab = ref(null);
-
+    const tab = ref(0);
+    router.push('/')
     const pushRouter = (menu : TopbarMenuDetails) => {
         router.push(menu.path);
     }
+    router.beforeEach((to, from, next) => {
+        if (to.path === '/rh') tab.value = 0;
+        else if (to.path === '/ds') tab.value = 1;
+        from.path;
+        next();
+    })
 </script>
   

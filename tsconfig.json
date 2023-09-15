@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6",
         "module": "esnext",
         "strict": true,
         "jsx": "preserve",
@@ -21,7 +21,7 @@
         "paths": {
             "@/*": ["src/*"],
             "tslib" : ["path/to/node_modules/tslib/tslib.d.ts"],
-            "@CrxClass" : ["src/ts/class/CrxClass.ts"],
+            "@CrxClass/*" : ["src/ts/class/*"],
             "@CrxApi" : ["src/ts/api/CrxApi.ts"],
             "@CrxConstants" : ["src/ts/constants/CrxConstants.ts"],
             "@CrxInterface" : ["src/ts/interface/CrxInterface.ts"],            
@@ -34,8 +34,8 @@
         ],
         "resolveJsonModule": true,
         "removeComments": true, //컴파일시 주석제거
-        "noUnusedLocals": true, //쓰지않는 지역변수 있으면 에러내기
-        "noUnusedParameters": true, //쓰지않는 파라미터 있으면 에러내기
+        "noUnusedLocals": false, //쓰지않는 지역변수 있으면 에러내기
+        "noUnusedParameters": false, //쓰지않는 파라미터 있으면 에러내기
         "noImplicitAny": false,
         "strictNullChecks": false
     },
@@ -45,10 +45,10 @@
         "src/**/*.vue",
         "tests/**/*.ts",
         "tests/**/*.tsx",
-        "src/main.ts"
+        "src/main.ts",
+        "src/DevToolsPlugin.js"
     ],
     "exclude": [
         "node_modules"
     ]
-    
 }

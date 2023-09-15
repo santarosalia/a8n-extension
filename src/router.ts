@@ -12,8 +12,8 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path : '/ds',
-        name : 'DataScrapping',
-        component : () => import('@/components/DataScrapping.vue')
+        name : 'DataScraping',
+        component : () => import('@/components/DataScraping.vue')
     },
     {
         path : '/:pathMatch(.*)',

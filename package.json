@@ -1,17 +1,24 @@
 {
   "name": "wd-extension",
-  "version": "0.0.0",
+  "version": "2308.29.1",
   "private": true,
   "scripts": {
     "serve": "vite preview",
     "build": "vite build",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "zip": "npm-build-zip --source=dist/ --destination=./build",
+    "docs": "npx typedoc --entryPointStrategy expand ./src"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
     "@types/chrome": "^0.0.228",
+    "@types/puppeteer-core": "^7.0.4",
     "@types/vue-router": "^2.0.0",
+    "@webcomponents/custom-elements": "^1.6.0",
+    "npm-build-zip": "^1.0.3",
+    "puppeteer-core": "^13.0.0",
+    "puppeteer-extension-transport": "^0.0.6",
     "roboto-fontface": "*",
     "vue": "^3.2.47",
     "vue-router": "^4.0.13",
@@ -20,12 +27,17 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^1.0.14",
+    "@crxjs/vite-plugin": "^2.0.0-beta.18",
     "@vitejs/plugin-vue": "^4.1.0",
     "tslib": "^2.5.0",
+    "typedoc": "^0.24.7",
     "vite": "^4.2.0",
     "vite-plugin-vuetify": "^1.0.0-alpha.12",
     "vue-cli-plugin-vuetify": "~2.5.8"
   },
-  "type": "module"
+  "type": "module",
+  "volta": {
+    "node": "18.16.0",
+    "npm": "9.5.1"
+  }
 }

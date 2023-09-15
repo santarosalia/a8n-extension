@@ -1,86 +1,13 @@
-import { EventInfo, FrameStack } from '@CrxInterface';
-import { EVENT, getLocatorInfo } from '@CrxConstants';
+import { LocatorType } from "@CrxConstants";
+import { EventInfo, FrameStack, Locator } from "@CrxInterface";
+import { CrxCapturedEventDetails } from "@CrxClass/CrxCapturedEventDetails";
 
-export class CapturedEventDetails {
-    AT_TARGET : number
-    BUBBLING_PHASE : number
-    CAPTURING_PHASE : number
-    NONE : number
-    bubbles : boolean
-    cancelBubble : boolean
-    cancelable : boolean
-    composed : boolean
-    currentTarget : Window
-    data : string
-    defaultPrevented: boolean
-    detail: number
-    eventPhase: number
-    inputType: string
-    isComposing: boolean
-    isTrusted: boolean
-    returnValue: boolean
-    srcElement: Element
-    target: Element
-    timeStamp: number
-    type: string
-    which: number
-    altKey: boolean
-    altitudeAngle: number
-    azimuthAngle: number
-    button: number
-    buttons: number
-    clientX: number
-    clientY: number
-    ctrlKey: boolean
-    height: number
-    isPrimary: boolean
-    layerX: number
-    layerY: number
-    metaKey: boolean
-    movementX: number
-    movementY: number
-    offsetX: number
-    offsetY: number
-    pageX: number
-    pageY: number
-    pointerId: number
-    pointerType: string
-    pressure: number
-    screenX: number
-    screenY: number
-    shiftKey: boolean
-    tangentialPressure: number
-    tiltX: number
-    tiltY: number
-    twist: number
-    width: number
-    x: number
-    y: number
-    charCode: number
-    code: string
-    key: string
-    keyCode: number
-    location: number
-    repeat : boolean
-    selectedIndex : number
-
-    constructor (ev : Event) {
-        this.getDetails(ev);
-    }
-
-    getDetails(ev : Event) {
-        for (let k in ev) {
-          this[k] = ev[k];
-        }
-    }
-}
-
-export class CapturedEvent extends CapturedEventDetails {
+export class CrxCapturedEvent extends CrxCapturedEventDetails {
     id : string;
     class : string[];
     name : string;
     value : string | number;
-    locator : string;
+    locator : Locator
     xpath : string;
     fullXpath : string;
     linkTextXpath : string;
@@ -92,8 +19,9 @@ export class CapturedEvent extends CapturedEventDetails {
     info : EventInfo[]
     image : string
     rect : any
+    view : Window
 
-    constructor (ev : Event) {
+    constructor (ev : Event | CrxCapturedEvent) {
         super(ev);
         if (ev !== null) {
             this.target = ev.target as Element;
@@ -104,7 +32,10 @@ export class CapturedEvent extends CapturedEventDetails {
             this.localName = this.target.localName;
             this.textContent = this.target.textContent;
             this.rect = this.getBoundingClientRect();
-            this.locator = this.getXPath(this.target);
+            this.locator = {
+                type : LocatorType.XPATH,
+                value : this.getXPath(this.target)
+            };
             this.xpath = this.getXPath(this.target);
             this.fullXpath = this.getFullXpath(this.target);
             this.linkTextXpath = this.getLinkText(this.target);
@@ -329,163 +260,4 @@ export class CapturedEvent extends CapturedEventDetails {
         return JSON.parse(JSON.stringify(rect));
     }
 
-}
-
-
-export class CrxInfo {
-    VIEW_WINDOW_ID : number;
-    TARGET_TAB : chrome.tabs.Tab;
-    TARGET_WINDOW_ID : number;
-    TARGET_TABS : chrome.tabs.Tab[]
-    constructor () {
-        
-    }
-}
-
-export class CrxBrowserOpenEvent extends CapturedEvent {
-    constructor (url : string) {
-        super(null);
-        this.info = this.getInfo();
-        this.type = EVENT.OPENBROWSER;
-        this.value = url;
-        this.frameStack = [];
-    }
-    getInfo() {
-        return [
-            {
-                type : 'input',
-                displayName : 'URL',
-                value : 'value'
-            }
-        ]
-    }
-}
-
-
-export class CrxClickEvent extends CapturedEvent {
-    info : EventInfo[]
-
-    constructor (ev : Event) {
-        super(ev);
-        this.info = this.getInfo();
-    }
-    
-    getInfo() {
-        return [
-            {
-                type : 'readonly',
-                displayName : '텍스트',
-                value : 'textContent'
-            },
-            {
-                type : 'selectLocator',
-                displayName : '로케이터',
-                values : [
-                    getLocatorInfo(this).xpath,
-                    getLocatorInfo(this).fullxpath,
-                    getLocatorInfo(this).linktextxpath
-                ]
-            },
-            {
-                type : 'image',
-                displayName : '이미지',
-                value : this.image
-            }
-        ]
-    }
-}
-
-export class CrxInputEvent extends CapturedEvent {
-    constructor (ev : Event) {
-        super(ev);
-        this.info = this.getInfo();
-    }
-    getInfo() {
-        return [
-            {
-                type : 'input',
-                displayName : '값',
-                value : 'value'
-            },
-            {
-                type : 'selectLocator',
-                displayName : '로케이터',
-                values : [
-                    getLocatorInfo(this).xpath,
-                    getLocatorInfo(this).fullxpath,
-                    getLocatorInfo(this).linktextxpath
-                ]
-            },
-            {
-                type : 'image',
-                displayName : '이미지',
-                value : this.image
-            }
-        ]
-    }
-}
-
-export class CrxSelectEvent extends CapturedEvent {
-    constructor (ev : Event) {
-        super(ev);
-        this.info = this.getInfo();
-    }
-    getInfo() {
-        return [
-            {
-                type : 'input',
-                displayName : '값',
-                value : 'value'
-            },
-            {
-                type : 'selectLocator',
-                displayName : '로케이터',
-                values : [
-                    getLocatorInfo(this).xpath,
-                    getLocatorInfo(this).fullxpath,
-                    getLocatorInfo(this).linktextxpath
-                ]
-            },
-            {
-                type : 'image',
-                displayName : '이미지',
-                value : this.image
-            }
-        ]
-    }
-}
-
-export class CrxKeyEvent extends CapturedEvent {
-    constructor (ev : Event) {
-        super(ev);
-        this.info = this.getInfo();
-    }
-    getInfo() {
-        return [
-            {
-                type : 'readonly',
-                displayName : '키',
-                value : 'key'
-            }
-        ]
-    }
-}
-
-export class CrxMoveTabEvent extends CapturedEvent {
-    constructor (tabIndex : number) {
-        super(null);
-        this.type = EVENT.MOVETAB;
-        this.value = tabIndex;
-        this.frameStack = [];
-        this.info = this.getInfo();
-    }
-    getInfo() {
-        return [
-            {
-                type : 'readonly',
-                displayName : '탭 인덱스',
-                value : 'value'
-            }
-        ]
-    }
 }
