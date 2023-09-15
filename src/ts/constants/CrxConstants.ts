@@ -166,7 +166,8 @@ export enum ElementAction {
     SET_SELECT_BOX_VALUE = 'setSelectBoxValue',
     SCREENSHOT = 'screenshot',
     FIND_CHILDREN = 'findChildren',
-    CLIPBOARD_WRITE = 'clipboardWrite'
+    CLIPBOARD_WRITE = 'clipboardWrite',
+    GET_OUTERHTML = 'getOuterHTML'
 }
 
 export enum ConnectOptionType {

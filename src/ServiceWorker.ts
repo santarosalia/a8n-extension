@@ -297,7 +297,8 @@ const execute = async (msg : ExecuteRequestMessage) => {
                 scrapedData : result ? result.scrapedData : null,
                 elements : result ? result.elements : null,
                 instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID,
-                evaluateResult : result ? result.evaluateResult : null
+                evaluateResult : result ? result.evaluateResult : null,
+                outerHTML : result ? result.outerHTML : null
             }
         }
     } catch (e : any) {

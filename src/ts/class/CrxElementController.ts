@@ -214,4 +214,9 @@ export class ElementController {
     async findChildrenByXpath(locator: string) {
         return await this._elementHandle.$x(locator);
     }
+    async getOuterHTML() {
+        return await this._elementHandle.evaluate(el => {
+            return el.outerHTML;
+        })
+    }
 }

@@ -216,6 +216,53 @@ const setClipboardTextTest = async () => {
 
 }
 
+const getOuterHTMLTest = async () => {
+    const window = await chrome.windows.create({
+        url : 'https://naver.com'
+    });
+
+    const [tab] = window.tabs;
+    const browserController = new BrowserController(tab);
+
+    await browserController.execute({
+        command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
+        object : {
+            action : BrowserAction.CONNECT,
+            parameter : {
+                connectOption : {
+                    type : ConnectOptionType.INSTANCE_UUID,
+                    value : '',
+                    isContains : true
+                }
+            }
+        },
+        tranId : 0
+    });
+    
+    const query = await browserController.execute({
+        command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
+        object : {
+            action : BrowserAction.WAIT,
+            parameter : {
+                locatorType : LocatorType.CSS_SELECTOR,
+                locator : 'body'
+            }
+        },
+        tranId : 0
+    });
+
+    const result = await browserController.execute({
+        command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
+        tranId : 0,
+        
+        object : {
+            instanceUUID : query.instanceUUID,
+            action : ElementAction.GET_OUTERHTML,
+        }
+    });
+
+    console.log(result);
+}
 // export const test = setClipboardImageTest;
 // export const test = setClipboardTableTest;
-export const test = setClipboardTextTest;
+export const test = getOuterHTMLTest;

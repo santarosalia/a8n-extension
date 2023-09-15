@@ -1,6 +1,6 @@
 import { KeyInput } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry"
 import { Action } from "@/ts/type/CrxType"
-import { AlertOption, BrowserType, CRX_COMMAND, CloseTarget, ConnectOptionType, LocatorType, Status } from "@CrxConstants"
+import { AlertOption, BrowserAction, BrowserType, CRX_COMMAND, CloseTarget, ConnectOptionType, LocatorType, Status } from "@CrxConstants"
 
 export interface TopbarMenuDetails {
     title : string
@@ -183,7 +183,22 @@ export interface ExecuteResponseMessage {
         evaluateResult?: {
             type: string,
             value: string | number | boolean | object
-        }
+        },
+        outerHTML?: string
+    }
+}
+
+export interface ExecuteReadTextResponseMessage extends ExecuteResponseMessage{
+    object : {
+        textContent: string
+    }
+}
+
+export interface ExcuteWaitRequestMessage extends ExecuteRequestMessage {
+    object: {
+        action: BrowserAction.WAIT,
+        
+
     }
 }
 

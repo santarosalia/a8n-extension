@@ -514,6 +514,12 @@ export class BrowserController {
                     }
                 }
             }
+            case ElementAction.GET_OUTERHTML : {
+                const outerHTML = await elementController.getOuterHTML();
+                return {
+                    outerHTML : outerHTML
+                }
+            }
         }
 
     }
