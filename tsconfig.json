@@ -12,11 +12,10 @@
         "allowSyntheticDefaultImports": true,
         "sourceMap": true,
         "baseUrl": ".",
+        "jsxImportSource": "@emotion/react",
         "types": [
             "chrome",
-            "vuetify",
             "vite/client",
-            "vue-router"
         ],
         "paths": {
             "@/*": ["src/*"],
@@ -47,7 +46,7 @@
         "tests/**/*.tsx",
         "src/main.tsx.ts",
         "src/DevToolsPlugin.js"
-, "src/main.jsx"    ],
+, "src/main.tsx"    ],
     "exclude": [
         "node_modules"
     ]

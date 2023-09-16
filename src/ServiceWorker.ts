@@ -54,7 +54,6 @@ const initBrowserRecorder = (url : string) => {
         });
     });
 
-    openRecordingHistory();
 }
 
 export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageSender , sendResponse : any) => {

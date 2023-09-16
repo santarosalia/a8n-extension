@@ -3,13 +3,13 @@
     "name": "A8N",
     "version": "1.0.0",
     "icons": {
-      "16": "icons/recIcon_default16.png",
-      "64": "icons/recIcon_default64.png",
-      "48": "icons/recIcon_default48.png",
-      "128": "icons/recIcon_default128.png"
+      "16": "icons/icon16.png",
+      "64": "icons/icon32.png",
+      "48": "icons/icon32.png",
+      "128": "icons/icon96.png"
     },
     "action": {
-      "default_icon": "icons/recIcon_default64.png",
+      "default_icon": "icons/icon32.png",
       "default_title": "A8N",
       "default_popup" : "index.html"
     },
