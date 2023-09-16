@@ -1,5 +1,5 @@
 import { EVENT, CRX_NEW_RECORD, CRX_MSG_RECEIVER, CRX_STATE, CRX_COMMAND } from "@CrxConstants";
-import { setItemFromLocalStorage} from '@CrxApi';
+import { getItemFromLocalStorage, setItemFromLocalStorage} from '@CrxApi';
 import CrxContextMenu from '@CrxClass/CrxContextMenu';
 import { CRX_CONTEXT_MENU_TYPE, CrxMessage } from '@CrxInterface';
 import CrxHilightCSS from '@/css/CrxHighlight.css?raw'
@@ -9,10 +9,9 @@ import { CrxInputEvent } from "@CrxClass/CrxInputEvent";
 import { CrxSelectEvent } from "@CrxClass/CrxSelectEvent";
 import { CrxKeyEvent } from "@CrxClass/CrxKeyEvent";
 
-window.customElements.define('crx-contextmenu', CrxContextMenu);
 
 let contextMenuType = CRX_CONTEXT_MENU_TYPE.NORMAL;
-let crxContextMenu = new CrxContextMenu(0, 0, null, contextMenuType);
+// let crxContextMenu = new CrxContextMenu(0, 0, null, contextMenuType);
 let browserRecorderStatus : boolean = false;
 
 const clickEventHandler = (ev : MouseEvent) => {
@@ -20,7 +19,6 @@ const clickEventHandler = (ev : MouseEvent) => {
     if (isContextMenu(target)) return;
 
     const e = new CrxClickEvent(ev);
-
     setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
 
@@ -52,16 +50,16 @@ const keydownEventHandler = (ev : Event)=> {
     setItemFromLocalStorage(CRX_NEW_RECORD, e);
 }
 
-const contextmenuEventHandler = (ev : Event) => {
-    ev.preventDefault();
-    crxContextMenu.remove();
+// const contextmenuEventHandler = (ev : Event) => {
+//     ev.preventDefault();
+//     crxContextMenu.remove();
 
-    const e = new CrxClickEvent(ev);
+//     const e = new CrxClickEvent(ev);
     
-    crxContextMenu = new CrxContextMenu(e.pageX,e.pageY, e, contextMenuType);
-    document.head.after(crxContextMenu);
-    crxContextMenu.show();
-}
+//     crxContextMenu = new CrxContextMenu(e.pageX,e.pageY, e, contextMenuType);
+//     document.head.after(crxContextMenu);
+//     crxContextMenu.show();
+// }
 const isContextMenu = (target : Element) => {
     return target.closest('crx-contextmenu');
 }
@@ -73,7 +71,7 @@ const browserRecorderEventHandler =  (ev : Event) => {
             break;
         }
         case EVENT.CLICK : {
-            crxContextMenu.remove();
+            // crxContextMenu.remove();
             clickEventHandler(ev as MouseEvent);
             break;
         }
@@ -90,25 +88,25 @@ const browserRecorderEventHandler =  (ev : Event) => {
             break;
         }
         case EVENT.CONTEXTMENU : {
-            contextmenuEventHandler(ev);
+            // contextmenuEventHandler(ev);
             break;
         }
-        case EVENT.MOUSEUP : {
-            const event = ev as MouseEvent;
-            if (event.button === 2) {
-                ev.preventDefault();
-                ev.stopPropagation();
-            }
-            break
-        }
-        case EVENT.MOUSEDOWN : {
-            const event = ev as MouseEvent;
-            if (event.button === 2) {
-                ev.preventDefault();
-                ev.stopPropagation();
-            }
-            break
-        }
+        // case EVENT.MOUSEUP : {
+        //     const event = ev as MouseEvent;
+        //     if (event.button === 2) {
+        //         ev.preventDefault();
+        //         ev.stopPropagation();
+        //     }
+        //     break
+        // }
+        // case EVENT.MOUSEDOWN : {
+        //     const event = ev as MouseEvent;
+        //     if (event.button === 2) {
+        //         ev.preventDefault();
+        //         ev.stopPropagation();
+        //     }
+        //     break
+        // }
     }
 }
 
@@ -158,7 +156,7 @@ export const browserRecorder = (request : CrxMessage) => {
             break;
         }
         case CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE : {
-            contextMenuType = request.payload as CRX_CONTEXT_MENU_TYPE;
+            // contextMenuType = request.payload as CRX_CONTEXT_MENU_TYPE;
         }
     }
 }

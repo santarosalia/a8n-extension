@@ -23,13 +23,13 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.4",
     "@webcomponents/custom-elements": "^1.6.0",
+    "axios": "^1.5.0",
     "npm-build-zip": "^1.0.3",
     "puppeteer-core": "^13.0.0",
     "puppeteer-extension-transport": "^0.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "roboto-fontface": "*",
-    "styled-components": "^6.0.8",
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
@@ -37,8 +37,7 @@
     "@vitejs/plugin-vue": "^4.1.0",
     "tslib": "^2.5.0",
     "typedoc": "^0.24.7",
-    "vite": "^4.2.0",
-    "vite-plugin-vuetify": "^1.0.0-alpha.12"
+    "vite": "^4.2.0"
   },
   "type": "module",
   "volta": {
