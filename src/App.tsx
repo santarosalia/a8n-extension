@@ -31,6 +31,10 @@ export default () => {
         });
         console.log(result)
     }
+    const startProcess = () => {
+        sendMessageToServiceWorker(CRX_COMMAND.CMD_START_PROCESS, {
+        });
+    }
     const ax = async () => {
         const result = await axios.post('/api/signin', inputs, {
             headers : {
@@ -68,6 +72,9 @@ export default () => {
                 }}>
                     logout
                 </Button>
+                <Box>
+                    <Button onClick={startProcess}>start</Button>
+                </Box>
             </Box>
             </>
         )

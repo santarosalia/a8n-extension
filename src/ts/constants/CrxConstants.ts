@@ -216,7 +216,8 @@ export enum CRX_COMMAND {
     CMD_SHOW_NOTIFICATION = 'CMD_SHOW_NOTIFICATION',
     CMD_OPEN_BROWSER = 'CMD_OPEN_BROWSER',
     CMD_CRX_EXECUTE_ACTION = 'Cmd_CRX_ExecuteAction',
-    CMD_WB_CHECK_BROWSER_LAUNCH = 'Cmd_WB_CheckBrowserLaunch'
+    CMD_WB_CHECK_BROWSER_LAUNCH = 'Cmd_WB_CheckBrowserLaunch',
+    CMD_START_PROCESS = 'CMD_START_PROCESS'
 }
 
 export enum AlertOption {

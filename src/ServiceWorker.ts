@@ -137,6 +137,9 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
             showNotification(message.payload.title,message.payload.message);
             break;
         }
+        case CRX_COMMAND.CMD_START_PROCESS : {
+            test();
+        }
         
         
     }

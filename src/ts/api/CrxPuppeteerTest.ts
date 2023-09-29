@@ -24,19 +24,42 @@ const evaluateTest = async () => {
         tranId : 0
     });
     
-    const evaluateResult = await browserController.execute({
+    // const evaluateResult = await browserController.execute({
+    //     command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
+    //     object : {
+    //         action : BrowserAction.EVALUATE,
+    //         instanceUUID : '',
+    //         parameter : {
+    //             script : 'return document.querySelector("#search-btn").click();'
+    //         }
+    //     },
+    //     tranId : 1
+    // });
+
+    // console.log(evaluateResult);
+    const query = await browserController.execute({
         command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
         object : {
-            action : BrowserAction.EVALUATE,
+            action : BrowserAction.WAIT,
             instanceUUID : '',
             parameter : {
-                script : 'return document.querySelector("#search-btn").click();'
+                locatorType : LocatorType.CSS_SELECTOR,
+                locator : '#query'
             }
         },
         tranId : 1
     });
-
-    console.log(evaluateResult);
+    await browserController.execute({
+        command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
+        object : {
+            action : ElementAction.TYPE,
+            instanceUUID : query.instanceUUID,
+            parameter : {
+                text : '안녕하세요'
+            }
+        },
+        tranId : 1
+    });
 }
 
 const recorderScrapingTest = async () => {
@@ -265,4 +288,4 @@ const getOuterHTMLTest = async () => {
 }
 // export const test = setClipboardImageTest;
 // export const test = setClipboardTableTest;
-export const test = getOuterHTMLTest;
+export const test = evaluateTest;
