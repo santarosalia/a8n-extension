@@ -1,6 +1,5 @@
 import { EVENT, CRX_NEW_RECORD, CRX_MSG_RECEIVER, CRX_STATE, CRX_COMMAND } from "@CrxConstants";
 import { getItemFromLocalStorage, setItemFromLocalStorage} from '@CrxApi';
-import CrxContextMenu from '@CrxClass/CrxContextMenu';
 import { CRX_CONTEXT_MENU_TYPE, CrxMessage } from '@CrxInterface';
 import CrxHilightCSS from '@/css/CrxHighlight.css?raw'
 import CrxContexMenuCSS from '@/css/CrxContextMenu.css?raw'
@@ -10,8 +9,6 @@ import { CrxSelectEvent } from "@CrxClass/CrxSelectEvent";
 import { CrxKeyEvent } from "@CrxClass/CrxKeyEvent";
 
 
-let contextMenuType = CRX_CONTEXT_MENU_TYPE.NORMAL;
-// let crxContextMenu = new CrxContextMenu(0, 0, null, contextMenuType);
 let browserRecorderStatus : boolean = false;
 
 const clickEventHandler = (ev : MouseEvent) => {
@@ -154,9 +151,6 @@ export const browserRecorder = (request : CrxMessage) => {
         case CRX_COMMAND.CMD_RECORDING_END : {
             browserRecorderEnd();
             break;
-        }
-        case CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE : {
-            // contextMenuType = request.payload as CRX_CONTEXT_MENU_TYPE;
         }
     }
 }

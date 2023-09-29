@@ -19,7 +19,7 @@ import {
     getItemFromLocalStorage
 } from "@CrxApi";
 import { BrowserType, CRX_ADD_SCRAPING_DATA, CRX_COMMAND, CRX_MSG_RECEIVER, CRX_NEW_RECORD, CRX_STATE } from "@CrxConstants";
-import { BrowserCheckReponseMessage, BrowserCheckRequestMessage, CrxMessage, ExecuteRequestMessage, ExecuteResponseMessage } from "@CrxInterface";
+import { CrxMessage, ExecuteRequestMessage, ExecuteResponseMessage } from "@CrxInterface";
 import { BrowserController } from "@/ts/class/CrxBrowserController";
 import { BrowserAction, ElementAction, Status } from "@CrxConstants";
 import { CrxInfo } from "@CrxClass/CrxInfo";
@@ -109,28 +109,8 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
             break;
         }
         case CRX_COMMAND.CMD_RECORDING_END : {
-            sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID, CRX_COMMAND.CMD_CREATE_ACTIVITY);
             closeWindow(crxInfo.RECORDING_TARGET_WINDOW_ID);
             closeWindow(crxInfo.RECORDING_HISTORY_WINDOW_ID);
-            break;
-        }
-        case CRX_COMMAND.CMD_SELECTOR_END : {
-            clearInterval(crxInfo.SELECTOR_INJECT_INTERVAL);
-            const allLocators = message.payload.locators;
-            const browserV1Locators = allLocators.filter(locator => locator.type !== 'CSSSELECTOR');
-            switch (crxInfo.BROWSER_VERSION) {
-                case 1 : {
-                    sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID,CRX_COMMAND.CMD_SEND_LOCATORS, browserV1Locators);
-                    break;
-                }
-                case 2 : {
-                    sendMessageToContentScript(crxInfo.LAUNCHER_TAB_ID,CRX_COMMAND.CMD_SEND_LOCATORS, allLocators);
-                    break;
-                }
-            }
-            
-            sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_END);
-            focusTab(crxInfo.LAUNCHER_TAB_ID)
             break;
         }
         case CRX_COMMAND.CMD_SHOW_NOTIFICATION : {
@@ -160,23 +140,6 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
                     clearInterval(injectInterval);
                 });
             },1000);
-            break;
-        }
-        case CRX_COMMAND.CMD_LAUNCH_BROWSER_SELECTOR : {
-            crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
-            crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
-            crxInfo.BROWSER_VERSION = message.payload.browserVersion;
-            const injectInterval = setInterval(() => {
-                sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_START, null, crxInfo.LAUNCHER_TAB_ID);
-            },1000);
-
-            crxInfo.SELECTOR_INJECT_INTERVAL = injectInterval;
-            sendResponse({started : true});
-            break;
-        }
-        case CRX_COMMAND.CMD_KILL_BROWSER_SELECTOR : {
-            clearInterval(crxInfo.SELECTOR_INJECT_INTERVAL);
-            sendMessageToSelector(CRX_COMMAND.CMD_SELECTOR_END);
             break;
         }
     }
@@ -210,65 +173,6 @@ chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 let tranId = 0;
 const tranIdBrowserControllerMap = new Map<number, BrowserController>();
-
-// Native Messaging
-// var port = chrome.runtime.connectNative('worktronics.browser_automation.chrome');
-// chrome.tabs.onCreated.addListener(tab => {
-//     const browserController = new BrowserController(tab);
-//     tranId++;
-//     tranIdBrowserControllerMap.set(tranId, browserController);
-//     const msg : BrowserCheckRequestMessage = {
-//         command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
-//         tranId : tranId,
-//         responseInfo : null,
-//         object : {
-//             browserType : self.navigator.userAgent.indexOf('Edg') > -1 ? BrowserType.EDGE : BrowserType.CHROME,
-//             instanceUUID : browserController.instanceUUID
-//         }
-//     }
-//     console.log('Browser Check REQ');
-//     console.log(msg);
-//     port.postMessage(msg);
-// });
-// port.onMessage.addListener(async (msg : ExecuteRequestMessage | BrowserCheckReponseMessage) => {
-//     const command = msg.command;
-//     switch (command) {
-//         case CRX_COMMAND.CMD_CRX_EXECUTE_ACTION : {
-//             console.log('-REQ-');
-//             console.log(msg);
-//             const responseMessage = await execute(msg as ExecuteRequestMessage);
-//             console.log('-RES-');
-//             console.log(responseMessage);
-//             port.postMessage(responseMessage);
-//             break;
-//         }
-//         case CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH : {
-//             msg = msg as BrowserCheckReponseMessage;
-//             console.log('Browser Check RES');
-//             console.log(msg);
-//             if (msg.object.isBrowserLaunch) {
-//                 const browserController = tranIdBrowserControllerMap.get(tranId);
-//                 instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
-//             }
-//             tranIdBrowserControllerMap.delete(tranId);
-//             break;
-//         }
-//     }
-    
-// });
-// port.onDisconnect.addListener(() => {
-//     console.log('Native Messaging Disconnected');
-//     // reConnect();
-// });
-
-// const reConnect = () => {
-//     port = chrome.runtime.connectNative('crx');
-//     console.log('Native Messaging Connected');
-//     port.onDisconnect.addListener(() => {
-//         console.log('Native Messaging Disconnected');
-//         reConnect();
-//     })
-// }
 
 let browserController : BrowserController;
 

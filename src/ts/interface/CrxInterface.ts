@@ -151,7 +151,7 @@ interface ScrapingData {
 }
 
 export interface ExecuteRequestMessage {
-    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION | CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH
+    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION
     object : {
         instanceUUID? : string
         action? : Action
@@ -199,28 +199,6 @@ export interface ExcuteWaitRequestMessage extends ExecuteRequestMessage {
         action: BrowserAction.WAIT,
         
 
-    }
-}
-
-export interface BrowserCheckRequestMessage {
-    command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
-    tranId : number,
-    responseInfo : null,
-    object : {
-        browserType : BrowserType,
-        instanceUUID : string
-    }
-}
-
-export interface BrowserCheckReponseMessage {
-    command : CRX_COMMAND.CMD_WB_CHECK_BROWSER_LAUNCH,
-    tranId : number,
-    responseInfo : {
-        result : Status,
-        errorMessage : string
-    },
-    object : {
-        isBrowserLaunch : boolean
     }
 }
 
