@@ -27,6 +27,7 @@ import { CrxBrowserOpenEvent } from "@CrxClass/CrxBrowserOpenEvent";
 import { CrxPopupEvent } from "@CrxClass/CrxPopupEvent";
 import { test } from "./ts/api/CrxPuppeteerTest";
 import { instanceUUIDBrowserControllerMap } from "@/ts/store/CrxStore";
+import { Executor } from "./ts/class/Executor";
 
 
 const crxInfo = new CrxInfo();
@@ -118,7 +119,18 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
             break;
         }
         case CRX_COMMAND.CMD_START_PROCESS : {
-            test();
+            new Executor([
+                {
+                    object : {
+                        action : BrowserAction.CONNECT,
+                        parameter : {
+                            browserType : BrowserType.CHROME,
+
+                        }
+                        
+                    }
+                }
+            ])
         }
         
         
@@ -171,9 +183,6 @@ chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
 chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
-let tranId = 0;
-const tranIdBrowserControllerMap = new Map<number, BrowserController>();
-
 let browserController : BrowserController;
 
 const execute = async (msg : ExecuteRequestMessage) => {
@@ -199,8 +208,6 @@ const execute = async (msg : ExecuteRequestMessage) => {
         instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
 
         responseMessage = {
-            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
-            tranId : msg.tranId,
             responseInfo : {
                 result : Status.SUCCESS,
             },
@@ -223,8 +230,6 @@ const execute = async (msg : ExecuteRequestMessage) => {
         }
     } catch (e : any) {
         responseMessage = {
-            command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION,
-            tranId : msg.tranId,
             responseInfo : {
                 result : Status.ERROR,
                 errorMessage : e.message

@@ -151,18 +151,14 @@ interface ScrapingData {
 }
 
 export interface ExecuteRequestMessage {
-    command : CRX_COMMAND.CMD_CRX_EXECUTE_ACTION
     object : {
         instanceUUID? : string
         action? : Action
         parameter? : ExecuteActionParameter
     }
-    tranId :number
 }
 
 export interface ExecuteResponseMessage {
-    command : string,
-    tranId : number,
     responseInfo : {
         result : Status,
         errorMessage? : string,
