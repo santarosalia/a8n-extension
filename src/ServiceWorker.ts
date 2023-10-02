@@ -122,15 +122,21 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
             new Executor([
                 {
                     object : {
-                        action : BrowserAction.CONNECT,
+                        action : BrowserAction.CREATE,
                         parameter : {
-                            browserType : BrowserType.CHROME,
-
+                            url : 'https://naver.com'
                         }
                         
                     }
+                }, {
+                    object : {
+                        action : BrowserAction.GO_TO,
+                        parameter : {
+                            url : 'https://daum.net'
+                        }
+                    }
                 }
-            ])
+            ]);
         }
         
         

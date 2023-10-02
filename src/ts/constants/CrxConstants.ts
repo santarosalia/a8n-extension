@@ -132,6 +132,7 @@ export enum Status {
 
 
 export enum BrowserAction {
+    CREATE = 'create',
     CONNECT = 'connect',
     SWITCH_FRAME = 'switchFrame',
     RESET_FRAME = 'resetFrame',

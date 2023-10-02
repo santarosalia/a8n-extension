@@ -13,7 +13,8 @@ import {
     focusTab,
     windowFocus,
     checkDebugger,
-    tabFocusCheck
+    tabFocusCheck,
+    createWindow
 } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
@@ -271,6 +272,15 @@ export class BrowserController {
         }
         
         switch(action) {
+            case BrowserAction.CREATE : {
+                const url = msg.object.parameter.url;
+                const window = await createWindow();
+                const [tab] = window.tabs;
+                this._tab = tab;
+                await this.connect();
+                await this.goTo(url);
+                break;
+            }
             case BrowserAction.CONNECT : {
                 const connectOptionType = msg.object.parameter.connectOption.type;
                 const connectOptionValue = msg.object.parameter.connectOption.value;
