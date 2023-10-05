@@ -10,34 +10,19 @@ export class Executor {
     constructor (process: ExecuteRequestMessage[]) {
         this.process = process;
         this.instanceUUIDBrowserControllerMap = new Map<string, BrowserController>();
-        const [msg] = process;
+        const msg = this.process.shift();
         this.execute(msg);
-        // const promiseses = process.map(msg => {
-        //     return this.execute(msg);
-        // });
-        // promiseses.reduce(async (prev, curr) => {
-        //     return prev.then(async (result) => {
-        //         if (result) {
-        //             this.instanceUUID = result.instanceUUID;
-        //         }
-        //         return curr
-        //     }).catch(e => {
-        //         console.log(e);
-        //     })
-        // }, Promise.resolve());
+
     }
-    async execute (msg: ExecuteRequestMessage, instanceUUID?: any) {
-        // console.log(msg)
+    async execute (msg: ExecuteRequestMessage, params?: any) {
         let browserController: BrowserController;
         const isElement = Object.values(ElementAction).includes(msg.object.action as any);
         const isWait = msg.object.action === BrowserAction.WAIT;
-        // console.log(params)
+        const instanceUUID = params?.instanceUUID;
         if (instanceUUID) {
             if (isElement) {
                 browserController = Array.from(this.instanceUUIDBrowserControllerMap.values()).find(browserController => browserController.instanceUUIDElementControllerMap.has(instanceUUID));
             } else {
-                console.log(instanceUUID)
-                console.log(this.instanceUUIDBrowserControllerMap)
                 browserController = this.instanceUUIDBrowserControllerMap.get(instanceUUID);
             }
             if (!browserController) throw new Error('Target Lost');
@@ -46,12 +31,26 @@ export class Executor {
             this.instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
         }
         const result = await browserController.execute(msg);
-        // if (isWait) this.instanceUUID = result.instanceUUID;
+        const param = {
+            textContent : result ? result.textContent : null,
+            propertyValue : result ? result.propertyValue : null,
+            x : result ? result.x : null,
+            y : result ? result.y : null,
+            width : result ? result.width : null,
+            height : result ? result.height : null,
+            exists : result ? result.exists : null,
+            tagName : result ? result.tagName : null,
+            image : result ? result.image : null,
+            scrapedData : result ? result.scrapedData : null,
+            elements : result ? result.elements : null,
+            instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID,
+            evaluateResult : result ? result.evaluateResult : null,
+            outerHTML : result ? result.outerHTML : null
+        }
         this.instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
         
-        this.process.shift();
-        console.log(this.process)
-        const [nextMsg] = this.process;
-        this.execute(nextMsg, browserController.instanceUUID);
+        const nextMsg = this.process.shift();
+        if (nextMsg === undefined) return;
+        this.execute(nextMsg, param);
     }
 }
