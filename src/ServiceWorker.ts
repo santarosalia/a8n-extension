@@ -43,11 +43,11 @@ const initBrowserRecorder = (url : string) => {
     const e = new CrxBrowserOpenEvent(url);
     setItemFromLocalStorage(CRX_NEW_RECORD, null);
     setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [e]);
-    setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA, null);
-    setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, {
-        exceptRow : [],
-        data : []
-    });
+    // setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA, null);
+    // setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, {
+    //     exceptRow : [],
+    //     data : []
+    // });
     
     createRecordingTargetTab(url).then(result => {
         openRecordingTargetWindow(result).then(result => {

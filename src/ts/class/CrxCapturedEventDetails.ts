@@ -1,5 +1,6 @@
 import { Locator } from '@CrxInterface';
 import { CrxCapturedEvent } from '@CrxClass/CrxCapturedEvent';
+import { Action } from '../type/CrxType';
 
 export class CrxCapturedEventDetails {
     AT_TARGET : number
@@ -22,7 +23,7 @@ export class CrxCapturedEventDetails {
     srcElement: Element
     target: Element
     timeStamp: number
-    type: string
+    action: Action
     which: number
     altKey: boolean
     altitudeAngle: number
