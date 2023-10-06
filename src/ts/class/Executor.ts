@@ -31,7 +31,7 @@ export class Executor {
             this.instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
         }
         const result = await browserController.execute(msg);
-        const param = {
+        const resultParams = {
             textContent : result ? result.textContent : null,
             propertyValue : result ? result.propertyValue : null,
             x : result ? result.x : null,
@@ -51,6 +51,6 @@ export class Executor {
         
         const nextMsg = this.process.shift();
         if (nextMsg === undefined) return;
-        this.execute(nextMsg, param);
+        this.execute(nextMsg, resultParams);
     }
 }
