@@ -1,7 +1,7 @@
 import {Box, Button, Container, InputLabel, TextField} from '@mui/material';
 import { sendMessageToServiceWorker } from '@CrxApi';
 import { CRX_COMMAND } from '@CrxConstants';
-import {axios, accessToken} from '@/ts/api/Axios'
+import {axios, getAccessToken} from '@/ts/api/Axios'
 import { useState, ChangeEvent, useEffect } from 'react';
 import './style.css'
 
@@ -21,9 +21,9 @@ export default () => {
         });
     }
     const getProcesses = async () => {
-        const result = await axios.post('/api/process', {id : user.id}, {
+        const result = await axios.post('/api/process', {userId : user.id}, {
             headers : {
-                Authorization : await accessToken(),
+                Authorization : await getAccessToken(),
             },
             params : {
                 id : 1
@@ -38,7 +38,7 @@ export default () => {
     const ax = async () => {
         const result = await axios.post('/api/signin', inputs, {
             headers : {
-                Authorization : await accessToken()
+                Authorization : await getAccessToken()
             }
         });
         setUser(result.data);

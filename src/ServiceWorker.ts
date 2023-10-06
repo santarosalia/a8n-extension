@@ -28,6 +28,7 @@ import { CrxPopupEvent } from "@CrxClass/CrxPopupEvent";
 import { test } from "./ts/api/CrxPuppeteerTest";
 import { instanceUUIDBrowserControllerMap } from "@/ts/store/CrxStore";
 import { Executor } from "./ts/class/Executor";
+import { axios, getAccessToken } from "./ts/api/Axios";
 
 
 const crxInfo = new CrxInfo();
@@ -57,17 +58,13 @@ const initBrowserRecorder = (url : string) => {
 
 }
 
-export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageSender , sendResponse : any) => {
+export const onMessage = async (message : CrxMessage, sender : chrome.runtime.MessageSender , sendResponse : any) => {
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     const COMMAND = message.command;
     switch (COMMAND) {
         case CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER : {
-            // crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
-            // crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
-            
             initBrowserRecorder(message.payload.url);
             const injectInterval = setInterval(() => {
-                // if(crxInfo.RECORDING_TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
                 sendMessageByWindowId(crxInfo.RECORDING_TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
                     //레코딩 창 닫힌 경우!
                     clearInterval(injectInterval);
@@ -97,18 +94,6 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
             
             break;
         }
-        case CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE : {
-            sendMessageByWindowId(crxInfo.RECORDING_TARGET_WINDOW_ID, CRX_COMMAND.CMD_CONTEXT_MENU_CHANGE, message.payload);
-            break;
-        }
-        case CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON : {
-            sendMessageToView(crxInfo.RECORDING_HISTORY_WINDOW_ID, CRX_COMMAND.CMD_SEND_NEXT_PAGE_BUTTON, message.payload);
-            break;
-        }
-        case CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER : {
-            sendMessageToView(crxInfo.RECORDING_HISTORY_WINDOW_ID, CRX_COMMAND.CMD_SEND_NEXT_PAGE_NUMBER, message.payload);
-            break;
-        }
         case CRX_COMMAND.CMD_RECORDING_END : {
             closeWindow(crxInfo.RECORDING_TARGET_WINDOW_ID);
             closeWindow(crxInfo.RECORDING_HISTORY_WINDOW_ID);
@@ -119,24 +104,39 @@ export const onMessage = (message : CrxMessage, sender : chrome.runtime.MessageS
             break;
         }
         case CRX_COMMAND.CMD_START_PROCESS : {
-            new Executor([
-                {
-                    object : {
-                        action : BrowserAction.CREATE,
-                        parameter : {
-                            url : 'https://naver.com'
-                        }
+            const { user } = await chrome.storage.local.get('user');
+            const result = await fetch(import.meta.env.VITE_BACK_END + 'api/process', {
+                method : 'POST',
+                headers : {
+                    Authorization : await getAccessToken()
+                },
+                body : JSON.stringify({
+                    id : 'clmp4qmap0000r3weime3jbet',
+                    userId : user.id
+                })
+
+            })
+            const body = await result.json();
+            const data = JSON.parse(body.data);
+            new Executor(data);
+            // new Executor([
+            //     {
+            //         object : {
+            //             action : BrowserAction.CREATE,
+            //             parameter : {
+            //                 url : 'https://naver.com'
+            //             }
                         
-                    }
-                }, {
-                    object : {
-                        action : BrowserAction.GO_TO,
-                        parameter : {
-                            url : 'https://daum.net'
-                        }
-                    }
-                }
-            ]);
+            //         }
+            //     }, {
+            //         object : {
+            //             action : BrowserAction.GO_TO,
+            //             parameter : {
+            //                 url : 'https://daum.net'
+            //             }
+            //         }
+            //     }
+            // ]);
         }
         
         
