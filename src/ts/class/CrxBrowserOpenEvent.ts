@@ -1,5 +1,6 @@
 import { BrowserAction, EVENT } from "@CrxConstants";
 import { CrxCapturedEvent } from "@CrxClass/CrxCapturedEvent";
+import { ExecuteRequestMessage } from "../interface/CrxInterface";
 
 export class CrxBrowserOpenEvent extends CrxCapturedEvent {
     constructor (url : string) {
@@ -8,12 +9,12 @@ export class CrxBrowserOpenEvent extends CrxCapturedEvent {
         this.value = url;
         this.frameStack = [];
     }
-    get object() {
+    get object(): ExecuteRequestMessage {
         return {
             object : {
                 action : BrowserAction.CREATE,
                 parameter : {
-                    url : this.value
+                    url : this.value as string
                 }
             }
         }

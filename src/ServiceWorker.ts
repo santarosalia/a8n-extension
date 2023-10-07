@@ -39,23 +39,15 @@ console.log('%c  | |  | |'+'%c | |   | |'+'%c   |  ___/'+'%c    |  _| _  ','colo
 console.log("%c _| |_.' / "+"%c\\  `-'  /"+"%c  _| |_    "+"%c  _| |__/ | ",'color:red','color:orange','color:yellow','color:green')
 console.log("%c|______.' "+"%c  `.___.' "+"%c |_____|   "+"%c |________| ",'color:red','color:orange','color:yellow','color:green')
 
-const initBrowserRecorder = (url : string) => {
+const initBrowserRecorder = async (url : string) => {
     const e = new CrxBrowserOpenEvent(url);
     setItemFromLocalStorage(CRX_NEW_RECORD, null);
-    setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [e]);
-    // setItemFromLocalStorage(CRX_ADD_SCRAPING_DATA, null);
-    // setItemFromLocalStorage(CRX_STATE.CRX_SCRAPING_DATAS, {
-    //     exceptRow : [],
-    //     data : []
-    // });
+    setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [e.object]);
     
-    createRecordingTargetTab(url).then(result => {
-        openRecordingTargetWindow(result).then(result => {
-            [crxInfo.TARGET_TAB] = result.tabs;
-            crxInfo.RECORDING_TARGET_WINDOW_ID = crxInfo.TARGET_TAB.windowId;
-        });
-    });
-
+    const recordingTargetTab = await createRecordingTargetTab(url);
+    const recordingTargetWindow = await openRecordingTargetWindow(recordingTargetTab);
+    [crxInfo.TARGET_TAB] = recordingTargetWindow.tabs;
+    crxInfo.RECORDING_TARGET_WINDOW_ID = crxInfo.TARGET_TAB.windowId;
 }
 
 export const onMessage = async (message : CrxMessage, sender : chrome.runtime.MessageSender , sendResponse : any) => {
@@ -142,6 +134,16 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
         
     }
 }
+chrome.storage.local.onChanged.addListener(async (changes) => {
+
+    const { CRX_RECORDS }= await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]);
+    const { CRX_NEW_RECORD } = changes;
+    if (CRX_NEW_RECORD && CRX_NEW_RECORD.newValue) {
+        if (CRX_NEW_RECORD.oldValue === null) return;
+        setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [...CRX_RECORDS, CRX_NEW_RECORD.newValue]);
+    }
+    console.log(CRX_RECORDS)
+})
 
 const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageSender, sendResponse : any) => {
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;

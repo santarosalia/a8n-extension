@@ -66,6 +66,13 @@ export default () => {
                 process
                 </Button>
                 <Button onClick={() => {
+                    sendMessageToServiceWorker(CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER, {
+                        url : 'https://naver.com'
+                    });
+                }}>
+                    recorder
+                </Button>
+                <Button onClick={() => {
                     chrome.storage.local.set({
                         user : null
                     })
