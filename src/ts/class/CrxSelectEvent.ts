@@ -1,34 +1,21 @@
-import { EVENT, getLocatorInfo } from "@CrxConstants";
+import { EVENT, ElementAction, LocatorType, getLocatorInfo } from "@CrxConstants";
 import { CrxCapturedEvent } from "@CrxClass/CrxCapturedEvent";
+import { ExecuteRequestMessage } from "../interface/CrxInterface";
 
 export class CrxSelectEvent extends CrxCapturedEvent {
     constructor (ev : Event) {
         super(ev);
-        this.type = EVENT.SELECT;
-        this.info = this.getInfo();
     }
-    getInfo() {
-        return [
-            {
-                type : 'input',
-                displayName : '값',
-                value : 'value'
-            },
-            {
-                type : 'selectLocator',
-                displayName : '로케이터',
-                values : [
-                    getLocatorInfo(this).xpath,
-                    getLocatorInfo(this).fullxpath,
-                    getLocatorInfo(this).linktextxpath,
-                    getLocatorInfo(this).cssselector
-                ]
-            },
-            {
-                type : 'image',
-                displayName : '이미지',
-                value : this.image
+    get object() : ExecuteRequestMessage {
+        return {
+            object : {
+                action : ElementAction.SET_SELECT_BOX_VALUE,
+                parameter : {
+                    locatorType : LocatorType.CSS_SELECTOR,
+                    locator : this.cssSelector,
+                    selectValue : this.value as string
+                }
             }
-        ]
+        }
     }
 }

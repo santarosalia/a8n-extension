@@ -16,7 +16,7 @@ const clickEventHandler = (ev : MouseEvent) => {
     if (isContextMenu(target)) return;
 
     const e = new CrxClickEvent(ev);
-    setItemFromLocalStorage(CRX_NEW_RECORD, e);
+    setItemFromLocalStorage(CRX_NEW_RECORD, e.object);
 }
 
 const inputEventHandler = (ev : Event) => {
@@ -27,7 +27,7 @@ const inputEventHandler = (ev : Event) => {
     } else {
         e = new CrxInputEvent(ev);
     }
-    setItemFromLocalStorage(CRX_NEW_RECORD, e);
+    setItemFromLocalStorage(CRX_NEW_RECORD, e.object);
 }
 
 const mouseoverEventHandler = (ev : Event) => {
