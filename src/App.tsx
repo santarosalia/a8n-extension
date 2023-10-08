@@ -7,11 +7,12 @@ import './style.css'
 
 export default () => {
     const [user, setUser] = useState(null);
-
+    const [process, setProcess] = useState(null);
     const [inputs, setInputs] = useState({
         email : '',
         password : ''
     });
+    const [processName, setProcessName] = useState('');
     const {email, password} = inputs;
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {id, value} = e.target;
@@ -21,19 +22,11 @@ export default () => {
         });
     }
     const getProcesses = async () => {
-        const result = await axios.post('/api/process', {userId : user.id}, {
-            headers : {
-                Authorization : await getAccessToken(),
-            },
-            params : {
-                id : 1
-            }
-        });
-        console.log(result)
+        const result = await axios.get(`/api/process/${user.id}`);
+        setProcess(result.data);
     }
     const startProcess = () => {
-        sendMessageToServiceWorker(CRX_COMMAND.CMD_START_PROCESS, {
-        });
+        
     }
     const ax = async () => {
         const result = await axios.post('/api/signin', inputs, {
@@ -46,7 +39,20 @@ export default () => {
             user : result.data
         });
     }
-
+    const processList = process ? process.map((p, i) => {
+        return (
+            <Button
+            key={i}
+            onClick={() => {
+                sendMessageToServiceWorker(CRX_COMMAND.CMD_START_PROCESS, {
+                    id : p.id
+                });
+            }}
+            >
+                {p.name}
+            </Button>
+        )
+    }) : null;
     const onClick = () => {
         sendMessageToServiceWorker(CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER, {
             url : 'https://naver.com'
@@ -65,12 +71,27 @@ export default () => {
                 <Button onClick={getProcesses}>
                 process
                 </Button>
+                {processList}
                 <Button onClick={() => {
                     sendMessageToServiceWorker(CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER, {
                         url : 'https://naver.com'
                     });
                 }}>
                     recorder
+                </Button>
+                <TextField
+                size='small'
+                onChange={(e) => {
+                    setProcessName(e.target.value)
+                }}>
+
+                </TextField>
+                <Button onClick={() => {
+                    sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_END, {
+                        name : processName
+                    })
+                }}>
+                    recorder end
                 </Button>
                 <Button onClick={() => {
                     chrome.storage.local.set({

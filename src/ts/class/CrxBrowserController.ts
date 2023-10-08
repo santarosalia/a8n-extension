@@ -268,7 +268,8 @@ export class BrowserController {
         const isElement = Object.values(ElementAction).includes(action as any);
 
         if (isElement) {
-            elementController = this._instanceUUIDElementControllerMap.get(targetInstanceUUID);
+            // elementController = this._instanceUUIDElementControllerMap.get(targetInstanceUUID);
+            elementController = await this.waitFor(msg);
         }
         
         switch(action) {

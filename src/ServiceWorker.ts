@@ -28,7 +28,7 @@ import { CrxPopupEvent } from "@CrxClass/CrxPopupEvent";
 import { test } from "./ts/api/CrxPuppeteerTest";
 import { instanceUUIDBrowserControllerMap } from "@/ts/store/CrxStore";
 import { Executor } from "./ts/class/Executor";
-import { axios, getAccessToken } from "./ts/api/Axios";
+import { getAccessToken } from "./ts/api/Axios";
 
 
 const crxInfo = new CrxInfo();
@@ -87,8 +87,22 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
             break;
         }
         case CRX_COMMAND.CMD_RECORDING_END : {
-            closeWindow(crxInfo.RECORDING_TARGET_WINDOW_ID);
-            closeWindow(crxInfo.RECORDING_HISTORY_WINDOW_ID);
+            const { CRX_RECORDS } = await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]);
+            const { user } = await chrome.storage.local.get('user');
+
+            await fetch(import.meta.env.VITE_BACK_END + 'api/process', {
+                method : 'PUT',
+                headers : {
+                    Authorization : await getAccessToken()
+                },
+                body : JSON.stringify({
+                    name : message.payload.name,
+                    data : JSON.stringify(CRX_RECORDS),
+                    userId : user.id
+                })
+
+            });
+            await closeWindow(crxInfo.RECORDING_TARGET_WINDOW_ID);
             break;
         }
         case CRX_COMMAND.CMD_SHOW_NOTIFICATION : {
@@ -103,46 +117,28 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
                     Authorization : await getAccessToken()
                 },
                 body : JSON.stringify({
-                    id : 'clmp4qmap0000r3weime3jbet',
+                    id : message.payload.id,
                     userId : user.id
                 })
 
             })
             const body = await result.json();
+            console.log(body.data)
             const data = JSON.parse(body.data);
             new Executor(data);
-            // new Executor([
-            //     {
-            //         object : {
-            //             action : BrowserAction.CREATE,
-            //             parameter : {
-            //                 url : 'https://naver.com'
-            //             }
-                        
-            //         }
-            //     }, {
-            //         object : {
-            //             action : BrowserAction.GO_TO,
-            //             parameter : {
-            //                 url : 'https://daum.net'
-            //             }
-            //         }
-            //     }
-            // ]);
+            
         }
         
         
     }
 }
 chrome.storage.local.onChanged.addListener(async (changes) => {
-
     const { CRX_RECORDS }= await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]);
     const { CRX_NEW_RECORD } = changes;
     if (CRX_NEW_RECORD && CRX_NEW_RECORD.newValue) {
         if (CRX_NEW_RECORD.oldValue === null) return;
         setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [...CRX_RECORDS, CRX_NEW_RECORD.newValue]);
     }
-    console.log(CRX_RECORDS)
 })
 
 const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageSender, sendResponse : any) => {

@@ -16,15 +16,15 @@ export class Executor {
     }
     async execute (msg: ExecuteRequestMessage, params?: any) {
         let browserController: BrowserController;
-        const isElement = Object.values(ElementAction).includes(msg.object.action as any);
-        const isWait = msg.object.action === BrowserAction.WAIT;
+        // const isElement = Object.values(ElementAction).includes(msg.object.action as any);
+        // const isWait = msg.object.action === BrowserAction.WAIT;
         const instanceUUID = params?.instanceUUID;
         if (instanceUUID) {
-            if (isElement) {
-                browserController = Array.from(this.instanceUUIDBrowserControllerMap.values()).find(browserController => browserController.instanceUUIDElementControllerMap.has(instanceUUID));
-            } else {
-                browserController = this.instanceUUIDBrowserControllerMap.get(instanceUUID);
-            }
+            // if (isElement) {
+            //     browserController = Array.from(this.instanceUUIDBrowserControllerMap.values()).find(browserController => browserController.instanceUUIDElementControllerMap.has(instanceUUID));
+            // } else {
+            browserController = this.instanceUUIDBrowserControllerMap.get(instanceUUID);
+            // }
             if (!browserController) throw new Error('Target Lost');
         } else {
             browserController = new BrowserController();
@@ -43,7 +43,7 @@ export class Executor {
             image : result ? result.image : null,
             scrapedData : result ? result.scrapedData : null,
             elements : result ? result.elements : null,
-            instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID,
+            instanceUUID : browserController.instanceUUID,
             evaluateResult : result ? result.evaluateResult : null,
             outerHTML : result ? result.outerHTML : null
         }

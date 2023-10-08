@@ -128,7 +128,9 @@ export interface CrxMessage {
             type: string,
             value: string
         }[]
-        url?: string
+        url?: string,
+        id?: string,
+        name?: string
     }
 }
 
