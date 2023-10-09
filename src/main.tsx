@@ -1,13 +1,8 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-// import "./index.css";
 import App from './App'
-
-// const storageChanged = (changes: chrome.storage.StorageChange) => {
-//     console.log(changes);
-// }
-// chrome.storage.local.onChanged.addListener(storageChanged);
-
+import { Provider } from "react-redux";
+import { store } from '@/ts/store'
 let root = document.getElementById("root");
 if (!root) {
     root = document.createElement('div');
@@ -17,6 +12,8 @@ if (!root) {
 
 ReactDOM.createRoot(root).render(
     <StrictMode>
+        <Provider store={store}>
         <App />
+        </Provider>
     </StrictMode>
 );

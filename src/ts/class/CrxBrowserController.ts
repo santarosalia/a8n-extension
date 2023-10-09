@@ -12,7 +12,6 @@ import {
     waitPageLoading,
     focusTab,
     windowFocus,
-    checkDebugger,
     tabFocusCheck,
     createWindow
 } from "@CrxApi";
@@ -22,7 +21,6 @@ import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
 import { ExecuteActionParameter, ExecuteRequestMessage } from "@CrxInterface";
 import { ElementController } from "@CrxClass/CrxElementController";
 import { AlertOption, BrowserAction, BrowserType, CloseTarget, ConnectOptionType, ElementAction, LocatorType } from "@CrxConstants";
-import { instanceUUIDBrowserControllerMap } from "@/ts/store/CrxStore";
 
 export class BrowserController {
     private _window : chrome.windows.Window
@@ -74,15 +72,15 @@ export class BrowserController {
     async connect() {
         await waitPageLoading(this._tab);
         this._window = await getWindow(this._tab.windowId);
-        const instance = await checkDebugger(this._tab);
-        this._instance = instance;
-        if (this._instance === undefined) {
-            const transport = await ExtensionDebuggerTransport.create(this._tab.id);
-            this._instance = await puppeteer.connect({
-                transport : transport,
-                defaultViewport : null
-            });
-        }
+        // const instance = await checkDebugger(this._tab);
+        // this._instance = instance;
+        // if (this._instance === undefined) {
+        //     const transport = await ExtensionDebuggerTransport.create(this._tab.id);
+        //     this._instance = await puppeteer.connect({
+        //         transport : transport,
+        //         defaultViewport : null
+        //     });
+        // }
         [this._page] = await this._instance.pages();
         this._frame = this._page.mainFrame();
         this._page.on('dialog', dialog => {

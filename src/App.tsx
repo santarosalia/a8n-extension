@@ -4,6 +4,8 @@ import { CRX_COMMAND } from '@CrxConstants';
 import {axios, getAccessToken} from '@/ts/api/Axios'
 import { useState, ChangeEvent, useEffect } from 'react';
 import './style.css'
+import BottomNavigation from './components/BottomNavigation';
+import ProcessSelect from './components/ProcessSelect';
 
 export default () => {
     const [user, setUser] = useState(null);
@@ -67,7 +69,6 @@ export default () => {
         return (
             <>
             <Box>
-                welcome {user.email}
                 <Button onClick={getProcesses}>
                 process
                 </Button>
@@ -79,6 +80,7 @@ export default () => {
                 }}>
                     recorder
                 </Button>
+                <ProcessSelect></ProcessSelect>
                 <TextField
                 size='small'
                 onChange={(e) => {
@@ -104,6 +106,7 @@ export default () => {
                     <Button onClick={startProcess}>start</Button>
                 </Box>
             </Box>
+            <BottomNavigation/>
             </>
         )
     }

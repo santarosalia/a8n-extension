@@ -26,7 +26,6 @@ import { CrxInfo } from "@CrxClass/CrxInfo";
 import { CrxBrowserOpenEvent } from "@CrxClass/CrxBrowserOpenEvent";
 import { CrxPopupEvent } from "@CrxClass/CrxPopupEvent";
 import { test } from "./ts/api/CrxPuppeteerTest";
-import { instanceUUIDBrowserControllerMap } from "@/ts/store/CrxStore";
 import { Executor } from "./ts/class/Executor";
 import { getAccessToken } from "./ts/api/Axios";
 
@@ -188,75 +187,5 @@ chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 let browserController : BrowserController;
-
-const execute = async (msg : ExecuteRequestMessage) => {
-    let responseMessage : ExecuteResponseMessage;
-
-    try {
-        const isElement = Object.values(ElementAction).includes(msg.object.action as any);
-        const isWait = msg.object.action === BrowserAction.WAIT;
-        await pickBrowserControllerMap();
-        // connect || else 나눠야할듯?
-        if (msg.object.instanceUUID) {
-            if (isElement) {
-                browserController = Array.from(instanceUUIDBrowserControllerMap.values()).find(browserController => browserController.instanceUUIDElementControllerMap.has(msg.object.instanceUUID));
-            } else {
-                browserController = instanceUUIDBrowserControllerMap.get(msg.object.instanceUUID);
-            }
-            if (!browserController) throw new Error('Target Lost');
-        } else {
-            browserController = new BrowserController();
-            instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
-        }
-        const result = await browserController.execute(msg);
-        instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
-
-        responseMessage = {
-            responseInfo : {
-                result : Status.SUCCESS,
-            },
-            object : {
-                textContent : result ? result.textContent : null,
-                propertyValue : result ? result.propertyValue : null,
-                x : result ? result.x : null,
-                y : result ? result.y : null,
-                width : result ? result.width : null,
-                height : result ? result.height : null,
-                exists : result ? result.exists : null,
-                tagName : result ? result.tagName : null,
-                image : result ? result.image : null,
-                scrapedData : result ? result.scrapedData : null,
-                elements : result ? result.elements : null,
-                instanceUUID : isWait ? result.instanceUUID : browserController.instanceUUID,
-                evaluateResult : result ? result.evaluateResult : null,
-                outerHTML : result ? result.outerHTML : null
-            }
-        }
-    } catch (e : any) {
-        responseMessage = {
-            responseInfo : {
-                result : Status.ERROR,
-                errorMessage : e.message
-            }
-        }
-    }
-    return responseMessage;
-}
-
-/**
- * 브라우저 살아있는거만 솎아내서 반환
- * @param browserControllerArray 
- * @returns 
- */
-const pickBrowserControllerMap = async () => {
-    for (const [instanceUUID, browserController] of instanceUUIDBrowserControllerMap) {
-        if (browserController.tab === undefined) {
-            instanceUUIDBrowserControllerMap.delete(instanceUUID);
-            continue;
-        }
-        const check = await checkTab(browserController.tab);
-        if (!check) instanceUUIDBrowserControllerMap.delete(instanceUUID);
-    }
-}
 
 // chrome.action.onClicked.addListener(test);
