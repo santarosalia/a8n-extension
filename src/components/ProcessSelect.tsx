@@ -20,7 +20,11 @@ export default () => {
     }, []);
     const processes = processesData.map((v, i) =>{
         return (
-            <MenuItem value={v.id} key={i}>
+            <MenuItem
+                value={v.id}
+                key={i}
+                dense
+            >
                 {v.name}
             </MenuItem>
         )
@@ -31,8 +35,9 @@ export default () => {
             value={process}
             displayEmpty
             onChange={e => setId(e)}
+            fullWidth
         >
-            <MenuItem value=''>Select Process</MenuItem>
+            <MenuItem value='' dense>Select Process</MenuItem>
             {processes}
         </Select>
     )

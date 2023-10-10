@@ -41,20 +41,16 @@ export default () => {
             user : result.data
         });
     }
-    const processList = process ? process.map((p, i) => {
-        return (
-            <Button
-            key={i}
-            onClick={() => {
-                sendMessageToServiceWorker(CRX_COMMAND.CMD_START_PROCESS, {
-                    id : p.id
-                });
-            }}
-            >
-                {p.name}
-            </Button>
-        )
-    }) : null;
+    const recorderStart = () => {
+        sendMessageToServiceWorker(CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER, {
+            url : 'https://naver.com'
+        });
+    }
+    const recorderEnd = () => {
+        sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_END, {
+            name : processName
+        });
+    }
     const onClick = () => {
         sendMessageToServiceWorker(CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER, {
             url : 'https://naver.com'
@@ -69,32 +65,10 @@ export default () => {
         return (
             <>
             <Box>
-                <Button onClick={getProcesses}>
-                process
-                </Button>
-                {processList}
-                <Button onClick={() => {
-                    sendMessageToServiceWorker(CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER, {
-                        url : 'https://naver.com'
-                    });
-                }}>
-                    recorder
-                </Button>
-                <ProcessSelect></ProcessSelect>
-                <TextField
-                size='small'
-                onChange={(e) => {
-                    setProcessName(e.target.value)
-                }}>
+                <Box width={'80%'} margin={'auto'}>
+                    <ProcessSelect/>
+                </Box>
 
-                </TextField>
-                <Button onClick={() => {
-                    sendMessageToServiceWorker(CRX_COMMAND.CMD_RECORDING_END, {
-                        name : processName
-                    })
-                }}>
-                    recorder end
-                </Button>
                 <Button onClick={() => {
                     chrome.storage.local.set({
                         user : null
