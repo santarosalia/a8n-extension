@@ -2,14 +2,14 @@ import { axios, getAccessToken } from "@/ts/api/Axios";
 import { setUser } from "@/ts/reducers/user";
 import { Box, Button, InputLabel, TextField } from "@mui/material"
 import { useState, ChangeEvent } from 'react';
-import { store } from "@/ts/store";
+import { useAppDispatch } from "@/ts/hooks";
 export default () => {
     const [inputs, setInputs] = useState({
         email : '',
         password : ''
     });
     const {email, password} = inputs;
-
+    const dispatch = useAppDispatch();
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const {id, value} = e.target;
         setInputs({
@@ -24,7 +24,7 @@ export default () => {
                 Authorization : await getAccessToken()
             }
         });
-        store.dispatch(setUser(result.data));
+        dispatch(setUser(result.data));
     }
     return (
         <Box>

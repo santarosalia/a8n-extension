@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { RootState } from "../store";
 
 export interface UserState {
     accessToken: string,
@@ -30,4 +31,5 @@ export const userSlice = createSlice({
 });
 
 export const { setUser } = userSlice.actions;
+export const getUser = (state: RootState) => state;
 export default userSlice.reducer;

@@ -8,20 +8,22 @@ import BottomNavigation from './components/BottomNavigation';
 import ProcessSelect from './components/ProcessSelect';
 import Signin from './components/Signin';
 import { store } from '@/ts/store'
-import { setUser } from './ts/reducers/user';
+import { getUser, setUser } from './ts/reducers/user';
+import { useAppSelector } from './ts/hooks';
 
 export default () => {
-    const { user } = store.getState();
+    const {user} = useAppSelector(getUser);
+    console.log(user)
     const [isSignin, setIsSignin] = useState(false);
     const [process, setProcess] = useState(null);
 
     const [processName, setProcessName] = useState('');
 
     
-    const getProcesses = async () => {
-        const result = await axios.get(`/api/process/${user.id}`);
-        setProcess(result.data);
-    }
+    // const getProcesses = async () => {
+    //     const result = await axios.get(`/api/process/${user.id}`);
+    //     setProcess(result.data);
+    // }
     const startProcess = () => {
         
     }
@@ -42,7 +44,6 @@ export default () => {
         });
     }
     useEffect(() => {
-        const { user } = store.getState();
         console.log(user)
         // user ? setIsSignin(true) : setIsSignin(false);
     });
