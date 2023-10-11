@@ -35,7 +35,6 @@
         "webNavigation",
         "scripting",
         "notifications",
-        "nativeMessaging",
         "background",
         "debugger"
     ],
