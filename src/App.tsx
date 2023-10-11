@@ -6,23 +6,18 @@ import { useState, ChangeEvent, useEffect } from 'react';
 import './style.css'
 import BottomNavigation from './components/BottomNavigation';
 import ProcessSelect from './components/ProcessSelect';
+import Signin from './components/Signin';
+import { store } from '@/ts/store'
+import { setUser } from './ts/reducers/user';
 
 export default () => {
-    const [user, setUser] = useState(null);
+    const { user } = store.getState();
+    const [isSignin, setIsSignin] = useState(false);
     const [process, setProcess] = useState(null);
-    const [inputs, setInputs] = useState({
-        email : '',
-        password : ''
-    });
+
     const [processName, setProcessName] = useState('');
-    const {email, password} = inputs;
-    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const {id, value} = e.target;
-        setInputs({
-            ...inputs,
-            [id] : value
-        });
-    }
+
+    
     const getProcesses = async () => {
         const result = await axios.get(`/api/process/${user.id}`);
         setProcess(result.data);
@@ -30,17 +25,7 @@ export default () => {
     const startProcess = () => {
         
     }
-    const ax = async () => {
-        const result = await axios.post('/api/signin', inputs, {
-            headers : {
-                Authorization : await getAccessToken()
-            }
-        });
-        setUser(result.data);
-        chrome.storage.local.set({
-            user : result.data
-        });
-    }
+   
     const recorderStart = () => {
         sendMessageToServiceWorker(CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER, {
             url : 'https://naver.com'
@@ -57,11 +42,11 @@ export default () => {
         });
     }
     useEffect(() => {
-        chrome.storage.local.get('user').then(result => {
-            setUser(result.user);
-        });
+        console.log(user)
+        user ? setIsSignin(true) : setIsSignin(false);
     });
-    if (user) {
+
+    if (isSignin) {
         return (
             <>
             <Box>
@@ -70,9 +55,7 @@ export default () => {
                 </Box>
 
                 <Button onClick={() => {
-                    chrome.storage.local.set({
-                        user : null
-                    })
+                    store.dispatch(setUser(null))
                 }}>
                     logout
                 </Button>
@@ -85,14 +68,6 @@ export default () => {
         )
     }
     return (
-        <>
-        <Box>
-            <InputLabel htmlFor="email" size="normal">이메일</InputLabel>
-            <TextField id="email" size="small" required value={email} type={"email"} onChange={onChange}></TextField>
-            <InputLabel htmlFor="password">비밀번호</InputLabel>
-            <TextField id="password" size="small" required value={password} type={"password"} onChange={onChange}></TextField>
-            <Button onClick={ax}>SignIn</Button>
-        </Box>
-        </>
+        <Signin/>
     )
 }
