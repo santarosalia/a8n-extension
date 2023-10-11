@@ -42,8 +42,9 @@ export default () => {
         });
     }
     useEffect(() => {
+        const { user } = store.getState();
         console.log(user)
-        user ? setIsSignin(true) : setIsSignin(false);
+        // user ? setIsSignin(true) : setIsSignin(false);
     });
 
     if (isSignin) {
@@ -53,7 +54,7 @@ export default () => {
                 <Box width={'80%'} margin={'auto'}>
                     <ProcessSelect/>
                 </Box>
-
+                
                 <Button onClick={() => {
                     store.dispatch(setUser(null))
                 }}>

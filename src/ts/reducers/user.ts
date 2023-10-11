@@ -24,6 +24,7 @@ export const userSlice = createSlice({
             chrome.storage.local.set({
                 user : action.payload
             });
+            console.log(state)
         },
     },
 });
