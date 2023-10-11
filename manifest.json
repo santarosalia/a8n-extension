@@ -31,9 +31,6 @@
         "tabs",
         "unlimitedStorage",
         "storage",
-        "contextMenus",
-        "webNavigation",
-        "scripting",
         "notifications",
         "background",
         "debugger"
