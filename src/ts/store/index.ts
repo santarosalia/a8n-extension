@@ -6,6 +6,7 @@ export const store = configureStore({
         process : processReducer,
         user : userReducer
     },
+    devTools: import.meta.env.DEV
 });
 
 export type RootState = ReturnType<typeof store.getState>;

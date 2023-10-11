@@ -17,7 +17,6 @@ export default () => {
             [id] : value
         });
     }
-
     const signin = async () => {
         const result = await axios.post('/api/signin', inputs, {
             headers : {
@@ -25,6 +24,7 @@ export default () => {
             }
         });
         dispatch(setUser(result.data));
+        // console.log(isSignin)
     }
     return (
         <Box>

@@ -1,22 +1,18 @@
-import {Box, Button, Container, InputLabel, TextField} from '@mui/material';
+import {Box, Button } from '@mui/material';
 import { sendMessageToServiceWorker } from '@CrxApi';
 import { CRX_COMMAND } from '@CrxConstants';
-import {axios, getAccessToken} from '@/ts/api/Axios'
-import { useState, ChangeEvent, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './style.css'
 import BottomNavigation from './components/BottomNavigation';
 import ProcessSelect from './components/ProcessSelect';
 import Signin from './components/Signin';
-import { store } from '@/ts/store'
-import { getUser, setUser } from './ts/reducers/user';
-import { useAppSelector } from './ts/hooks';
+import { getSigninSwitch, setUser } from './ts/reducers/user';
+import { useAppDispatch, useAppSelector } from './ts/hooks';
 
 export default () => {
-    const {user} = useAppSelector(getUser);
-    console.log(user)
     const [isSignin, setIsSignin] = useState(false);
     const [process, setProcess] = useState(null);
-
+    const dispatch = useAppDispatch();
     const [processName, setProcessName] = useState('');
 
     
@@ -43,11 +39,13 @@ export default () => {
             url : 'https://naver.com'
         });
     }
+    const signinSwitch = useAppSelector(getSigninSwitch);
     useEffect(() => {
-        console.log(user)
-        // user ? setIsSignin(true) : setIsSignin(false);
-    });
-
+        chrome.storage.local.get('user').then(result => {
+            if (result.user) setIsSignin(true);
+            else setIsSignin(false);
+        });
+    }, [signinSwitch])
     if (isSignin) {
         return (
             <>
@@ -57,7 +55,7 @@ export default () => {
                 </Box>
                 
                 <Button onClick={() => {
-                    store.dispatch(setUser(null))
+                    dispatch(setUser(null))
                 }}>
                     logout
                 </Button>
