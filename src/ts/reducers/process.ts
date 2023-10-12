@@ -33,4 +33,5 @@ export const processSlice = createSlice({
 export const { setProcessId, setIsRecording, setIsPlaying } = processSlice.actions;
 export const getIsRecording = (state: RootState) => state.process.isRecording;
 export const getIsPlaying = (state: RootState) => state.process.isPlaying;
+export const getProcessId = (state: RootState) => state.process.processId;
 export default processSlice.reducer;

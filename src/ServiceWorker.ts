@@ -187,5 +187,7 @@ chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
 
 let browserController : BrowserController;
-
+// chrome.action.onClicked.addListener(tab => {
+//     chrome.action.getPopup()
+// })
 // chrome.action.onClicked.addListener(test);

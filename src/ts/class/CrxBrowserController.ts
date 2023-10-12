@@ -75,11 +75,11 @@ export class BrowserController {
         // const instance = await checkDebugger(this._tab);
         // this._instance = instance;
         // if (this._instance === undefined) {
-        //     const transport = await ExtensionDebuggerTransport.create(this._tab.id);
-        //     this._instance = await puppeteer.connect({
-        //         transport : transport,
-        //         defaultViewport : null
-        //     });
+            const transport = await ExtensionDebuggerTransport.create(this._tab.id);
+            this._instance = await puppeteer.connect({
+                transport : transport,
+                defaultViewport : null
+            });
         // }
         [this._page] = await this._instance.pages();
         this._frame = this._page.mainFrame();

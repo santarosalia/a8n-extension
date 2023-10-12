@@ -294,17 +294,11 @@ export const editImage = (image : string, rect : DOMRect) => {
     }
   ```
  */
-export const sendMessageToView = async (windowId : number, command : CRX_COMMAND, payload? : any) => {
-    return currentWindowTabs(windowId).then(tabs => {
-        if (tabs.length === 0) throw new Error("Window is Closed");
-        
-        tabs.forEach(tab => {
-            chrome.tabs.sendMessage(tab.id, {
-                receiver : CRX_MSG_RECEIVER.VUE,
-                command : command,
-                payload : payload
-            });
-        });
+export const sendMessageToView = async (command : CRX_COMMAND, payload? : any) => {
+    return chrome.runtime.sendMessage({
+        receiver : CRX_MSG_RECEIVER.REACT,
+        command : command,
+        payload : payload
     });
 }
 

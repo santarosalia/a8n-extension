@@ -1,21 +1,28 @@
 import {Box, Button } from '@mui/material';
 import { sendMessageToServiceWorker } from '@CrxApi';
-import { CRX_COMMAND } from '@CrxConstants';
+import { CRX_COMMAND, CRX_MSG_RECEIVER } from '@CrxConstants';
 import { useEffect, useState } from 'react';
 import './style.css'
-import BottomNavigation from './components/BottomNavigation';
-import ProcessSelect from './components/ProcessSelect';
 import Signin from './components/Signin';
-import { getSigninSwitch, setUser } from './ts/reducers/user';
+import { getSigninSwitch } from './ts/reducers/user';
 import { useAppDispatch, useAppSelector } from './ts/hooks';
 import Home from './components/Home';
+import { CrxMessage } from './ts/interface/CrxInterface';
+import { setIsPlaying } from './ts/reducers/process';
 
 export default () => {
+    const dispatch = useAppDispatch();
+    chrome.runtime.onMessage.addListener((message: CrxMessage) => {
+        if (message.receiver !== CRX_MSG_RECEIVER.REACT) return;
+        switch (message.command) {
+            case CRX_COMMAND.CMD_END_PROCESS : {
+                dispatch(setIsPlaying(false));
+                break;
+            }
+        }
+    });
     const [isSignin, setIsSignin] = useState(false);
     const [processName, setProcessName] = useState('');
-    const startProcess = () => {
-        
-    }
    
     const recorderStart = () => {
         sendMessageToServiceWorker(CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER, {

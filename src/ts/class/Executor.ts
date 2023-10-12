@@ -1,6 +1,7 @@
 import { ExecuteRequestMessage, ExecuteResponseMessage } from "@CrxInterface";
-import { BrowserAction, ElementAction } from "@CrxConstants";
+import { BrowserAction, CRX_COMMAND, ElementAction } from "@CrxConstants";
 import { BrowserController } from "./CrxBrowserController";
+import { sendMessageToView } from "../api/CrxApi";
 
 export class Executor {
     instanceUUIDBrowserControllerMap: Map<string, BrowserController>
@@ -50,7 +51,7 @@ export class Executor {
         this.instanceUUIDBrowserControllerMap.set(browserController.instanceUUID, browserController);
         
         const nextMsg = this.process.shift();
-        if (nextMsg === undefined) return;
+        if (nextMsg === undefined) return sendMessageToView(CRX_COMMAND.CMD_END_PROCESS);
         this.execute(nextMsg, resultParams);
     }
 }

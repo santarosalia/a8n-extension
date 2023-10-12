@@ -1,15 +1,14 @@
-import { setProcessId } from "@/ts/reducers/process"
+import { getProcessId, setProcessId } from "@/ts/reducers/process"
 import { MenuItem, Select } from "@mui/material"
-import { store } from "@/ts/store"
 import { useEffect, useState } from "react"
 import { axios } from "@/ts/api/Axios"
+import { useAppDispatch, useAppSelector } from "@/ts/hooks"
 export default () => {
-    
-    const [process, setProcess] = useState('');
+    const dispatch = useAppDispatch();
+    const processId = useAppSelector(getProcessId);
     const [processesData, setProcessesData] = useState([]);
     const setId = (e) => {
-        setProcess(e.target.value)
-        store.dispatch(setProcessId(e.target.value));
+        dispatch(setProcessId(e.target.value));
     }
     useEffect(() => {
         chrome.storage.local.get('user').then(result => {
@@ -32,7 +31,7 @@ export default () => {
     return (
         <Select
             size="small"
-            value={process}
+            value={processId}
             displayEmpty
             onChange={e => setId(e)}
             fullWidth
