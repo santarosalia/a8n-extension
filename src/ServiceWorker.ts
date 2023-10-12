@@ -89,7 +89,7 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
             const { CRX_RECORDS } = await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]);
             const { user } = await chrome.storage.local.get('user');
 
-            await fetch(import.meta.env.VITE_BACK_END + 'api/process', {
+            await fetch(import.meta.env.VITE_HOME + 'api/process', {
                 method : 'PUT',
                 headers : {
                     Authorization : await getAccessToken()
@@ -110,7 +110,7 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
         }
         case CRX_COMMAND.CMD_START_PROCESS : {
             const { user } = await chrome.storage.local.get('user');
-            const result = await fetch(import.meta.env.VITE_BACK_END + 'api/process', {
+            const result = await fetch(import.meta.env.VITE_HOME + 'api/process', {
                 method : 'POST',
                 headers : {
                     Authorization : await getAccessToken()

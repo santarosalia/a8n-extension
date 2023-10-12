@@ -428,6 +428,14 @@ export const createWindow = () => {
     })
 }
 
+export const openWindow = (url: string) => {
+    return chrome.windows.create({
+        type : 'normal',
+        url : url,
+        state : 'maximized'
+    });
+}
+
 /**
  * 주어진 Window ID 를 가진 Window 에 메시지를 전달합니다.
  * @category Recorder

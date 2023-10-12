@@ -1,5 +1,5 @@
 interface ImportMetaEnv {
-    readonly VITE_BACK_END: string
+    readonly VITE_HOME: string
 }
 
 interface ImportMeta {

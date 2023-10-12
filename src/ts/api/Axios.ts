@@ -7,5 +7,5 @@ export const getAccessToken = async () => {
 }
 
 export const axios = Axios.create({
-    baseURL : import.meta.env.VITE_BACK_END,
+    baseURL : import.meta.env.VITE_HOME,
 });
