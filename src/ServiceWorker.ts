@@ -121,11 +121,13 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
                 })
 
             })
-            const body = await result.json();
-            console.log(body.data)
-            const data = JSON.parse(body.data);
-            new Executor(data);
-            
+            if (result.ok) {
+                const body = await result.json();
+                const data = JSON.parse(body.data);
+                new Executor(data);
+            } else {
+                sendMessageToView(CRX_COMMAND.CMD_SET_SNACKBAR_MESSAGE, {message : '토큰 만료'});
+            }
         }
         
         

@@ -4,6 +4,7 @@ import { Box, Button, FormControl, InputLabel, TextField } from "@mui/material"
 import { useState, ChangeEvent } from 'react';
 import { useAppDispatch } from "@/ts/hooks";
 import { openWindow } from "@/ts/api/CrxApi";
+import { setIsOpenSnackbar, setSnackbarMessage } from "@/ts/reducers/dialog";
 export default () => {
     const [inputs, setInputs] = useState({
         email : '',
@@ -25,7 +26,12 @@ export default () => {
                 Authorization : await getAccessToken()
             }
         });
-        dispatch(setUser(result.data));
+        if (result.data) {
+            dispatch(setUser(result.data));
+        } else {
+            dispatch(setSnackbarMessage('로그인 실패'));
+        }
+        
     }
     const goHome = () => {
         openWindow(import.meta.env.VITE_HOME + '/signup');

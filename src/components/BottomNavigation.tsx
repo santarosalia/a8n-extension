@@ -32,7 +32,7 @@ export default () => {
     const playerOnClick = (bool: boolean) => {
         dispatch(setIsPlaying(bool));
         if (bool) {
-            sendMessageToServiceWorker(CRX_COMMAND.CMD_START_PROCESS, {id : processId})
+            sendMessageToServiceWorker(CRX_COMMAND.CMD_START_PROCESS, {id : processId});
         }
     }
     const recorderIcon = () => {

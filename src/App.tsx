@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from './ts/hooks';
 import Home from './components/Home';
 import { CrxMessage } from './ts/interface/CrxInterface';
 import { setIsPlaying } from './ts/reducers/process';
+import { setSnackbarMessage } from './ts/reducers/dialog';
 
 export default () => {
     const dispatch = useAppDispatch();
@@ -18,6 +19,9 @@ export default () => {
             case CRX_COMMAND.CMD_END_PROCESS : {
                 dispatch(setIsPlaying(false));
                 break;
+            }
+            case CRX_COMMAND.CMD_SET_SNACKBAR_MESSAGE : {
+                dispatch(setSnackbarMessage(message.payload.message))
             }
         }
     });
