@@ -1,11 +1,11 @@
 import { AccountCircle, PlayArrow, RadioButtonChecked, Save, Stop, VideoCall } from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/ts/hooks";
 import { getIsPlaying, getIsRecording, getProcessId, setIsPlaying, setIsRecording } from "@/ts/reducers/process";
 import { sendMessageToServiceWorker } from "@/ts/api/CrxApi";
 import { CRX_COMMAND } from "@/ts/constants/CrxConstants";
-import { setIsOpenRecorderURLDialog } from "@/ts/reducers/dialog";
+import { setIsOpenRecorderURLDialog, setIsOpenSaveRecordsDialog } from "@/ts/reducers/dialog";
 
 export default () => {
     const [value, setValue] = useState('recents');
@@ -14,20 +14,23 @@ export default () => {
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
-    const isRecording = useAppSelector(getIsRecording);
+    const [isRecording, setIsRecordingFromStorage] = useState(false);
+    useEffect(() => {
+        chrome.storage.local.get('isRecording').then(result => {
+            setIsRecordingFromStorage(result.isRecording);
+        });
+    });
     const isPlaying = useAppSelector(getIsPlaying);
     const processId = useAppSelector(getProcessId);
-    const recorderOnClick = (e: MouseEvent) => {
-        
+    const openRecorderModal = () => {
         dispatch(setIsOpenRecorderURLDialog(true));
-        console.log(1)
-        // dispatch(setIsRecording(bool));
+    }
+    const stopRecorder = () => {
+        dispatch(setIsRecording(false));
+        dispatch(setIsOpenSaveRecordsDialog(true));
     }
     const playerOnClick = (bool: boolean) => {
-        console.log(bool)
         dispatch(setIsPlaying(bool));
-        console.log(processId);
-        console.log(bool)
         if (bool) {
             sendMessageToServiceWorker(CRX_COMMAND.CMD_START_PROCESS, {id : processId})
         }
@@ -36,7 +39,7 @@ export default () => {
         if (isRecording) {
             return (
                 <BottomNavigationAction
-                onClick={recorderOnClick}
+                onClick={stopRecorder}
                 value='stopRecorder'
                 icon={<Stop />}
                 />
@@ -44,7 +47,7 @@ export default () => {
         } else {
             return (
                 <BottomNavigationAction
-                onClick={recorderOnClick}
+                onClick={openRecorderModal}
                 value='startRecorder'
                 {...(isPlaying && {disabled : true})}
                 icon={<RadioButtonChecked />}

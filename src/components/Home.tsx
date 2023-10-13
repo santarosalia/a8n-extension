@@ -5,6 +5,7 @@ import { useAppDispatch } from "@/ts/hooks";
 import { setUser } from "@/ts/reducers/user";
 import Header from "./Header";
 import RecorderURLDialog from "./RecorderURLDialog";
+import SaveRecordsDialog from "./SaveRecordsDialog";
 
 export default () => {
     const dispatch = useAppDispatch();
@@ -24,6 +25,7 @@ export default () => {
             </Box>
             <BottomNavigation/>
             <RecorderURLDialog/>
+            <SaveRecordsDialog/>
         </>
     )
 }
