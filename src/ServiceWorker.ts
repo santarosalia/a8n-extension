@@ -89,7 +89,7 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
             const { CRX_RECORDS } = await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]);
             const { user } = await chrome.storage.local.get('user');
 
-            await fetch(import.meta.env.VITE_HOME + 'api/process', {
+            const result = await fetch(import.meta.env.VITE_HOME + 'api/process', {
                 method : 'PUT',
                 headers : {
                     Authorization : await getAccessToken()
@@ -134,10 +134,16 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
     }
 }
 chrome.storage.local.onChanged.addListener(async (changes) => {
-    const { CRX_RECORDS }= await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]);
+    const { CRX_RECORDS }: { [key: string] : ExecuteRequestMessage[] } = await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]);
     const { CRX_NEW_RECORD } = changes;
-    if (CRX_NEW_RECORD && CRX_NEW_RECORD.newValue) {
-        if (CRX_NEW_RECORD.oldValue === null) return;
+    const oldValue = CRX_NEW_RECORD?.oldValue as ExecuteRequestMessage;
+    const newValue = CRX_NEW_RECORD?.newValue as ExecuteRequestMessage;
+    if (CRX_NEW_RECORD && newValue) {
+        if (oldValue === null) return;
+        if (oldValue?.object?.action === ElementAction.TYPE && newValue?.object?.action === ElementAction.TYPE) {
+            CRX_RECORDS.pop();
+        }
+        console.log(CRX_RECORDS);
         setItemFromLocalStorage(CRX_STATE.CRX_RECORDS, [...CRX_RECORDS, CRX_NEW_RECORD.newValue]);
     }
 })
