@@ -147,7 +147,8 @@ export enum BrowserAction {
     WAIT = 'wait',
     HANDLE_ALERT = 'handleAlert',
     BROWSER_RECORDER_SCRAPING = 'browserRecorderScraping',
-    EVALUATE = 'evaluate'
+    EVALUATE = 'evaluate',
+    DETACH_DEBUGGER = 'detachDebugger'
 }
 
 export enum ElementAction {

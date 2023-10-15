@@ -405,6 +405,10 @@ export class BrowserController {
                     }
                 }
             }
+            case BrowserAction.DETACH_DEBUGGER : {
+                await detachDebugger(this._tab);
+                break;
+            }
             case ElementAction.LEFT_CLICK : {
                 elementController.leftClick();
                 break;
