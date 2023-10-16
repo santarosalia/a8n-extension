@@ -1,4 +1,4 @@
-import { getProcessId, setProcessId } from "@/ts/reducers/process"
+import { getProcessId, getProcesses, setProcessId, setProcesses } from "@/ts/reducers/process"
 import { MenuItem, Select } from "@mui/material"
 import { useEffect, useState } from "react"
 import { axios } from "@/ts/api/Axios"
@@ -6,18 +6,18 @@ import { useAppDispatch, useAppSelector } from "@/ts/hooks"
 export default () => {
     const dispatch = useAppDispatch();
     const processId = useAppSelector(getProcessId);
-    const [processesData, setProcessesData] = useState([]);
+    const processes = useAppSelector(getProcesses);
     const setId = (e) => {
         dispatch(setProcessId(e.target.value));
     }
     useEffect(() => {
         chrome.storage.local.get('user').then(result => {
             axios.get(`/api/process/${result.user.id}`).then(result => {
-                setProcessesData(result.data);
+                dispatch(setProcesses(result.data));
             });
         });
     }, []);
-    const processes = processesData.map((v, i) =>{
+    const processMenuItems = processes.map((v, i) =>{
         return (
             <MenuItem
                 value={v.id}
@@ -37,7 +37,7 @@ export default () => {
             fullWidth
         >
             <MenuItem value='' dense>Select Process</MenuItem>
-            {processes}
+            {processMenuItems}
         </Select>
     )
 }

@@ -2,15 +2,21 @@ import { AccountCircle, PlayArrow, RadioButtonChecked, Save, Stop, VideoCall } f
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { MouseEvent, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/ts/hooks";
-import { getIsPlaying, getIsRecording, getProcessId, setIsPlaying, setIsRecording } from "@/ts/reducers/process";
+import { getIsPlaying, getIsRecording, getProcessId, getProcesses, setIsPlaying, setIsRecording } from "@/ts/reducers/process";
 import { sendMessageToServiceWorker } from "@/ts/api/CrxApi";
 import { CRX_COMMAND } from "@/ts/constants/CrxConstants";
-import { setIsOpenRecorderURLDialog, setIsOpenSaveRecordsDialog } from "@/ts/reducers/dialog";
+import { setIsOpenRecorderURLDialog, setIsOpenSaveRecordsDialog, setSnackbarMessage } from "@/ts/reducers/dialog";
+import { getUser } from "@/ts/reducers/user";
+import { getMaxProcessCount } from "@/ts/func/func";
 
 export default () => {
+    
     const [value, setValue] = useState('recents');
     const dispatch = useAppDispatch();
-
+    const user = useAppSelector(getUser);
+    const processes = useAppSelector(getProcesses);
+    const maxProcessCount = getMaxProcessCount(user?.level);
+    const isFull = maxProcessCount <= processes.length;
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
@@ -50,6 +56,7 @@ export default () => {
                 onClick={openRecorderModal}
                 value='startRecorder'
                 {...(isPlaying && {disabled : true})}
+                {...(isFull && {onClick : () => {dispatch(setSnackbarMessage('프로세스 공간이 부족합니다.'))}})}
                 icon={<RadioButtonChecked />}
                 />
             )
