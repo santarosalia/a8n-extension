@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vite preview",
     "build": "vite build",
-    "dev": "vite",
+    "dev": "vite --mode dev",
     "preview": "vite preview",
     "zip": "npm-build-zip --source=dist/ --destination=./build",
     "docs": "npx typedoc --entryPointStrategy expand ./src"

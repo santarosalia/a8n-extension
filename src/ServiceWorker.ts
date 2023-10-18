@@ -29,7 +29,7 @@ import { test } from "./ts/api/CrxPuppeteerTest";
 import { Executor } from "./ts/class/Executor";
 import { getAccessToken } from "./ts/api/Axios";
 
-
+console.log(import.meta.env.VITE_HOME)
 const crxInfo = new CrxInfo();
 console.log('%c ______'+'%c       ___'+'%c     _______'+'%c    ________  ','color:red','color:orange','color:yellow','color:green')
 console.log("%c|_   _ `."+"%c   .'   `."+"%c  |_   __ \\"+"%c  |_   __  | ",'color:red','color:orange','color:yellow','color:green')
