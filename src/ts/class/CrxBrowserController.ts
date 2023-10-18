@@ -17,7 +17,7 @@ import {
 } from "@CrxApi";
 import { Browser, Page, ElementHandle, Frame, Dialog } from "puppeteer-core/lib/cjs/puppeteer/api-docs-entry";
 import puppeteer from 'puppeteer-core/lib/cjs/puppeteer/web'
-import { ExtensionDebuggerTransport } from 'puppeteer-extension-transport'
+import { Transport } from "./Transport";
 import { ExecuteActionParameter, ExecuteRequestMessage } from "@CrxInterface";
 import { ElementController } from "@CrxClass/CrxElementController";
 import { AlertOption, BrowserAction, BrowserType, CloseTarget, ConnectOptionType, ElementAction, LocatorType } from "@CrxConstants";
@@ -75,7 +75,7 @@ export class BrowserController {
         // const instance = await checkDebugger(this._tab);
         // this._instance = instance;
         // if (this._instance === undefined) {
-            const transport = await ExtensionDebuggerTransport.create(this._tab.id);
+            const transport = await Transport.create(this._tab.id);
             this._instance = await puppeteer.connect({
                 transport : transport,
                 defaultViewport : null
