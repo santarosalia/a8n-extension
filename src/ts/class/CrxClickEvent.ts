@@ -14,8 +14,8 @@ export class CrxClickEvent extends CrxCapturedEvent {
             object : {
                 action : ElementAction.LEFT_CLICK,
                 parameter : {
-                    locatorType : LocatorType.CSS_SELECTOR,
-                    locator : this.cssSelector
+                    locatorType : LocatorType.XPATH,
+                    locator : this.xpath
                 }
             }
         }

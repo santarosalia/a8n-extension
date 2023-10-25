@@ -1,21 +1,20 @@
-import { EVENT } from "@CrxConstants";
+import { BrowserAction, EVENT } from "@CrxConstants";
 import { CrxCapturedEvent } from "@CrxClass/CrxCapturedEvent";
+import { ExecuteRequestMessage } from "../interface/CrxInterface";
 
 export class CrxMoveTabEvent extends CrxCapturedEvent {
     constructor (tabIndex : number) {
         super(null);
-        this.type = EVENT.MOVETAB;
         this.value = tabIndex;
-        this.frameStack = [];
-        this.info = this.getInfo();
     }
-    getInfo() {
-        return [
-            {
-                type : 'readonly',
-                displayName : '탭 인덱스',
-                value : 'value'
+    get object() : ExecuteRequestMessage {
+        return {
+            object : {
+                action : BrowserAction.SWITCH_TAB,
+                parameter : {
+                    tabIndex : this.value as number
+                }
             }
-        ]
+        }
     }
 }
