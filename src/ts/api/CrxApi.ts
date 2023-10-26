@@ -166,7 +166,7 @@ export const onHighlightedTab = (windowId : number) => {
         currentWindowTabs(windowId).then(tabs => {
             const activeTabIndex = tabs.find(tab => tab.active).index;
             const e = new CrxMoveTabEvent(activeTabIndex);
-            setItemFromLocalStorage(CRX_NEW_RECORD, e);
+            setItemFromLocalStorage(CRX_NEW_RECORD, e.object);
 
         });
     }, 100);

@@ -89,6 +89,7 @@ export default () => {
         {recorderIcon()}
         {playIcon()}
         <BottomNavigationAction
+        onClick={() => {console.log(user)}}
         value="account"
         icon={<AccountCircle />}
         />

@@ -24,12 +24,10 @@ import { BrowserController } from "@/ts/class/CrxBrowserController";
 import { BrowserAction, ElementAction, Status } from "@CrxConstants";
 import { CrxInfo } from "@CrxClass/CrxInfo";
 import { CrxBrowserOpenEvent } from "@CrxClass/CrxBrowserOpenEvent";
-import { CrxPopupEvent } from "@CrxClass/CrxPopupEvent";
 import { test } from "./ts/api/CrxPuppeteerTest";
 import { Executor } from "./ts/class/Executor";
 import { getAccessToken } from "./ts/api/Axios";
 
-console.log(import.meta.env.VITE_HOME)
 const crxInfo = new CrxInfo();
 console.log('%c ______'+'%c       ___'+'%c     _______'+'%c    ________  ','color:red','color:orange','color:yellow','color:green')
 console.log("%c|_   _ `."+"%c   .'   `."+"%c  |_   __ \\"+"%c  |_   __  | ",'color:red','color:orange','color:yellow','color:green')
@@ -99,8 +97,15 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
                     data : JSON.stringify(CRX_RECORDS),
                     userId : user.id
                 })
+            
 
             });
+            
+            if (result.ok) {
+
+            } else {
+
+            }
             await closeWindow(crxInfo.RECORDING_TARGET_WINDOW_ID);
             break;
         }
