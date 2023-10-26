@@ -2,7 +2,7 @@ import { CRX_COMMAND, CRX_MSG_RECEIVER } from '@CrxConstants';
 import { useEffect, useState } from 'react';
 import './style.css'
 import Signin from './components/Signin';
-import { getSigninSwitch, setUser } from './ts/reducers/user';
+import { getIsSignin, setIsSignin, setUser } from './ts/reducers/user';
 import { useAppDispatch, useAppSelector } from './ts/hooks';
 import Home from './components/Home';
 import { CrxMessage } from './ts/interface/CrxInterface';
@@ -23,17 +23,18 @@ export default () => {
             }
         }
     });
-    const [isSignin, setIsSignin] = useState(false);
+    const isSignin = useAppSelector(getIsSignin);
+    // const [isSignin, setIsSignin] = useState(false);
    
     useEffect(() => {
         chrome.storage.local.get('user').then(result => {
             if (result.user) {
                 dispatch(setUser(result.user));
-                setIsSignin(true);
+                dispatch(setIsSignin(true));
             }
-            else setIsSignin(false);
+            else dispatch(setIsSignin(false));
         });
-    }, []);
+    }, [isSignin]);
 
     if (isSignin) return <Home/>
     return <Signin/>

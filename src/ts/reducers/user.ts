@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
 export interface UserState {
-    signinSwitch: boolean,
+    isSignin: false,
     user: {
         name: string,
         id: string,
@@ -13,7 +13,7 @@ export interface UserState {
 
 // const initialState: UserState = null;
 const initialState: UserState = {
-    signinSwitch : false,
+    isSignin : false,
     user : null
 };
 
@@ -21,9 +21,11 @@ export const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
+        setIsSignin: (state, action) => {
+          state.isSignin = action.payload;  
+        },
         setUser: (state, action) => {
             state.user = action.payload;
-            state.signinSwitch = !state.signinSwitch;
             chrome.storage.local.set({
                 user : action.payload
             });
@@ -31,7 +33,7 @@ export const userSlice = createSlice({
     },
 });
 
-export const { setUser } = userSlice.actions;
-export const getSigninSwitch = (state: RootState) => state.user.signinSwitch;
+export const { setUser, setIsSignin } = userSlice.actions;
+export const getIsSignin = (state: RootState) => state.user.isSignin;
 export const getUser = (state: RootState) => state.user.user;
 export default userSlice.reducer;

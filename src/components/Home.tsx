@@ -2,7 +2,7 @@ import { Box, Button } from "@mui/material"
 import ProcessSelect from "./ProcessSelect"
 import BottomNavigation from "./BottomNavigation"
 import { useAppDispatch } from "@/ts/hooks";
-import { setUser } from "@/ts/reducers/user";
+import { setIsSignin, setUser } from "@/ts/reducers/user";
 import Header from "./Header";
 import RecorderURLDialog from "./RecorderURLDialog";
 import SaveRecordsDialog from "./SaveRecordsDialog";
@@ -18,7 +18,8 @@ export default () => {
                 </Box>
                 
                 <Button onClick={() => {
-                    dispatch(setUser(null))
+                    dispatch(setUser(null));
+                    dispatch(setIsSignin(false));
                 }}>
                     logout
                 </Button>

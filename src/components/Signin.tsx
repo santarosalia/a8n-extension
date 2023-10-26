@@ -1,5 +1,5 @@
 import { axios, getAccessToken } from "@/ts/api/Axios";
-import { setUser } from "@/ts/reducers/user";
+import { setIsSignin, setUser } from "@/ts/reducers/user";
 import { Box, Button, FormControl, InputLabel, TextField } from "@mui/material"
 import { useState, ChangeEvent } from 'react';
 import { useAppDispatch } from "@/ts/hooks";
@@ -28,6 +28,7 @@ export default () => {
         });
         if (result.data) {
             dispatch(setUser(result.data));
+            dispatch(setIsSignin(true));
         } else {
             dispatch(setSnackbarMessage('로그인 실패'));
         }
