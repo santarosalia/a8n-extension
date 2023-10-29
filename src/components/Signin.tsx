@@ -21,17 +21,6 @@ export default () => {
     }
 
     const signin = async () => {
-        const result = await axios.post('/api/signin', inputs, {
-            headers : {
-                Authorization : await getAccessToken()
-            }
-        });
-        if (result.data) {
-            dispatch(setUser(result.data));
-            dispatch(setIsSignin(true));
-        } else {
-            dispatch(setSnackbarMessage('로그인 실패'));
-        }
         
     }
     const goHome = () => {
