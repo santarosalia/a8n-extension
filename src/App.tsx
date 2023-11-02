@@ -2,7 +2,7 @@ import { CRX_COMMAND, CRX_MSG_RECEIVER } from '@CrxConstants';
 import { useEffect, useState } from 'react';
 import './style.css'
 import Signin from './components/Signin';
-import { getIsSignin, setIsSignin, setUser } from './ts/reducers/user';
+import { getIsSignin, setIsSignIn, setUser } from './ts/reducers/user';
 import { useAppDispatch, useAppSelector } from './ts/hooks';
 import Home from './components/Home';
 import { CrxMessage } from './ts/interface/CrxInterface';
@@ -19,20 +19,19 @@ export default () => {
                 break;
             }
             case CRX_COMMAND.CMD_SET_SNACKBAR_MESSAGE : {
-                dispatch(setSnackbarMessage(message.payload.message))
+                dispatch(setSnackbarMessage(message.payload.message));
             }
         }
     });
     const isSignin = useAppSelector(getIsSignin);
-    // const [isSignin, setIsSignin] = useState(false);
    
     useEffect(() => {
         chrome.storage.local.get('user').then(result => {
             if (result.user) {
                 dispatch(setUser(result.user));
-                dispatch(setIsSignin(true));
+                dispatch(setIsSignIn(true));
             }
-            else dispatch(setIsSignin(false));
+            else dispatch(setIsSignIn(false));
         });
     }, [isSignin]);
 

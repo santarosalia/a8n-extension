@@ -89,9 +89,6 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
 
             const result = await fetch(import.meta.env.VITE_HOME + 'api/process', {
                 method : 'PUT',
-                headers : {
-                    Authorization : await getAccessToken()
-                },
                 body : JSON.stringify({
                     name : message.payload.name,
                     data : JSON.stringify(CRX_RECORDS),
@@ -117,9 +114,6 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
             const { user } = await chrome.storage.local.get('user');
             const result = await fetch(import.meta.env.VITE_HOME + 'api/process', {
                 method : 'POST',
-                headers : {
-                    Authorization : await getAccessToken()
-                },
                 body : JSON.stringify({
                     id : message.payload.id,
                     userId : user.id
@@ -157,11 +151,19 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     switch (message.command) {
         case CRX_COMMAND.CMD_CHECK_LUNATIC_MONSTER : {
-            sendResponse(true);
+            return sendResponse(true);
+        }
+        case CRX_COMMAND.CMD_SIGN_IN_LUNATIC_MONSTER : {
+            const payload = message.payload as string
+            console.log(payload)
+            chrome.storage.local.set({
+                user : JSON.parse(payload)
+            });
+            return sendResponse(true);
+            
         }
     }
-    sendResponse({});
-    return;
+    return sendResponse();
 }
 const openRecordingHistory = async () => {
     const tab = await createRecordingHistoryTab();
@@ -187,9 +189,3 @@ chrome.storage.onChanged.addListener(storageChange);
 chrome.tabs.onHighlighted.addListener(onHighlightedTabHandler);
 chrome.runtime.onInstalled.addListener(onInstalled);
 chrome.runtime.onMessageExternal.addListener(onMessageExternal);
-
-let browserController : BrowserController;
-// chrome.action.onClicked.addListener(tab => {
-//     chrome.action.getPopup()
-// })
-// chrome.action.onClicked.addListener(test);

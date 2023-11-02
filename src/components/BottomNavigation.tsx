@@ -1,12 +1,12 @@
-import { AccountCircle, PlayArrow, RadioButtonChecked, Save, Stop, VideoCall } from "@mui/icons-material";
+import { Logout, PlayArrow, RadioButtonChecked, Save, Stop, VideoCall } from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
-import { MouseEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/ts/hooks";
 import { getIsPlaying, getIsRecording, getProcessId, getProcesses, setIsPlaying, setIsRecording } from "@/ts/reducers/process";
-import { sendMessageToServiceWorker } from "@/ts/api/CrxApi";
+import { openWindow, sendMessageToServiceWorker } from "@/ts/api/CrxApi";
 import { CRX_COMMAND } from "@/ts/constants/CrxConstants";
 import { setIsOpenRecorderURLDialog, setIsOpenSaveRecordsDialog, setSnackbarMessage } from "@/ts/reducers/dialog";
-import { getUser } from "@/ts/reducers/user";
+import { getUser, setIsSignIn, setUser } from "@/ts/reducers/user";
 import { getMaxProcessCount } from "@/ts/func/func";
 
 export default () => {
@@ -80,6 +80,10 @@ export default () => {
             )
         }
     }
+    const signOut = () => {
+        dispatch(setUser(null));
+        dispatch(setIsSignIn(false));
+    }
     return (
     <BottomNavigation
     sx={{  }}
@@ -89,9 +93,9 @@ export default () => {
         {recorderIcon()}
         {playIcon()}
         <BottomNavigationAction
-        onClick={() => {console.log(user)}}
-        value="account"
-        icon={<AccountCircle />}
+        onClick={signOut}
+        value="signOut"
+        icon={<Logout />}
         />
     </BottomNavigation>
     );

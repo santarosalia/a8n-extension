@@ -21,7 +21,7 @@ export const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        setIsSignin: (state, action) => {
+        setIsSignIn: (state, action) => {
           state.isSignin = action.payload;  
         },
         setUser: (state, action) => {
@@ -33,7 +33,7 @@ export const userSlice = createSlice({
     },
 });
 
-export const { setUser, setIsSignin } = userSlice.actions;
+export const { setUser, setIsSignIn } = userSlice.actions;
 export const getIsSignin = (state: RootState) => state.user.isSignin;
 export const getUser = (state: RootState) => state.user.user;
 export default userSlice.reducer;
