@@ -156,19 +156,8 @@ chrome.storage.local.onChanged.addListener(async (changes) => {
 const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageSender, sendResponse : any) => {
     if (message.receiver !== CRX_MSG_RECEIVER.SERVICE_WORKER) return;
     switch (message.command) {
-        case CRX_COMMAND.CMD_LAUNCH_BROWSER_RECORDER : {
-            crxInfo.LAUNCHER_TAB_ID = sender.tab.id;
-            crxInfo.LAUNCHER_WINDOW_ID = sender.tab.windowId;
-            
-            initBrowserRecorder(message.payload.url);
-            const injectInterval = setInterval(() => {
-                // if(crxInfo.RECORDING_TARGET_WINDOW_ID === undefined) clearInterval(injectInterval);
-                sendMessageByWindowId(crxInfo.RECORDING_TARGET_WINDOW_ID, CRX_COMMAND.CMD_RECORDING_START).catch((e) => {
-                    //레코딩 창 닫힌 경우!
-                    clearInterval(injectInterval);
-                });
-            },1000);
-            break;
+        case CRX_COMMAND.CMD_CHECK_LUNATIC_MONSTER : {
+            sendResponse(true);
         }
     }
     sendResponse({});
