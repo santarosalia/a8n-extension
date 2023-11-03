@@ -30,7 +30,6 @@ export default () => {
    
     useEffect(() => {
         chrome.storage.local.get('SantaRosalia').then(result => {
-            console.log(result.SantaRosalia)
             if (result.SantaRosalia) {
                 setCookie('SantaRosalia', result.SantaRosalia, {
                     httpOnly : true
