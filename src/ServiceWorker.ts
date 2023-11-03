@@ -155,9 +155,8 @@ const onMessageExternal = (message : CrxMessage, sender :chrome.runtime.MessageS
         }
         case CRX_COMMAND.CMD_SIGN_IN_LUNATIC_MONSTER : {
             const payload = message.payload as string
-            console.log(payload)
             chrome.storage.local.set({
-                user : JSON.parse(payload)
+                SantaRosalia : JSON.parse(payload)
             });
             return sendResponse(true);
             

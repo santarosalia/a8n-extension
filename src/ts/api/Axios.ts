@@ -9,3 +9,9 @@ export const getAccessToken = async () => {
 export const axios = Axios.create({
     baseURL : import.meta.env.VITE_HOME,
 });
+
+export const getUser = async () => {
+    const res = await axios.get('/api/user');
+    if (res.status !== 200) throw res.data;
+    return res.data;
+}

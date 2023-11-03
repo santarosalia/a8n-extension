@@ -80,7 +80,10 @@ export default () => {
             )
         }
     }
-    const signOut = () => {
+    const signOut = async () => {
+        await chrome.storage.local.set({
+            SantaRosalia : null
+        });
         dispatch(setUser(null));
         dispatch(setIsSignIn(false));
     }

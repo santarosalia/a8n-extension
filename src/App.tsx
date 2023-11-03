@@ -8,9 +8,12 @@ import Home from './components/Home';
 import { CrxMessage } from './ts/interface/CrxInterface';
 import { setIsPlaying } from './ts/reducers/process';
 import { setSnackbarMessage } from './ts/reducers/dialog';
+import { useCookies } from 'react-cookie';
+import { getUser } from './ts/api/Axios';
 
 export default () => {
     const dispatch = useAppDispatch();
+    const [cookies, setCookie, removeCookie] = useCookies();
     chrome.runtime.onMessage.addListener((message: CrxMessage) => {
         if (message.receiver !== CRX_MSG_RECEIVER.REACT) return;
         switch (message.command) {
@@ -26,12 +29,19 @@ export default () => {
     const isSignin = useAppSelector(getIsSignin);
    
     useEffect(() => {
-        chrome.storage.local.get('user').then(result => {
-            if (result.user) {
-                dispatch(setUser(result.user));
-                dispatch(setIsSignIn(true));
+        chrome.storage.local.get('SantaRosalia').then(result => {
+            console.log(result.SantaRosalia)
+            if (result.SantaRosalia) {
+                setCookie('SantaRosalia', result.SantaRosalia, {
+                    httpOnly : true
+                });
+                getUser().then(user => {
+                    dispatch(setUser(user));
+                    dispatch(setIsSignIn(true));
+                });
+            } else {
+                removeCookie('SantaRosalia');
             }
-            else dispatch(setIsSignIn(false));
         });
     }, [isSignin]);
 
