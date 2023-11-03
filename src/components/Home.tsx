@@ -7,12 +7,11 @@ import RecorderURLDialog from "./RecorderURLDialog";
 import SaveRecordsDialog from "./SaveRecordsDialog";
 
 export default () => {
-    const dispatch = useAppDispatch();
     return (
         <>
             <Header/>
             <Box height={200} marginTop={'40px'}>
-                <Box width={'80%'} margin={'auto'}>
+                <Box>
                     <ProcessSelect/>
                 </Box>
             </Box>

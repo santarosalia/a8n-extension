@@ -1,17 +1,18 @@
 import { getProcessId, getProcesses, setProcessId, setProcesses } from "@/ts/reducers/process"
-import { MenuItem, Select } from "@mui/material"
+import { Divider, List, ListItem, ListItemButton, MenuItem, Select } from "@mui/material"
 import { useEffect, useState } from "react"
 import { axios } from "@/ts/api/Axios"
 import { useAppDispatch, useAppSelector } from "@/ts/hooks"
 import { getUser } from "@/ts/reducers/user"
+import ProcessItemButton from "./ProcessItemButton"
 export default () => {
     const dispatch = useAppDispatch();
     const processId = useAppSelector(getProcessId);
     const processes = useAppSelector(getProcesses);
     const user = useAppSelector(getUser);
     
-    const setId = (e) => {
-        dispatch(setProcessId(e.target.value));
+    const setId = (id: string) => {
+        dispatch(setProcessId(id));
     }
     useEffect(() => {
         axios.get(`/api/process/${user.id}`).then(result => {
@@ -20,25 +21,19 @@ export default () => {
     }, []);
     const processMenuItems = processes.map((v, i) =>{
         return (
-            <MenuItem
-                value={v.id}
-                key={i}
-                dense
-            >
-                {v.name}
-            </MenuItem>
+            <>
+            <ListItem key={i} dense>
+                <ProcessItemButton value={v.id} onClick={setId}>
+                    {v.name}
+                </ProcessItemButton>
+            </ListItem>
+            <Divider variant="middle"/>
+            </>
         )
-    })
+    });
     return (
-        <Select
-            size="small"
-            value={processId}
-            displayEmpty
-            onChange={e => setId(e)}
-            fullWidth
-        >
-            <MenuItem value='' dense>Select Process</MenuItem>
+        <List>
             {processMenuItems}
-        </Select>
+        </List>
     )
 }

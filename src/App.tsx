@@ -10,9 +10,12 @@ import { setIsPlaying } from './ts/reducers/process';
 import { setSnackbarMessage } from './ts/reducers/dialog';
 import { useCookies } from 'react-cookie';
 import { getUser } from './ts/api/Axios';
+import { CircularProgress } from '@mui/material';
+import Loading from './components/Loading';
 
 export default () => {
     const dispatch = useAppDispatch();
+    const [isLoading, setIsLoading] = useState(true);
     const [cookies, setCookie, removeCookie] = useCookies();
     chrome.runtime.onMessage.addListener((message: CrxMessage) => {
         if (message.receiver !== CRX_MSG_RECEIVER.REACT) return;
@@ -37,13 +40,16 @@ export default () => {
                 getUser().then(user => {
                     dispatch(setUser(user));
                     dispatch(setIsSignIn(true));
+                    setIsLoading(false);
                 });
             } else {
                 removeCookie('SantaRosalia');
+                setIsLoading(false);
             }
         });
     }, [isSignin]);
 
     if (isSignin) return <Home/>
+    else if (isLoading) return <Loading/>
     return <Signin/>
 }
