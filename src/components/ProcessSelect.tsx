@@ -15,7 +15,7 @@ export default () => {
         dispatch(setProcessId(id));
     }
     useEffect(() => {
-        axios.get(`/api/process/${user.id}`).then(result => {
+        axios.get(`/api/process`).then(result => {
             dispatch(setProcesses(result.data));
         });
     }, []);
