@@ -26,7 +26,7 @@ import { CrxInfo } from "@CrxClass/CrxInfo";
 import { CrxBrowserOpenEvent } from "@CrxClass/CrxBrowserOpenEvent";
 import { test } from "./ts/api/CrxPuppeteerTest";
 import { Executor } from "./ts/class/Executor";
-import { getAccessToken } from "./ts/api/Axios";
+import { fetchProcess, putProcess } from "./ts/api/Fetch";
 
 const crxInfo = new CrxInfo();
 console.log('%c ______'+'%c       ___'+'%c     _______'+'%c    ________  ','color:red','color:orange','color:yellow','color:green')
@@ -87,22 +87,12 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
             const { CRX_RECORDS } = await getItemFromLocalStorage([CRX_STATE.CRX_RECORDS]);
             const { user } = await chrome.storage.local.get('user');
 
-            const result = await fetch(import.meta.env.VITE_HOME + 'api/process', {
-                method : 'PUT',
-                body : JSON.stringify({
-                    name : message.payload.name,
-                    data : JSON.stringify(CRX_RECORDS),
-                    userId : user.id
-                })
+            const result = await putProcess(JSON.stringify({
+                name : message.payload.name,
+                data : JSON.stringify(CRX_RECORDS),
+                userId : user.id
+            }));
             
-
-            });
-            
-            if (result.ok) {
-
-            } else {
-
-            }
             await closeWindow(crxInfo.RECORDING_TARGET_WINDOW_ID);
             break;
         }
@@ -111,21 +101,12 @@ export const onMessage = async (message : CrxMessage, sender : chrome.runtime.Me
             break;
         }
         case CRX_COMMAND.CMD_START_PROCESS : {
-            const { user } = await chrome.storage.local.get('user');
-            const result = await fetch(import.meta.env.VITE_HOME + 'api/process', {
-                method : 'POST',
-                body : JSON.stringify({
-                    id : message.payload.id,
-                    userId : user.id
-                })
-
-            })
-            if (result.ok) {
-                const body = await result.json();
-                const data = JSON.parse(body.data);
-                new Executor(data);
+            const processId = message.payload.id
+            const result = await fetchProcess(processId);
+            if (result) {
+                new Executor(JSON.parse(result.data));
             } else {
-                sendMessageToView(CRX_COMMAND.CMD_SET_SNACKBAR_MESSAGE, {message : '토큰 만료'});
+                sendMessageToView(CRX_COMMAND.CMD_SET_SNACKBAR_MESSAGE, {message : '실행 오류'});
             }
         }
         

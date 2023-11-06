@@ -9,7 +9,7 @@ import { CrxMessage } from './ts/interface/CrxInterface';
 import { setIsPlaying } from './ts/reducers/process';
 import { setSnackbarMessage } from './ts/reducers/dialog';
 import { useCookies } from 'react-cookie';
-import { getUser } from './ts/api/Axios';
+import { fetchUser } from './ts/api/Fetch';
 import { CircularProgress } from '@mui/material';
 import Loading from './components/Loading';
 
@@ -37,7 +37,7 @@ export default () => {
                 setCookie('SantaRosalia', result.SantaRosalia, {
                     httpOnly : true
                 });
-                getUser().then(user => {
+                fetchUser().then(user => {
                     dispatch(setUser(user));
                     dispatch(setIsSignIn(true));
                     setIsLoading(false);
